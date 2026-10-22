@@ -2,7 +2,17 @@
  * IPC results are always wrapped so errors reach the UI as data instead of
  * rejected promises with stack traces from the main process.
  */
-export type IpcErrorCode = 'invalid_request' | 'unknown_channel' | 'internal';
+export type IpcErrorCode =
+  | 'invalid_request'
+  | 'unknown_channel'
+  | 'internal'
+  // User-facing errors: the renderer shows a translated message for each.
+  | 'not_found'
+  | 'already_exists'
+  | 'outside_workspace'
+  | 'no_workspace'
+  | 'not_a_directory'
+  | 'permission_denied';
 
 export interface IpcError {
   code: IpcErrorCode;

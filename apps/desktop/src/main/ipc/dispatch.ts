@@ -1,5 +1,6 @@
 import { fail, ipcContract, isIpcChannel, ok } from '@kestrel/shared';
 import type { IpcChannel, IpcResult } from '@kestrel/shared';
+import { toUserError } from './errors';
 import type { IpcContext, IpcHandlers } from './handlers';
 
 /**
@@ -36,6 +37,10 @@ async function runChannel(
     const response = await handler(parsed.data, context);
     return ok(contract.response.parse(response));
   } catch (error) {
+    // Known, user-facing errors carry a code the UI translates. Their message
+    // is generic on purpose: no paths or system details reach the renderer.
+    const userError = toUserError(error);
+    if (userError) return fail(userError.code, userError.message);
     // Log the details locally, send only a generic message to the renderer.
     console.error(`[ipc] ${channel} failed`, error);
     return fail('internal', `${channel} failed.`);

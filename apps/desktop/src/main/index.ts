@@ -1,10 +1,11 @@
 import { pathToFileURL } from 'node:url';
 import { join } from 'node:path';
-import { BrowserWindow, app, nativeTheme, session } from 'electron';
+import { BrowserWindow, app, nativeTheme, session, webContents } from 'electron';
 import type { Settings } from '@kestrel/shared';
 import { toAppInfo } from './modules/app';
-import { createSettingsStore } from './modules/settings';
-import { broadcastEvent } from './ipc/events';
+import { createSettingsHandlers, createSettingsStore } from './modules/settings';
+import { WorkspaceManager, createWorkspaceHandlers, watchWorkspace } from './modules/workspace';
+import { broadcastEvent, sendEvent } from './ipc/events';
 import { registerIpc } from './ipc/register';
 import {
   CONTENT_SECURITY_POLICY,
@@ -49,6 +50,22 @@ void app.whenReady().then(async () => {
     broadcastEvent('settings:changed', next);
   });
 
+  const workspaces = new WorkspaceManager({
+    watch: watchWorkspace,
+    onChanges: (ownerId, changes) => {
+      const contents = webContents.fromId(ownerId);
+      if (contents) sendEvent(contents, 'workspace:changed', changes);
+    },
+  });
+  app.on('web-contents-created', (_event, contents) => {
+    // A closed or reloaded window releases its workspace and watcher.
+    contents.on('destroyed', () => void workspaces.close(contents.id));
+    contents.on('did-start-navigation', (details) => {
+      if (details.isMainFrame && !details.isSameDocument) void workspaces.close(contents.id);
+    });
+  });
+  app.on('before-quit', () => void workspaces.closeAll());
+
   registerIpc(
     {
       'app:getInfo': () =>
@@ -58,8 +75,8 @@ void app.whenReady().then(async () => {
           platform: process.platform,
           locale: app.getLocale(),
         }),
-      'settings:get': () => settings.get(),
-      'settings:update': (patch) => settings.update(patch),
+      ...createSettingsHandlers(settings),
+      ...createWorkspaceHandlers(workspaces, settings),
       'window:setTitleBarTheme': (theme, { sender }) => {
         const window = BrowserWindow.fromWebContents(sender);
         if (window && process.platform !== 'darwin') {

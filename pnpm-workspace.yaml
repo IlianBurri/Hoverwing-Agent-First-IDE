@@ -5,3 +5,8 @@ packages:
 onlyBuiltDependencies:
   - electron
   - esbuild
+
+# Native fallbacks we do not need: prebuilt binaries are used instead.
+ignoredBuiltDependencies:
+  - '@parcel/watcher'
+  - electron-winstaller
