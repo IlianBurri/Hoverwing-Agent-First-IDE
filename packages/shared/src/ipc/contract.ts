@@ -12,7 +12,7 @@ import { z } from 'zod';
  */
 export const ipcContract = {
   'app:getInfo': {
-    request: z.void(),
+    request: z.undefined(),
     response: z.object({
       name: z.string(),
       version: z.string(),
