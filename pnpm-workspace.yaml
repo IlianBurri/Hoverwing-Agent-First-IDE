@@ -5,6 +5,7 @@ packages:
 onlyBuiltDependencies:
   - electron
   - esbuild
+  - node-pty
 
 # Native fallbacks we do not need: prebuilt binaries are used instead.
 ignoredBuiltDependencies:

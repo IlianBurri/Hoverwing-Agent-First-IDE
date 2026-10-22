@@ -26,3 +26,14 @@ describe('ipcContract', () => {
     ).toBe(true);
   });
 });
+
+describe('app:openExternalUrl', () => {
+  const schema = ipcContract['app:openExternalUrl'].request;
+
+  it('accepts web links only', () => {
+    expect(schema.safeParse({ url: 'https://example.com/docs' }).success).toBe(true);
+    for (const url of ['file:///etc/passwd', 'javascript:alert(1)', 'ms-settings:', 'https://']) {
+      expect(schema.safeParse({ url }).success).toBe(false);
+    }
+  });
+});

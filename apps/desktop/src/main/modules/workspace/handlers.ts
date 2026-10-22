@@ -22,9 +22,12 @@ function setWindowTitle(sender: IpcContext['sender'], name: string | null): void
 export function createWorkspaceHandlers(
   manager: WorkspaceManager,
   settings: SettingsStore,
+  /** Called when a window opens or closes a folder (e.g. to end its terminals). */
+  onWorkspaceChanged: (ownerId: number) => void = () => undefined,
 ): ModuleHandlers<'workspace'> {
   async function openAndRemember(sender: IpcContext['sender'], folder: string) {
     const info = await manager.openFolder(sender.id, folder);
+    onWorkspaceChanged(sender.id);
     await settings.update({
       recentWorkspaces: addRecent(settings.get().recentWorkspaces, info.root),
     });
@@ -55,6 +58,7 @@ export function createWorkspaceHandlers(
     },
     'workspace:close': async (_request, { sender }) => {
       await manager.close(sender.id);
+      onWorkspaceChanged(sender.id);
       setWindowTitle(sender, null);
       return null;
     },

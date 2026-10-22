@@ -2,6 +2,7 @@ import type { z } from 'zod';
 import { appChannels } from './channels/app';
 import { searchChannels } from './channels/search';
 import { settingsChannels, settingsEvents } from './channels/settings';
+import { terminalChannels, terminalEvents } from './channels/terminal';
 import { windowChannels } from './channels/window';
 import { workspaceChannels, workspaceEvents } from './channels/workspace';
 
@@ -22,12 +23,14 @@ export const ipcContract = {
   ...appChannels,
   ...searchChannels,
   ...settingsChannels,
+  ...terminalChannels,
   ...windowChannels,
   ...workspaceChannels,
 } as const satisfies Record<string, { request: z.ZodType; response: z.ZodType }>;
 
 export const ipcEvents = {
   ...settingsEvents,
+  ...terminalEvents,
   ...workspaceEvents,
 } as const satisfies Record<string, z.ZodType>;
 

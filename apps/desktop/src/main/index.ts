@@ -2,9 +2,10 @@ import { pathToFileURL } from 'node:url';
 import { join } from 'node:path';
 import { BrowserWindow, app, nativeTheme, session, webContents } from 'electron';
 import type { Settings } from '@kestrel/shared';
-import { toAppInfo } from './modules/app';
+import { createAppHandlers } from './modules/app/handlers';
 import { SearchRunner, createSearchHandlers } from './modules/search';
 import { createSettingsHandlers, createSettingsStore } from './modules/settings';
+import { TerminalManager, createTerminalHandlers, spawnNodePty } from './modules/terminal';
 import { WorkspaceManager, createWorkspaceHandlers, watchWorkspace } from './modules/workspace';
 import { broadcastEvent, sendEvent } from './ipc/events';
 import { registerIpc } from './ipc/register';
@@ -65,29 +66,42 @@ void app.whenReady().then(async () => {
     },
   });
   const search = new SearchRunner();
+  const sendTo = (ownerId: number) => webContents.fromId(ownerId);
+  const terminals = new TerminalManager(spawnNodePty, {
+    onData: (ownerId, id, data) => {
+      const contents = sendTo(ownerId);
+      if (contents) sendEvent(contents, 'terminal:data', { id, data });
+    },
+    onExit: (ownerId, id, exitCode) => {
+      const contents = sendTo(ownerId);
+      if (contents) sendEvent(contents, 'terminal:exit', { id, exitCode });
+    },
+  });
   app.on('web-contents-created', (_event, contents) => {
     // A closed or reloaded window releases its workspace, watcher and search.
-    contents.on('destroyed', () => {
+    const release = () => {
       void workspaces.close(contents.id);
       search.cancel(contents.id);
-    });
+      terminals.killAll(contents.id);
+    };
+    contents.on('destroyed', release);
     contents.on('did-start-navigation', (details) => {
-      if (details.isMainFrame && !details.isSameDocument) void workspaces.close(contents.id);
+      if (details.isMainFrame && !details.isSameDocument) release();
     });
   });
-  app.on('before-quit', () => void workspaces.closeAll());
+  app.on('before-quit', () => {
+    void workspaces.closeAll();
+    terminals.killAll();
+  });
 
   registerIpc(
     {
-      'app:getInfo': () =>
-        toAppInfo({
-          name: app.getName(),
-          version: app.getVersion(),
-          platform: process.platform,
-          locale: app.getLocale(),
-        }),
+      ...createAppHandlers(),
       ...createSettingsHandlers(settings),
-      ...createWorkspaceHandlers(workspaces, settings),
+      ...createWorkspaceHandlers(workspaces, settings, (ownerId) => {
+        terminals.killAll(ownerId);
+      }),
+      ...createTerminalHandlers(terminals, workspaces),
       ...createSearchHandlers(search, workspaces),
       'window:setTitleBarTheme': (theme, { sender }) => {
         const window = BrowserWindow.fromWebContents(sender);

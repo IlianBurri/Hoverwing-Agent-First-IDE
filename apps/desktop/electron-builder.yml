@@ -11,6 +11,7 @@ asar: true
 asarUnpack:
   - '**/node_modules/@vscode/ripgrep-*/**'
   - '**/node_modules/@parcel/watcher-*/**'
+  - '**/node_modules/node-pty/**'
 mac:
   category: public.app-category.developer-tools
   target: dmg
