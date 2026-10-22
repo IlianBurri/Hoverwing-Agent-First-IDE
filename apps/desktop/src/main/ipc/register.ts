@@ -19,7 +19,7 @@ export function registerIpc(
       if (event.senderFrame?.parent !== null || !isTrustedSender(frameUrl)) {
         return { ok: false, error: { code: 'unknown_channel', message: 'Untrusted sender.' } };
       }
-      return dispatch(handlers, channel, payload);
+      return dispatch(handlers, channel, payload, { sender: event.sender });
     },
   );
 }

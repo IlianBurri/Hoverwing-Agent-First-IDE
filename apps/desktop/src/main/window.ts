@@ -1,14 +1,20 @@
 import { join } from 'node:path';
 import { BrowserWindow } from 'electron';
 import { lockNavigation } from './security';
+import { titleBarOptions } from './titleBar';
+import type { TitleBarTheme } from './titleBar';
 import { hardenedWebPreferences } from './webPreferences';
 
 export interface MainWindowOptions {
   /** URL of the renderer: dev server URL or file:// URL of the built page. */
   appUrl: string;
+  /** Initial theme for the window background and native controls. */
+  theme: TitleBarTheme;
 }
 
-export function createMainWindow({ appUrl }: MainWindowOptions): BrowserWindow {
+const backgrounds: Record<TitleBarTheme, string> = { dark: '#0f1115', light: '#ffffff' };
+
+export function createMainWindow({ appUrl, theme }: MainWindowOptions): BrowserWindow {
   const window = new BrowserWindow({
     width: 1400,
     height: 900,
@@ -16,7 +22,8 @@ export function createMainWindow({ appUrl }: MainWindowOptions): BrowserWindow {
     minHeight: 500,
     show: false,
     title: 'Kestrel',
-    backgroundColor: '#0F1115',
+    backgroundColor: backgrounds[theme],
+    ...titleBarOptions(process.platform, theme),
     webPreferences: hardenedWebPreferences(join(import.meta.dirname, '../preload/index.cjs')),
   });
 

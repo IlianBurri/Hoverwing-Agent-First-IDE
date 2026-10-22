@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { ipcChannels, ipcContract, isIpcChannel } from './contract';
+import { ipcChannels, ipcContract, ipcEventNames, isIpcChannel, isIpcEvent } from './contract';
 
 describe('ipcContract', () => {
-  it('uses namespaced channel names', () => {
-    for (const channel of ipcChannels) {
+  it('uses namespaced channel and event names', () => {
+    for (const channel of [...ipcChannels, ...ipcEventNames]) {
       expect(channel).toMatch(/^[a-z]+:[a-zA-Z]+$/);
     }
   });
@@ -13,6 +13,8 @@ describe('ipcContract', () => {
     expect(isIpcChannel('shell:exec')).toBe(false);
     expect(isIpcChannel('toString')).toBe(false);
     expect(isIpcChannel(42)).toBe(false);
+    expect(isIpcEvent('settings:changed')).toBe(true);
+    expect(isIpcEvent('app:getInfo')).toBe(false);
   });
 
   it('rejects malformed app:getInfo responses', () => {
