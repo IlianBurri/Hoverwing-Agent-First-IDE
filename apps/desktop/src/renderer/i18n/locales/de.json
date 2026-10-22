@@ -65,7 +65,7 @@
     "logs": "Logs",
     "problems": "Probleme",
     "terminalEmptyTitle": "Noch kein Terminal",
-    "terminalEmptyText": "Terminals starten in deinem Projektordner. Öffne zuerst einen Ordner.",
+    "terminalEmptyText": "Terminals starten im Projektordner (ohne Projekt im Home-Ordner) mit deiner Standard-Shell.",
     "logsEmptyTitle": "Keine Logs",
     "logsEmptyText": "Hier erscheinen später Ausgaben von Agenten, Docker und MCP-Servern.",
     "problemsEmptyTitle": "Keine Probleme",
@@ -120,7 +120,8 @@
       "view": "Ansicht",
       "preferences": "Einstellungen",
       "files": "Dateien",
-      "editor": "Editor"
+      "editor": "Editor",
+      "terminal": "Terminal"
     },
     "palette": "Befehlspalette öffnen",
     "showFiles": "Dateien anzeigen",
@@ -199,5 +200,13 @@
     "replaced_other": "{{count}} Treffer in {{files}} Datei(en) ersetzt.",
     "replaceFailed_one": "{{count}} Datei konnte nicht geändert werden.",
     "replaceFailed_other": "{{count}} Dateien konnten nicht geändert werden."
+  },
+  "terminal": {
+    "new": "Neues Terminal",
+    "kill": "Terminal beenden",
+    "sessions": "Terminals",
+    "ended": "beendet",
+    "exited": "[Prozess beendet mit Code {{code}}]",
+    "inputLabel": "Terminal-Eingabe"
   }
 }

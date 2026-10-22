@@ -65,7 +65,7 @@
     "logs": "Logs",
     "problems": "Problems",
     "terminalEmptyTitle": "No terminal yet",
-    "terminalEmptyText": "Terminals start in your project folder. Open a folder first.",
+    "terminalEmptyText": "Terminals start in the project folder (or your home folder) with your default shell.",
     "logsEmptyTitle": "No logs",
     "logsEmptyText": "Output from agents, Docker and MCP servers will appear here.",
     "problemsEmptyTitle": "No problems",
@@ -120,7 +120,8 @@
       "view": "View",
       "preferences": "Preferences",
       "files": "Files",
-      "editor": "Editor"
+      "editor": "Editor",
+      "terminal": "Terminal"
     },
     "palette": "Open command palette",
     "showFiles": "Show files",
@@ -199,5 +200,13 @@
     "replaced_other": "Replaced {{count}} matches in {{files}} file(s).",
     "replaceFailed_one": "{{count}} file could not be changed.",
     "replaceFailed_other": "{{count}} files could not be changed."
+  },
+  "terminal": {
+    "new": "New terminal",
+    "kill": "Kill terminal",
+    "sessions": "Terminals",
+    "ended": "ended",
+    "exited": "[Process exited with code {{code}}]",
+    "inputLabel": "Terminal input"
   }
 }

@@ -66,6 +66,12 @@ describe('findCommandForEvent', () => {
     );
   });
 
+  it('supports several default shortcuts', () => {
+    const palette = command('palette', { keybinding: ['Mod+K', 'Mod+Shift+P'] });
+    const ctrlShiftP = { ...ctrlB, shiftKey: true, key: 'P', code: 'KeyP' };
+    expect(findCommandForEvent(ctrlShiftP, [palette], {}, 'linux')).toBe(palette);
+  });
+
   it('skips commands that are not available', () => {
     const hidden = command('x', { keybinding: 'Mod+B', when: () => false });
     expect(findCommandForEvent(ctrlB, [hidden], {}, 'linux')).toBeUndefined();

@@ -3,6 +3,7 @@ import type { WorkspaceInfo } from '@kestrel/shared';
 import { i18next } from '../../i18n';
 import { notifyError } from '../../lib/errors';
 import { confirm, prompt } from '../../stores/dialogs';
+import { resetTerminals } from '../../stores/terminal';
 import { notify } from '../../stores/toasts';
 import {
   loadDir,
@@ -17,7 +18,10 @@ import { closeAll, onPathDeleted, onPathRenamed } from '../editor';
 const t = i18next.t.bind(i18next);
 
 function opened(info: WorkspaceInfo | null): void {
-  if (info) setWorkspace(info);
+  if (!info) return;
+  // The main process ended the shells of the previous folder.
+  resetTerminals();
+  setWorkspace(info);
 }
 
 export async function openFolder(): Promise<void> {
@@ -38,6 +42,7 @@ export async function closeFolder(): Promise<void> {
   // Unsaved edits are offered for saving first; cancelling keeps the folder open.
   if (!(await closeAll())) return;
   await window.kestrel.invoke('workspace:close');
+  resetTerminals();
   setWorkspace(null);
 }
 

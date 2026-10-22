@@ -11,8 +11,8 @@ export interface Command {
   /** Translated category shown before the title, e.g. "View". */
   category?: () => string;
   icon?: LucideIcon;
-  /** Default key combination, e.g. "Mod+B". */
-  keybinding?: string;
+  /** Default key combination(s), e.g. "Mod+B". The first one is shown in the UI. */
+  keybinding?: string | readonly string[];
   /** Set to false for commands that make no sense inside the palette. */
   showInPalette?: boolean;
   /** Command is hidden and cannot run when this returns false. */
@@ -76,16 +76,22 @@ export async function runCommand(id: string): Promise<boolean> {
 }
 
 /**
- * The binding that applies to a command: a user override from the settings
- * wins over the default; an empty override disables the shortcut.
+ * The bindings that apply to a command: a user override from the settings
+ * replaces the defaults; an empty override disables the shortcut.
  */
-export function effectiveKeybinding(
+export function effectiveKeybindings(
   command: Command,
   overrides: Readonly<Record<string, string>>,
   platform: Platform,
-): KeyCombo | null {
-  const text = Object.hasOwn(overrides, command.id) ? overrides[command.id] : command.keybinding;
-  return text ? parseKeyCombo(text, platform) : null;
+): KeyCombo[] {
+  const texts = Object.hasOwn(overrides, command.id)
+    ? [overrides[command.id] ?? '']
+    : typeof command.keybinding === 'string'
+      ? [command.keybinding]
+      : [...(command.keybinding ?? [])];
+  return texts
+    .map((text) => (text ? parseKeyCombo(text, platform) : null))
+    .filter((combo): combo is KeyCombo => combo !== null);
 }
 
 /** Finds the enabled command bound to this key event, if any. */
@@ -96,8 +102,10 @@ export function findCommandForEvent(
   platform: Platform,
 ): Command | undefined {
   for (const command of commands) {
-    const combo = effectiveKeybinding(command, overrides, platform);
-    if (combo && matchesKeyCombo(event, combo) && isCommandEnabled(command)) return command;
+    const combos = effectiveKeybindings(command, overrides, platform);
+    if (combos.some((combo) => matchesKeyCombo(event, combo)) && isCommandEnabled(command)) {
+      return command;
+    }
   }
   return undefined;
 }

@@ -17,6 +17,7 @@ import { i18next } from '../../i18n';
 import { setPanelOpen, togglePanel } from '../../stores/layout';
 import { useSettingsStore } from '../../stores/settings';
 import { requestSearchFocus } from '../../stores/search';
+import { ensureTerminal } from '../terminal/actions';
 import { nextThemePreference } from '../../stores/theme';
 import type { Command } from './registry';
 import { registerCommands, useCommandStore } from './registry';
@@ -59,7 +60,7 @@ export function registerWorkbenchCommands(): () => void {
       id: 'workbench.commandPalette',
       title: t('commands.palette'),
       icon: CommandIcon,
-      keybinding: 'Mod+K',
+      keybinding: ['Mod+K', 'Mod+Shift+P'],
       showInPalette: false,
       run: () => {
         const { paletteOpen, setPaletteOpen } = useCommandStore.getState();
@@ -123,8 +124,9 @@ export function registerWorkbenchCommands(): () => void {
       title: t('commands.showTerminal'),
       icon: SquareTerminal,
       keybinding: 'Ctrl+`',
-      run: () => {
+      run: async () => {
         showBottomView('terminal');
+        await ensureTerminal();
       },
     },
     {
