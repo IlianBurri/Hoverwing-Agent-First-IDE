@@ -48,3 +48,12 @@ button {
     transition-duration: 0ms !important;
   }
 }
+
+/* A panel that fills its slot and stacks header + content vertically. */
+.panel-fill {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background: var(--surface);
+}

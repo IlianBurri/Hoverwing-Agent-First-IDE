@@ -1,0 +1,22 @@
+.root {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--space-8);
+  padding: 0 var(--space-2) 0 var(--space-4);
+}
+
+.title {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-1);
+}

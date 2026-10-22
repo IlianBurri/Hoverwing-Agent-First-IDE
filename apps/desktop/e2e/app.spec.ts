@@ -14,10 +14,14 @@ test.afterAll(async () => {
   await app.close();
 });
 
-test('shows the main window with app info from IPC', async () => {
+test('shows the workbench with welcome screen and agent panel', async () => {
   await expect(page).toHaveTitle('Kestrel');
-  await expect(page.getByRole('heading', { level: 1, name: 'Kestrel' })).toBeVisible();
-  await expect(page.getByTestId('app-info')).toContainText('Kestrel');
+  await expect(page.getByRole('heading', { level: 1, name: 'Welcome to Kestrel' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Agent' })).toBeVisible();
+  await expect(page.getByRole('tab', { name: 'Terminal' })).toHaveAttribute(
+    'aria-selected',
+    'true',
+  );
 });
 
 test('renderer has no access to Node.js', async () => {
@@ -26,10 +30,14 @@ test('renderer has no access to Node.js', async () => {
     return {
       require: typeof scope['require'],
       process: typeof scope['process'],
-      kestrelKeys: Object.keys(scope['kestrel'] as object),
+      kestrelKeys: Object.keys(scope['kestrel'] as object).sort(),
     };
   });
-  expect(exposed).toEqual({ require: 'undefined', process: 'undefined', kestrelKeys: ['invoke'] });
+  expect(exposed).toEqual({
+    require: 'undefined',
+    process: 'undefined',
+    kestrelKeys: ['invoke', 'on'],
+  });
 });
 
 test('rejects unknown IPC channels', async () => {
@@ -41,10 +49,19 @@ test('rejects unknown IPC channels', async () => {
   expect(result).toMatchObject({ ok: false, error: { code: 'unknown_channel' } });
 });
 
-test('switches between dark and light theme', async () => {
+test('cycles the color theme', async () => {
   const html = page.locator('html');
-  await page.getByRole('radio', { name: /^(Hell|Light)$/ }).click();
-  await expect(html).toHaveAttribute('data-theme', 'light');
-  await page.getByRole('radio', { name: /^(Dunkel|Dark)$/ }).click();
   await expect(html).toHaveAttribute('data-theme', 'dark');
+  await page.getByRole('button', { name: /^Color theme: Dark/ }).click();
+  await expect(html).toHaveAttribute('data-theme', 'light');
+  await page.getByRole('button', { name: /^Color theme: Light/ }).click();
+  await page.getByRole('button', { name: /^Color theme: System/ }).click();
+  await expect(html).toHaveAttribute('data-theme', 'dark');
+});
+
+test('switches bottom panel tabs with the keyboard', async () => {
+  await page.getByRole('tab', { name: 'Terminal' }).focus();
+  await page.keyboard.press('ArrowRight');
+  await expect(page.getByRole('tab', { name: 'Logs' })).toHaveAttribute('aria-selected', 'true');
+  await expect(page.getByText('No logs')).toBeVisible();
 });

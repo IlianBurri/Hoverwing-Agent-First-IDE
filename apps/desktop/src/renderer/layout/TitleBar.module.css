@@ -1,0 +1,62 @@
+/*
+ * env(titlebar-area-*) is provided by the Window Controls Overlay; it tells
+ * us where the native buttons are so our content never sits underneath.
+ */
+.root {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  flex-shrink: 0;
+  height: var(--titlebar-height);
+  padding-left: calc(env(titlebar-area-x, 0px) + var(--space-3));
+  padding-right: calc(100vw - env(titlebar-area-x, 0px) - env(titlebar-area-width, 100vw));
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  -webkit-app-region: drag;
+  user-select: none;
+}
+
+:global([data-platform='darwin']) .root {
+  /* Room for the macOS traffic lights. */
+  padding-left: calc(var(--space-10) + var(--space-4));
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.mark {
+  width: var(--space-5);
+  height: var(--space-5);
+  color: var(--accent);
+}
+
+.name {
+  font-weight: var(--font-weight-semibold);
+}
+
+.center {
+  min-width: 0;
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  text-align: center;
+}
+
+.project {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-1);
+  padding-right: var(--space-2);
+}
+
+.actions button {
+  -webkit-app-region: no-drag;
+}

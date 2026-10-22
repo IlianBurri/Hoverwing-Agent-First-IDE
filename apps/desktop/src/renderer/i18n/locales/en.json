@@ -1,38 +1,70 @@
 {
-  "app": {
-    "tagline": "The cockpit for your agents."
+  "titleBar": {
+    "noProject": "No project open"
+  },
+  "layout": {
+    "toggleSidebar": "Toggle sidebar",
+    "toggleBottom": "Toggle bottom panel",
+    "toggleAgent": "Toggle agent panel",
+    "closeBottom": "Close bottom panel",
+    "resizeHandle": "Resize"
+  },
+  "activity": {
+    "label": "Activities",
+    "files": "Files",
+    "search": "Search"
+  },
+  "sidebar": {
+    "files": {
+      "title": "Files",
+      "emptyTitle": "No folder open",
+      "emptyText": "Open a project folder to see its files here."
+    },
+    "search": {
+      "title": "Search",
+      "emptyTitle": "Project search",
+      "emptyText": "Open a folder to search and replace across all files."
+    }
+  },
+  "editor": {
+    "label": "Editor",
+    "welcomeTitle": "Welcome to Kestrel",
+    "welcomeText": "Your cockpit for agents. Open a folder to work with your project and your own agent."
+  },
+  "bottom": {
+    "label": "Bottom panel",
+    "terminal": "Terminal",
+    "logs": "Logs",
+    "problems": "Problems",
+    "terminalEmptyTitle": "No terminal yet",
+    "terminalEmptyText": "Terminals start in your project folder. Open a folder first.",
+    "logsEmptyTitle": "No logs",
+    "logsEmptyText": "Output from agents, Docker and MCP servers will appear here.",
+    "problemsEmptyTitle": "No problems",
+    "problemsEmptyText": "Errors and warnings from your code appear here once language support is active."
+  },
+  "agent": {
+    "title": "Agent",
+    "emptyTitle": "No agent connected yet",
+    "emptyText": "This is where you work with your own agent: chat, plan, tool calls, permissions and checkpoints. The connection follows in the next step."
+  },
+  "status": {
+    "label": "Status bar",
+    "agentNone": "No agent",
+    "modelNone": "No model",
+    "noProject": "No project"
   },
   "theme": {
     "label": "Color theme",
     "dark": "Dark",
     "light": "Light",
-    "system": "System"
+    "system": "System",
+    "cycle": "Color theme: {{current}} (click to change)"
   },
   "language": {
     "label": "Language"
   },
-  "showcase": {
-    "title": "Design tokens",
-    "intro": "Phase 0: foundation. This page shows colors, fonts and spacing. The actual IDE follows in phase 1.",
-    "colors": "Colors",
-    "status": "Status colors",
-    "typography": "Typography",
-    "spacing": "Spacing",
-    "buttons": "Buttons",
-    "primary": "Primary",
-    "secondary": "Secondary",
-    "codeSample": "const agent = await connect('claude-code');",
-    "uiSample": "The agent wants to change a file."
-  },
-  "status": {
-    "success": "Success: change applied",
-    "warning": "Warning: agent is waiting for permission",
-    "error": "Error: connection failed",
-    "info": "Info: checkpoint created"
-  },
-  "appInfo": {
-    "loading": "Loading app info …",
-    "error": "Could not load app info: {{message}}",
-    "value": "{{name}} {{version}} · {{platform}}"
+  "errors": {
+    "settingsSave": "Settings could not be saved."
   }
 }

@@ -1,0 +1,37 @@
+.root {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard);
+}
+
+.sm {
+  width: var(--space-6);
+  height: var(--space-6);
+}
+
+.md {
+  width: var(--space-8);
+  height: var(--space-8);
+}
+
+.root:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+.root[aria-pressed='true'] {
+  color: var(--text);
+}
+
+.root:disabled {
+  cursor: default;
+  opacity: 0.5;
+}

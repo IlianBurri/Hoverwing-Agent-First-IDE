@@ -1,0 +1,32 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-shrink: 0;
+  width: var(--space-9);
+  padding: var(--space-2) 0;
+  border-right: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.item {
+  position: relative;
+}
+
+.item[aria-pressed='true']::before {
+  content: '';
+  position: absolute;
+  top: var(--space-2);
+  bottom: var(--space-2);
+  left: calc(-1 * var(--space-1));
+  width: 2px;
+  border-radius: var(--radius-full);
+  background: var(--accent);
+}

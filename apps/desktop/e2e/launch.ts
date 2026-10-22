@@ -1,12 +1,23 @@
+import { mkdtempSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { _electron as electron } from '@playwright/test';
 import type { ElectronApplication } from '@playwright/test';
 
-/** Launches the built app (out/) the same way a user would. */
-export function launchApp(): Promise<ElectronApplication> {
+/** A fresh user data directory, so tests never share or touch real settings. */
+export function createUserDataDir(): string {
+  return mkdtempSync(join(tmpdir(), 'kestrel-e2e-'));
+}
+
+/** Launches the built app (out/) the same way a user would, in English. */
+export function launchApp(userDataDir = createUserDataDir()): Promise<ElectronApplication> {
   return electron.launch({
-    // Chromium refuses its OS sandbox when running as root (CI containers).
-    args: [join(import.meta.dirname, '..'), ...(process.getuid?.() === 0 ? ['--no-sandbox'] : [])],
-    env: { ...process.env, ELECTRON_RENDERER_URL: '' },
+    args: [
+      join(import.meta.dirname, '..'),
+      '--lang=en-US',
+      // Chromium refuses its OS sandbox when running as root (CI containers).
+      ...(process.getuid?.() === 0 ? ['--no-sandbox'] : []),
+    ],
+    env: { ...process.env, ELECTRON_RENDERER_URL: '', KESTREL_USER_DATA_DIR: userDataDir },
   });
 }

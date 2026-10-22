@@ -1,0 +1,36 @@
+.group {
+  height: 100%;
+  min-height: 0;
+}
+
+.content {
+  height: 100%;
+}
+
+.content[hidden] {
+  display: none;
+}
+
+.separator {
+  flex-shrink: 0;
+  background: var(--border);
+  transition: background-color var(--duration-fast) var(--ease-standard);
+}
+
+.separator[aria-orientation='vertical'] {
+  width: 1px;
+}
+
+.separator[aria-orientation='horizontal'] {
+  height: 1px;
+}
+
+.separator:hover,
+.separator:focus-visible,
+.separator[data-separator='active'] {
+  background: var(--accent);
+}
+
+.separator:focus-visible {
+  outline-offset: 0;
+}

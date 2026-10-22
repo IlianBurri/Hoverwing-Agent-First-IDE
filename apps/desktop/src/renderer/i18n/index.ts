@@ -3,8 +3,11 @@ import { initReactI18next } from 'react-i18next';
 import de from './locales/de.json';
 import en from './locales/en.json';
 
-export const supportedLanguages = ['de', 'en'] as const;
-export type Language = (typeof supportedLanguages)[number];
+import { languageSchema } from '@kestrel/shared';
+import type { Language } from '@kestrel/shared';
+
+export type { Language };
+export const supportedLanguages = languageSchema.options;
 
 export const resources = {
   de: { translation: de },

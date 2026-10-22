@@ -42,6 +42,9 @@
   --duration-base: 180ms;
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
 
+  /* Layout. Keep --titlebar-height in sync with TITLE_BAR_HEIGHT in main/titleBar.ts */
+  --titlebar-height: 36px;
+
   /* Focus */
   --focus-ring-width: 2px;
   --focus-ring-offset: 2px;

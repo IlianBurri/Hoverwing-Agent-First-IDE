@@ -1,25 +1,7 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import type { ThemePreference } from '@kestrel/shared';
 
-export type ThemePreference = 'dark' | 'light' | 'system';
+export type { ThemePreference };
 export type ResolvedTheme = 'dark' | 'light';
-
-interface ThemeState {
-  preference: ThemePreference;
-  setPreference: (preference: ThemePreference) => void;
-}
-
-export const useThemeStore = create<ThemeState>()(
-  persist(
-    (set) => ({
-      preference: 'dark',
-      setPreference: (preference) => {
-        set({ preference });
-      },
-    }),
-    { name: 'kestrel.theme' },
-  ),
-);
 
 export function resolveTheme(
   preference: ThemePreference,
@@ -27,4 +9,11 @@ export function resolveTheme(
 ): ResolvedTheme {
   if (preference === 'system') return systemPrefersDark ? 'dark' : 'light';
   return preference;
+}
+
+const order: readonly ThemePreference[] = ['dark', 'light', 'system'];
+
+/** dark -> light -> system -> dark */
+export function nextThemePreference(current: ThemePreference): ThemePreference {
+  return order[(order.indexOf(current) + 1) % order.length] ?? 'dark';
 }

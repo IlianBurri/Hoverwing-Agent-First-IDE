@@ -1,38 +1,70 @@
 {
-  "app": {
-    "tagline": "Das Cockpit für deine Agenten."
+  "titleBar": {
+    "noProject": "Kein Projekt geöffnet"
+  },
+  "layout": {
+    "toggleSidebar": "Seitenleiste ein- oder ausblenden",
+    "toggleBottom": "Unteres Panel ein- oder ausblenden",
+    "toggleAgent": "Agent-Panel ein- oder ausblenden",
+    "closeBottom": "Unteres Panel schliessen",
+    "resizeHandle": "Grösse ändern"
+  },
+  "activity": {
+    "label": "Aktivitäten",
+    "files": "Dateien",
+    "search": "Suche"
+  },
+  "sidebar": {
+    "files": {
+      "title": "Dateien",
+      "emptyTitle": "Kein Ordner geöffnet",
+      "emptyText": "Öffne einen Projektordner, um seine Dateien hier zu sehen."
+    },
+    "search": {
+      "title": "Suche",
+      "emptyTitle": "Projektsuche",
+      "emptyText": "Öffne einen Ordner, um in allen Dateien zu suchen und zu ersetzen."
+    }
+  },
+  "editor": {
+    "label": "Editor",
+    "welcomeTitle": "Willkommen bei Kestrel",
+    "welcomeText": "Dein Cockpit für Agenten. Öffne einen Ordner, um mit deinem Projekt und deinem eigenen Agenten zu arbeiten."
+  },
+  "bottom": {
+    "label": "Unteres Panel",
+    "terminal": "Terminal",
+    "logs": "Logs",
+    "problems": "Probleme",
+    "terminalEmptyTitle": "Noch kein Terminal",
+    "terminalEmptyText": "Terminals starten in deinem Projektordner. Öffne zuerst einen Ordner.",
+    "logsEmptyTitle": "Keine Logs",
+    "logsEmptyText": "Hier erscheinen später Ausgaben von Agenten, Docker und MCP-Servern.",
+    "problemsEmptyTitle": "Keine Probleme",
+    "problemsEmptyText": "Fehler und Warnungen aus deinem Code erscheinen hier, sobald die Sprachunterstützung aktiv ist."
+  },
+  "agent": {
+    "title": "Agent",
+    "emptyTitle": "Noch kein Agent verbunden",
+    "emptyText": "Hier arbeitest du mit deinem eigenen Agenten: Chat, Plan, Tool-Aufrufe, Berechtigungen und Checkpoints. Die Anbindung folgt im nächsten Schritt."
+  },
+  "status": {
+    "label": "Statusleiste",
+    "agentNone": "Kein Agent",
+    "modelNone": "Kein Modell",
+    "noProject": "Kein Projekt"
   },
   "theme": {
     "label": "Farbschema",
     "dark": "Dunkel",
     "light": "Hell",
-    "system": "System"
+    "system": "System",
+    "cycle": "Farbschema: {{current}} (klicken zum Wechseln)"
   },
   "language": {
     "label": "Sprache"
   },
-  "showcase": {
-    "title": "Design-Tokens",
-    "intro": "Phase 0: Fundament. Diese Seite zeigt Farben, Schriften und Abstände. Die eigentliche IDE folgt in Phase 1.",
-    "colors": "Farben",
-    "status": "Statusfarben",
-    "typography": "Typografie",
-    "spacing": "Abstände",
-    "buttons": "Schaltflächen",
-    "primary": "Primär",
-    "secondary": "Sekundär",
-    "codeSample": "const agent = await connect('claude-code');",
-    "uiSample": "Der Agent möchte eine Datei ändern."
-  },
-  "status": {
-    "success": "Erfolg: Änderung übernommen",
-    "warning": "Warnung: Agent wartet auf Erlaubnis",
-    "error": "Fehler: Verbindung fehlgeschlagen",
-    "info": "Info: Checkpoint erstellt"
-  },
-  "appInfo": {
-    "loading": "Lade App-Infos …",
-    "error": "App-Infos konnten nicht geladen werden: {{message}}",
-    "value": "{{name}} {{version}} · {{platform}}"
+  "errors": {
+    "settingsSave": "Einstellungen konnten nicht gespeichert werden."
   }
 }
