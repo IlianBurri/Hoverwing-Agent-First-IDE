@@ -1,0 +1,38 @@
+{
+  "app": {
+    "tagline": "The cockpit for your agents."
+  },
+  "theme": {
+    "label": "Color theme",
+    "dark": "Dark",
+    "light": "Light",
+    "system": "System"
+  },
+  "language": {
+    "label": "Language"
+  },
+  "showcase": {
+    "title": "Design tokens",
+    "intro": "Phase 0: foundation. This page shows colors, fonts and spacing. The actual IDE follows in phase 1.",
+    "colors": "Colors",
+    "status": "Status colors",
+    "typography": "Typography",
+    "spacing": "Spacing",
+    "buttons": "Buttons",
+    "primary": "Primary",
+    "secondary": "Secondary",
+    "codeSample": "const agent = await connect('claude-code');",
+    "uiSample": "The agent wants to change a file."
+  },
+  "status": {
+    "success": "Success: change applied",
+    "warning": "Warning: agent is waiting for permission",
+    "error": "Error: connection failed",
+    "info": "Info: checkpoint created"
+  },
+  "appInfo": {
+    "loading": "Loading app info …",
+    "error": "Could not load app info: {{message}}",
+    "value": "{{name}} {{version}} · {{platform}}"
+  }
+}
