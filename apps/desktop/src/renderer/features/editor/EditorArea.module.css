@@ -33,3 +33,17 @@
   margin: 0;
   color: var(--text-muted);
 }
+
+.shortcuts {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: var(--space-2) var(--space-6);
+  margin: var(--space-6) 0 0;
+  color: var(--text-muted);
+  text-align: left;
+}
+
+.shortcuts dd {
+  margin: 0;
+  text-align: right;
+}

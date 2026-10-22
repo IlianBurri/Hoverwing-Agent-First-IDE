@@ -1,7 +1,9 @@
-import { PanelBottom, PanelLeft, PanelRight } from 'lucide-react';
+import { PanelBottom, PanelLeft, PanelRight, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { IconButton } from '../components/IconButton';
+import { Kbd } from '../components/Kbd';
 import { KestrelMark } from '../components/KestrelMark';
+import { runCommand, useKeybindingLabel } from '../features/commands';
 import { togglePanel, useLayoutStore } from '../stores/layout';
 import styles from './TitleBar.module.css';
 
@@ -12,6 +14,7 @@ import styles from './TitleBar.module.css';
 export function TitleBar() {
   const { t } = useTranslation();
   const collapsed = useLayoutStore((state) => state.collapsed);
+  const paletteShortcut = useKeybindingLabel('workbench.commandPalette');
 
   return (
     <header className={styles['root']}>
@@ -20,7 +23,18 @@ export function TitleBar() {
         <span className={styles['name']}>Kestrel</span>
       </div>
       <div className={styles['center']}>
-        <span className={styles['project']}>{t('titleBar.noProject')}</span>
+        <button
+          type="button"
+          className={styles['commandCenter']}
+          aria-label={t('titleBar.searchCommands')}
+          onClick={() => {
+            void runCommand('workbench.commandPalette');
+          }}
+        >
+          <Search size={14} aria-hidden="true" />
+          <span className={styles['project']}>{t('titleBar.noProject')}</span>
+          {paletteShortcut && <Kbd>{paletteShortcut}</Kbd>}
+        </button>
       </div>
       <div className={styles['actions']}>
         <IconButton

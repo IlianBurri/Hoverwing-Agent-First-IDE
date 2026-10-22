@@ -1,6 +1,7 @@
 {
   "titleBar": {
-    "noProject": "Kein Projekt geöffnet"
+    "noProject": "Kein Projekt geöffnet",
+    "searchCommands": "Befehle durchsuchen"
   },
   "layout": {
     "toggleSidebar": "Seitenleiste ein- oder ausblenden",
@@ -66,5 +67,26 @@
   },
   "errors": {
     "settingsSave": "Einstellungen konnten nicht gespeichert werden."
+  },
+  "palette": {
+    "label": "Befehlspalette",
+    "placeholder": "Befehl suchen …",
+    "empty": "Kein passender Befehl gefunden.",
+    "recent": "Zuletzt verwendet",
+    "all": "Alle Befehle"
+  },
+  "commands": {
+    "category": {
+      "view": "Ansicht",
+      "preferences": "Einstellungen"
+    },
+    "palette": "Befehlspalette öffnen",
+    "showFiles": "Dateien anzeigen",
+    "showSearch": "Suche anzeigen",
+    "showTerminal": "Terminal anzeigen",
+    "cycleTheme": "Nächstes Farbschema",
+    "setTheme": "Farbschema: {{theme}}",
+    "setLanguage": "Sprache: {{language}}",
+    "languageSystem": "Sprache: wie System"
   }
 }

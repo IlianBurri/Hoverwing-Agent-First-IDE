@@ -13,7 +13,7 @@ test('panel visibility and sidebar view survive a restart', async () => {
   await expect(agentToggle).toHaveAttribute('aria-pressed', 'false');
   await expect(page.getByRole('heading', { name: 'Agent' })).toBeHidden();
 
-  await page.getByRole('button', { name: 'Search' }).click();
+  await page.getByRole('button', { name: 'Search', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Search' })).toBeVisible();
 
   // Layout saves are debounced; wait until they reach the settings file.

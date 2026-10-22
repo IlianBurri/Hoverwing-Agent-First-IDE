@@ -1,6 +1,7 @@
 {
   "titleBar": {
-    "noProject": "No project open"
+    "noProject": "No project open",
+    "searchCommands": "Search commands"
   },
   "layout": {
     "toggleSidebar": "Toggle sidebar",
@@ -66,5 +67,26 @@
   },
   "errors": {
     "settingsSave": "Settings could not be saved."
+  },
+  "palette": {
+    "label": "Command palette",
+    "placeholder": "Search for a command …",
+    "empty": "No matching command found.",
+    "recent": "Recently used",
+    "all": "All commands"
+  },
+  "commands": {
+    "category": {
+      "view": "View",
+      "preferences": "Preferences"
+    },
+    "palette": "Open command palette",
+    "showFiles": "Show files",
+    "showSearch": "Show search",
+    "showTerminal": "Show terminal",
+    "cycleTheme": "Next color theme",
+    "setTheme": "Color theme: {{theme}}",
+    "setLanguage": "Language: {{language}}",
+    "languageSystem": "Language: same as system"
   }
 }
