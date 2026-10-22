@@ -5,6 +5,7 @@ import { Kbd } from '../components/Kbd';
 import { KestrelMark } from '../components/KestrelMark';
 import { runCommand, useKeybindingLabel } from '../features/commands';
 import { togglePanel, useLayoutStore } from '../stores/layout';
+import { useWorkspaceStore } from '../stores/workspace';
 import styles from './TitleBar.module.css';
 
 /**
@@ -15,6 +16,7 @@ export function TitleBar() {
   const { t } = useTranslation();
   const collapsed = useLayoutStore((state) => state.collapsed);
   const paletteShortcut = useKeybindingLabel('workbench.commandPalette');
+  const projectName = useWorkspaceStore((state) => state.info?.name);
 
   return (
     <header className={styles['root']}>
@@ -32,7 +34,7 @@ export function TitleBar() {
           }}
         >
           <Search size={14} aria-hidden="true" />
-          <span className={styles['project']}>{t('titleBar.noProject')}</span>
+          <span className={styles['project']}>{projectName ?? t('titleBar.noProject')}</span>
           {paletteShortcut && <Kbd>{paletteShortcut}</Kbd>}
         </button>
       </div>

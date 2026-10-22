@@ -1,0 +1,85 @@
+.scroller {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding-bottom: var(--space-4);
+}
+
+.scroller:focus-visible {
+  outline-offset: calc(-1 * var(--focus-ring-width));
+}
+
+.dropRoot {
+  background: var(--accent-subtle);
+}
+
+.inner {
+  position: relative;
+  width: 100%;
+}
+
+.row {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  width: 100%;
+  height: var(--size-tree-row);
+  padding-right: var(--space-2);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.row:hover {
+  background: var(--surface-hover);
+}
+
+.row[aria-selected='true'] {
+  background: var(--accent-subtle);
+}
+
+/* Show where keyboard focus is when the tree itself has focus. */
+.scroller:focus-visible .row[aria-selected='true'] {
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.dropTarget {
+  background: var(--accent-subtle);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.chevron {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  transition: transform var(--duration-fast) var(--ease-standard);
+}
+
+.chevron.open {
+  transform: rotate(90deg);
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+.icon {
+  flex-shrink: 0;
+  color: var(--text-muted);
+}
+
+.name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.heavy .name {
+  color: var(--text-muted);
+}
+
+.badge {
+  flex-shrink: 0;
+  color: var(--text-muted);
+}

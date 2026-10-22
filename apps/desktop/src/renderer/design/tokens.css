@@ -45,6 +45,8 @@
   /* Layout. Keep --titlebar-height in sync with TITLE_BAR_HEIGHT in main/titleBar.ts */
   --titlebar-height: 36px;
   --size-dialog: 640px;
+  --size-dialog-sm: 420px;
+  --size-tree-row: 24px;
   --size-command-center: 420px;
   --size-list-max: 400px;
 

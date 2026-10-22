@@ -30,7 +30,8 @@
   "editor": {
     "label": "Editor",
     "welcomeTitle": "Welcome to Kestrel",
-    "welcomeText": "Your cockpit for agents. Open a folder to work with your project and your own agent."
+    "welcomeText": "Your cockpit for agents. Open a folder to work with your project and your own agent.",
+    "workspaceOpenText": "Pick a file on the left. The editor follows in the next step."
   },
   "bottom": {
     "label": "Bottom panel",
@@ -66,7 +67,18 @@
     "label": "Language"
   },
   "errors": {
-    "settingsSave": "Settings could not be saved."
+    "settingsSave": "Settings could not be saved.",
+    "code": {
+      "invalid_request": "Invalid request.",
+      "unknown_channel": "Unknown action.",
+      "internal": "Unexpected error. Details are in the log.",
+      "not_found": "Not found. Was it deleted or moved in the meantime?",
+      "already_exists": "A file or folder with this name already exists.",
+      "outside_workspace": "This path is outside the project folder.",
+      "no_workspace": "No folder is open.",
+      "not_a_directory": "This is not a folder.",
+      "permission_denied": "Permission denied."
+    }
   },
   "palette": {
     "label": "Command palette",
@@ -78,7 +90,8 @@
   "commands": {
     "category": {
       "view": "View",
-      "preferences": "Preferences"
+      "preferences": "Preferences",
+      "files": "Files"
     },
     "palette": "Open command palette",
     "showFiles": "Show files",
@@ -88,5 +101,43 @@
     "setTheme": "Color theme: {{theme}}",
     "setLanguage": "Language: {{language}}",
     "languageSystem": "Language: same as system"
+  },
+  "workspace": {
+    "openFolder": "Open folder …",
+    "closeFolder": "Close folder",
+    "recent": "Recently opened",
+    "treeLabel": "Files",
+    "menuLabel": "File actions",
+    "newFile": "New file",
+    "newFolder": "New folder",
+    "create": "Create",
+    "inFolder": "Name in folder “{{folder}}”",
+    "inRoot": "Name in the project folder",
+    "rename": "Rename",
+    "renameSelected": "Rename selected file",
+    "newName": "New name",
+    "move": "Move",
+    "trash": "Move to trash",
+    "trashSelected": "Move selected file to trash",
+    "trashTitle": "Move “{{name}}” to the trash?",
+    "trashMessage": "You can restore it from your system’s trash.",
+    "trashed": "“{{name}}” is now in the trash.",
+    "deleteKey": "Del",
+    "refresh": "Refresh",
+    "collapseAll": "Collapse all folders",
+    "symlink": "Symbolic link",
+    "readError": "Folder could not be read",
+    "emptyFolderTitle": "This folder is empty",
+    "emptyFolderText": "Create a first file.",
+    "nameProblem": {
+      "empty": "Please enter a name.",
+      "invalidCharacters": "The name must not contain / or \\.",
+      "reserved": "This name is not allowed.",
+      "exists": "Something with this name already exists here."
+    }
+  },
+  "dialog": {
+    "cancel": "Cancel",
+    "dismiss": "Dismiss message"
   }
 }

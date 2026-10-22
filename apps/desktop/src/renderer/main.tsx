@@ -5,12 +5,14 @@ import { App } from './App';
 import { initI18n, pickLanguage } from './i18n';
 import { useAppStore } from './stores/app';
 import { useSettingsStore } from './stores/settings';
+import { setWorkspace } from './stores/workspace';
 
 /** Loads app info and settings before the first render to avoid flicker. */
 async function bootstrap(): Promise<void> {
-  const [info, settings] = await Promise.all([
+  const [info, settings, workspace] = await Promise.all([
     window.kestrel.invoke('app:getInfo'),
     window.kestrel.invoke('settings:get'),
+    window.kestrel.invoke('workspace:get'),
   ]);
   if (info.ok) {
     useAppStore.getState().setInfo(info.data);
@@ -18,6 +20,7 @@ async function bootstrap(): Promise<void> {
   }
   // On failure the store keeps its defaults; the app still works.
   if (settings.ok) useSettingsStore.getState().replace(settings.data);
+  if (workspace.ok) setWorkspace(workspace.data);
 
   const language =
     useSettingsStore.getState().settings.language ?? pickLanguage(navigator.languages);

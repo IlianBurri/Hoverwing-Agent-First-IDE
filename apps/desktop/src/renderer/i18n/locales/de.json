@@ -30,7 +30,8 @@
   "editor": {
     "label": "Editor",
     "welcomeTitle": "Willkommen bei Kestrel",
-    "welcomeText": "Dein Cockpit für Agenten. Öffne einen Ordner, um mit deinem Projekt und deinem eigenen Agenten zu arbeiten."
+    "welcomeText": "Dein Cockpit für Agenten. Öffne einen Ordner, um mit deinem Projekt und deinem eigenen Agenten zu arbeiten.",
+    "workspaceOpenText": "Wähle links eine Datei aus. Der Editor folgt im nächsten Schritt."
   },
   "bottom": {
     "label": "Unteres Panel",
@@ -66,7 +67,18 @@
     "label": "Sprache"
   },
   "errors": {
-    "settingsSave": "Einstellungen konnten nicht gespeichert werden."
+    "settingsSave": "Einstellungen konnten nicht gespeichert werden.",
+    "code": {
+      "invalid_request": "Ungültige Anfrage.",
+      "unknown_channel": "Unbekannte Aktion.",
+      "internal": "Unerwarteter Fehler. Details stehen im Log.",
+      "not_found": "Nicht gefunden. Wurde es inzwischen gelöscht oder verschoben?",
+      "already_exists": "Es gibt schon eine Datei oder einen Ordner mit diesem Namen.",
+      "outside_workspace": "Dieser Pfad liegt ausserhalb des Projektordners.",
+      "no_workspace": "Es ist kein Ordner geöffnet.",
+      "not_a_directory": "Das ist kein Ordner.",
+      "permission_denied": "Keine Berechtigung."
+    }
   },
   "palette": {
     "label": "Befehlspalette",
@@ -78,7 +90,8 @@
   "commands": {
     "category": {
       "view": "Ansicht",
-      "preferences": "Einstellungen"
+      "preferences": "Einstellungen",
+      "files": "Dateien"
     },
     "palette": "Befehlspalette öffnen",
     "showFiles": "Dateien anzeigen",
@@ -88,5 +101,43 @@
     "setTheme": "Farbschema: {{theme}}",
     "setLanguage": "Sprache: {{language}}",
     "languageSystem": "Sprache: wie System"
+  },
+  "workspace": {
+    "openFolder": "Ordner öffnen …",
+    "closeFolder": "Ordner schliessen",
+    "recent": "Zuletzt geöffnet",
+    "treeLabel": "Dateien",
+    "menuLabel": "Dateiaktionen",
+    "newFile": "Neue Datei",
+    "newFolder": "Neuer Ordner",
+    "create": "Erstellen",
+    "inFolder": "Name im Ordner «{{folder}}»",
+    "inRoot": "Name im Projektordner",
+    "rename": "Umbenennen",
+    "renameSelected": "Ausgewählte Datei umbenennen",
+    "newName": "Neuer Name",
+    "move": "Verschieben",
+    "trash": "In den Papierkorb",
+    "trashSelected": "Ausgewählte Datei in den Papierkorb",
+    "trashTitle": "«{{name}}» in den Papierkorb verschieben?",
+    "trashMessage": "Du kannst es aus dem Papierkorb deines Systems wiederherstellen.",
+    "trashed": "«{{name}}» liegt jetzt im Papierkorb.",
+    "deleteKey": "Entf",
+    "refresh": "Aktualisieren",
+    "collapseAll": "Alle Ordner zuklappen",
+    "symlink": "Symbolischer Link",
+    "readError": "Ordner konnte nicht gelesen werden",
+    "emptyFolderTitle": "Dieser Ordner ist leer",
+    "emptyFolderText": "Lege eine erste Datei an.",
+    "nameProblem": {
+      "empty": "Bitte gib einen Namen ein.",
+      "invalidCharacters": "Der Name darf keine / oder \\ enthalten.",
+      "reserved": "Dieser Name ist nicht erlaubt.",
+      "exists": "Hier gibt es schon etwas mit diesem Namen."
+    }
+  },
+  "dialog": {
+    "cancel": "Abbrechen",
+    "dismiss": "Meldung schliessen"
   }
 }
