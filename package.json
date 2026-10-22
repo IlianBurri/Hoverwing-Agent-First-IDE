@@ -1,0 +1,35 @@
+{
+  "name": "kestrel",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Agent-first desktop IDE",
+  "license": "MIT",
+  "type": "module",
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @kestrel/desktop dev",
+    "build": "pnpm --filter @kestrel/desktop build",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "test:e2e": "pnpm --filter @kestrel/desktop test:e2e",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,mjs,cjs}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,css,yml,yaml,html}": [
+      "prettier --write"
+    ]
+  },
+  "devDependencies": {
+    "typescript": "6.0.3"
+  }
+}
