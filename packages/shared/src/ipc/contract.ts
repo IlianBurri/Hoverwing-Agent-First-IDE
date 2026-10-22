@@ -1,5 +1,6 @@
 import type { z } from 'zod';
 import { appChannels } from './channels/app';
+import { searchChannels } from './channels/search';
 import { settingsChannels, settingsEvents } from './channels/settings';
 import { windowChannels } from './channels/window';
 import { workspaceChannels, workspaceEvents } from './channels/workspace';
@@ -19,6 +20,7 @@ import { workspaceChannels, workspaceEvents } from './channels/workspace';
  */
 export const ipcContract = {
   ...appChannels,
+  ...searchChannels,
   ...settingsChannels,
   ...windowChannels,
   ...workspaceChannels,

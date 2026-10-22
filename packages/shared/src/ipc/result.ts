@@ -12,7 +12,8 @@ export type IpcErrorCode =
   | 'outside_workspace'
   | 'no_workspace'
   | 'not_a_directory'
-  | 'permission_denied';
+  | 'permission_denied'
+  | 'invalid_pattern';
 
 export interface IpcError {
   code: IpcErrorCode;

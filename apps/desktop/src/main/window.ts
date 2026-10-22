@@ -3,6 +3,7 @@ import { BrowserWindow } from 'electron';
 import { lockNavigation } from './security';
 import { titleBarOptions } from './titleBar';
 import type { TitleBarTheme } from './titleBar';
+import { guardUnsavedChanges } from './unsavedChanges';
 import { hardenedWebPreferences } from './webPreferences';
 
 export interface MainWindowOptions {
@@ -10,11 +11,13 @@ export interface MainWindowOptions {
   appUrl: string;
   /** Initial theme for the window background and native controls. */
   theme: TitleBarTheme;
+  /** Language for native dialogs shown by the main process. */
+  language: () => 'de' | 'en';
 }
 
 const backgrounds: Record<TitleBarTheme, string> = { dark: '#0f1115', light: '#ffffff' };
 
-export function createMainWindow({ appUrl, theme }: MainWindowOptions): BrowserWindow {
+export function createMainWindow({ appUrl, theme, language }: MainWindowOptions): BrowserWindow {
   const window = new BrowserWindow({
     width: 1400,
     height: 900,
@@ -28,6 +31,7 @@ export function createMainWindow({ appUrl, theme }: MainWindowOptions): BrowserW
   });
 
   lockNavigation(window.webContents, appUrl);
+  guardUnsavedChanges(window, language);
   window.once('ready-to-show', () => {
     window.show();
   });
