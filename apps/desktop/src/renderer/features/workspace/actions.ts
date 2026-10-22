@@ -12,6 +12,7 @@ import {
   useWorkspaceStore,
 } from '../../stores/workspace';
 import { checkEntryName, nameSelection } from './names';
+import { closeAll, onPathDeleted, onPathRenamed } from '../editor';
 
 const t = i18next.t.bind(i18next);
 
@@ -20,18 +21,22 @@ function opened(info: WorkspaceInfo | null): void {
 }
 
 export async function openFolder(): Promise<void> {
+  if (!(await closeAll())) return;
   const result = await window.kestrel.invoke('workspace:openDialog');
   if (result.ok) opened(result.data);
   else notifyError(t('workspace.openFolder'), result.error);
 }
 
 export async function openRecent(root: string): Promise<void> {
+  if (!(await closeAll())) return;
   const result = await window.kestrel.invoke('workspace:openRecent', { root });
   if (result.ok) opened(result.data);
   else notifyError(t('workspace.openFolder'), result.error);
 }
 
 export async function closeFolder(): Promise<void> {
+  // Unsaved edits are offered for saving first; cancelling keeps the folder open.
+  if (!(await closeAll())) return;
   await window.kestrel.invoke('workspace:close');
   setWorkspace(null);
 }
@@ -104,6 +109,7 @@ async function moveTo(from: string, to: string, action: string): Promise<void> {
     notifyError(action, result.error);
     return;
   }
+  await onPathRenamed(from, result.data);
   await Promise.all([loadDir(parentPath(from)), loadDir(parentPath(to))]);
   reveal(result.data);
 }
@@ -122,6 +128,7 @@ export async function trashEntry(path: string): Promise<void> {
     notifyError(t('workspace.trash'), result.error);
     return;
   }
+  onPathDeleted(path);
   await loadDir(parentPath(path));
   notify('success', t('workspace.trashed', { name }));
 }

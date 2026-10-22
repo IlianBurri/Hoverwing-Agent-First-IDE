@@ -31,7 +31,33 @@
     "label": "Editor",
     "welcomeTitle": "Welcome to Kestrel",
     "welcomeText": "Your cockpit for agents. Open a folder to work with your project and your own agent.",
-    "workspaceOpenText": "Pick a file on the left. The editor follows in the next step."
+    "workspaceOpenText": "Pick a file on the left or search with the command palette.",
+    "open": "Open file",
+    "save": "Save",
+    "saveAll": "Save all",
+    "closeActive": "Close tab",
+    "closeAll": "Close all tabs",
+    "nextTab": "Next tab",
+    "previousTab": "Previous tab",
+    "loading": "Loading editor …",
+    "binaryTitle": "Binary file",
+    "binaryText": "This file contains no text and cannot be shown in the editor.",
+    "tooLargeTitle": "File too large",
+    "tooLargeText": "This file is {{size}}. Files over {{limit}} are not opened in the editor so Kestrel stays fast.",
+    "tabs": "Open files",
+    "unsaved": "unsaved",
+    "closeTab": "Close “{{name}}”",
+    "closeTabShort": "Close tab",
+    "changedOnDisk": "The file was changed outside while you have unsaved changes.",
+    "deletedOnDisk": "The file was deleted outside. Saving creates it again.",
+    "reloadFromDisk": "Reload",
+    "keepMine": "Keep my version",
+    "conflictTitle": "“{{name}}” was changed in the meantime",
+    "conflictMessage": "The file on disk is newer than your version. Overwriting replaces the other change.",
+    "overwrite": "Overwrite",
+    "unsavedTitle": "Save changes to “{{name}}”?",
+    "unsavedMessage": "Your changes will be lost if you don’t save them.",
+    "discard": "Don’t save"
   },
   "bottom": {
     "label": "Bottom panel",
@@ -54,7 +80,8 @@
     "label": "Status bar",
     "agentNone": "No agent",
     "modelNone": "No model",
-    "noProject": "No project"
+    "noProject": "No project",
+    "cursor": "Ln {{line}}, Col {{column}}"
   },
   "theme": {
     "label": "Color theme",
@@ -77,7 +104,8 @@
       "outside_workspace": "This path is outside the project folder.",
       "no_workspace": "No folder is open.",
       "not_a_directory": "This is not a folder.",
-      "permission_denied": "Permission denied."
+      "permission_denied": "Permission denied.",
+      "invalid_pattern": "The regular expression is invalid."
     }
   },
   "palette": {
@@ -91,7 +119,8 @@
     "category": {
       "view": "View",
       "preferences": "Preferences",
-      "files": "Files"
+      "files": "Files",
+      "editor": "Editor"
     },
     "palette": "Open command palette",
     "showFiles": "Show files",
@@ -139,5 +168,36 @@
   "dialog": {
     "cancel": "Cancel",
     "dismiss": "Dismiss message"
+  },
+  "search": {
+    "toggleReplace": "Toggle replace",
+    "query": "Search",
+    "caseSensitive": "Match case",
+    "wholeWord": "Match whole word",
+    "regex": "Use regular expression",
+    "replacement": "Replace with",
+    "replaceAll": "Replace all",
+    "replaceInFile": "Replace in “{{name}}”",
+    "toggleDetails": "Toggle file filters",
+    "include": "Files to include (e.g. src/**, *.ts)",
+    "exclude": "Files to exclude",
+    "searching": "Searching …",
+    "noResults": "No results.",
+    "summary_one": "{{count}} result in {{files}} file(s)",
+    "summary_other": "{{count}} results in {{files}} file(s)",
+    "truncated": "Too many results: only the first 2000 are shown. Narrow your search.",
+    "results": "Search results",
+    "matchLabel": "Line {{line}}: {{text}}",
+    "idleTitle": "Search the project",
+    "idleText": "Type a search term. Folders like node_modules and .git are skipped, .gitignore is respected.",
+    "failed": "Search failed",
+    "skippedDirty_one": "{{count}} file with unsaved changes is skipped.",
+    "skippedDirty_other": "{{count}} files with unsaved changes are skipped.",
+    "replaceConfirmTitle": "Replace {{count}} matches in {{files}} file(s)?",
+    "replaceConfirmMessage": "The files are changed directly on disk.",
+    "replaced_one": "Replaced {{count}} match in {{files}} file(s).",
+    "replaced_other": "Replaced {{count}} matches in {{files}} file(s).",
+    "replaceFailed_one": "{{count}} file could not be changed.",
+    "replaceFailed_other": "{{count}} files could not be changed."
   }
 }

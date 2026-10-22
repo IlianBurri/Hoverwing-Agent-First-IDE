@@ -16,6 +16,7 @@ import type { BottomView, Language, SidebarView, ThemePreference } from '@kestre
 import { i18next } from '../../i18n';
 import { setPanelOpen, togglePanel } from '../../stores/layout';
 import { useSettingsStore } from '../../stores/settings';
+import { requestSearchFocus } from '../../stores/search';
 import { nextThemePreference } from '../../stores/theme';
 import type { Command } from './registry';
 import { registerCommands, useCommandStore } from './registry';
@@ -113,6 +114,7 @@ export function registerWorkbenchCommands(): () => void {
       keybinding: 'Mod+Shift+F',
       run: () => {
         showSidebarView('search');
+        requestSearchFocus();
       },
     },
     {

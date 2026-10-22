@@ -19,9 +19,27 @@ export interface ConfirmOptions {
   danger?: boolean;
 }
 
+export interface Choice<T extends string> {
+  id: T;
+  label: string;
+  variant?: 'primary' | 'secondary' | 'danger';
+}
+
+export interface ChooseOptions<T extends string> {
+  title: string;
+  message: string;
+  /** Buttons from left to right; the first one gets focus. */
+  choices: readonly Choice<T>[];
+}
+
 export type DialogRequest = { id: number } & (
   | { kind: 'prompt'; options: PromptOptions; resolve: (value: string | null) => void }
   | { kind: 'confirm'; options: ConfirmOptions; resolve: (value: boolean) => void }
+  | {
+      kind: 'choose';
+      options: ChooseOptions<string>;
+      resolve: (value: string | null) => void;
+    }
 );
 
 let nextId = 1;
@@ -59,5 +77,18 @@ export function prompt(options: PromptOptions): Promise<string | null> {
 export function confirm(options: ConfirmOptions): Promise<boolean> {
   return new Promise((resolve) => {
     enqueue({ id: nextId++, kind: 'confirm', options, resolve });
+  });
+}
+
+/** Offers several answers; resolves to the chosen id, or null when cancelled. */
+export function choose<T extends string>(options: ChooseOptions<T>): Promise<T | null> {
+  return new Promise((resolve) => {
+    enqueue({
+      id: nextId++,
+      kind: 'choose',
+      options,
+      // The dialog only ever resolves with ids from `options.choices`.
+      resolve: resolve as (value: string | null) => void,
+    });
   });
 }

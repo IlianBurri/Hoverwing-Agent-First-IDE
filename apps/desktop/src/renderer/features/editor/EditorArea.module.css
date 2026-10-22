@@ -1,9 +1,27 @@
 .root {
   display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--bg);
+}
+
+.content {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.loading {
+  padding: var(--space-4);
+  color: var(--text-muted);
+}
+
+.welcomeRoot {
+  display: flex;
   align-items: center;
   justify-content: center;
   height: 100%;
-  background: var(--bg);
+  overflow: auto;
 }
 
 .welcome {

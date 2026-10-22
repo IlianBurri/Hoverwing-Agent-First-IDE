@@ -48,10 +48,19 @@ export function ContextMenu({ label, x, y, entries, onClose }: ContextMenuProps)
     function onPointerDown(event: PointerEvent) {
       if (!ref.current?.contains(event.target as Node)) onClose();
     }
+    // Escape closes the menu even if focus moved elsewhere in the meantime.
+    function onEscape(event: globalThis.KeyboardEvent) {
+      if (event.key !== 'Escape') return;
+      event.preventDefault();
+      event.stopPropagation();
+      onClose();
+    }
     window.addEventListener('pointerdown', onPointerDown, true);
+    window.addEventListener('keydown', onEscape, true);
     window.addEventListener('blur', onClose);
     return () => {
       window.removeEventListener('pointerdown', onPointerDown, true);
+      window.removeEventListener('keydown', onEscape, true);
       window.removeEventListener('blur', onClose);
       returnFocus?.focus();
     };
@@ -66,7 +75,7 @@ export function ContextMenu({ label, x, y, entries, onClose }: ContextMenuProps)
       Home: 0,
       End: buttons.length - 1,
     };
-    if (event.key === 'Escape' || event.key === 'Tab') {
+    if (event.key === 'Tab') {
       event.preventDefault();
       onClose();
       return;

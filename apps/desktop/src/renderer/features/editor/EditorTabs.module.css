@@ -1,0 +1,103 @@
+.list {
+  display: flex;
+  flex-shrink: 0;
+  height: var(--space-8);
+  overflow-x: auto;
+  overflow-y: hidden;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  scrollbar-width: thin;
+}
+
+.tab {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-2);
+  max-width: calc(var(--space-10) * 4);
+  padding: 0 var(--space-1) 0 var(--space-3);
+  border-right: 1px solid var(--border);
+  color: var(--text-muted);
+  cursor: pointer;
+  user-select: none;
+}
+
+.tab:hover {
+  color: var(--text);
+}
+
+.tab[aria-selected='true'] {
+  background: var(--bg);
+  color: var(--text);
+}
+
+.tab[aria-selected='true']::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 2px;
+  background: var(--accent);
+}
+
+.tab:focus-visible {
+  outline-offset: calc(-1 * var(--focus-ring-width));
+}
+
+.deleted .name {
+  text-decoration: line-through;
+}
+
+.icon {
+  flex-shrink: 0;
+}
+
+.name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-5);
+  height: var(--space-5);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.close:hover {
+  background: var(--surface-hover);
+}
+
+/* Unsaved: a dot instead of the X, which reappears on hover. */
+.dot {
+  display: none;
+  width: var(--space-2);
+  height: var(--space-2);
+  border-radius: var(--radius-full);
+  background: currentColor;
+}
+
+.dirty .x {
+  display: none;
+}
+
+.dirty .dot {
+  display: block;
+}
+
+.dirty:hover .x {
+  display: block;
+}
+
+.dirty:hover .dot {
+  display: none;
+}

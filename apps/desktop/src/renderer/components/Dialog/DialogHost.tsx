@@ -2,7 +2,12 @@ import { useEffect, useId, useRef, useState } from 'react';
 import type { SubmitEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { closeDialog, useDialogStore } from '../../stores/dialogs';
-import type { ConfirmOptions, DialogRequest, PromptOptions } from '../../stores/dialogs';
+import type {
+  ChooseOptions,
+  ConfirmOptions,
+  DialogRequest,
+  PromptOptions,
+} from '../../stores/dialogs';
 import { Button } from '../Button';
 import styles from './Dialog.module.css';
 
@@ -26,8 +31,8 @@ function ModalDialog({ request }: { request: DialogRequest }) {
     if (settled.current) return;
     settled.current = true;
     ref.current?.close();
-    if (request.kind === 'prompt') request.resolve(typeof value === 'string' ? value : null);
-    else request.resolve(value === true);
+    if (request.kind === 'confirm') request.resolve(value === true);
+    else request.resolve(typeof value === 'string' ? value : null);
     closeDialog();
   }
 
@@ -46,11 +51,9 @@ function ModalDialog({ request }: { request: DialogRequest }) {
         finish(null);
       }}
     >
-      {request.kind === 'prompt' ? (
-        <PromptForm options={request.options} onDone={finish} />
-      ) : (
-        <ConfirmForm options={request.options} onDone={finish} />
-      )}
+      {request.kind === 'prompt' && <PromptForm options={request.options} onDone={finish} />}
+      {request.kind === 'confirm' && <ConfirmForm options={request.options} onDone={finish} />}
+      {request.kind === 'choose' && <ChooseForm options={request.options} onDone={finish} />}
     </dialog>
   );
 }
@@ -163,5 +166,44 @@ function ConfirmForm({
         </Button>
       </div>
     </form>
+  );
+}
+
+function ChooseForm({
+  options,
+  onDone,
+}: {
+  options: ChooseOptions<string>;
+  onDone: (value: string | null) => void;
+}) {
+  const { t } = useTranslation();
+  return (
+    <div className={styles['form']}>
+      <h2 id="dialog-title" className={styles['title']}>
+        {options.title}
+      </h2>
+      <p className={styles['message']}>{options.message}</p>
+      <div className={styles['actions']}>
+        {options.choices.map((choice, index) => (
+          <Button
+            key={choice.id}
+            autoFocus={index === 0}
+            variant={choice.variant ?? 'secondary'}
+            onClick={() => {
+              onDone(choice.id);
+            }}
+          >
+            {choice.label}
+          </Button>
+        ))}
+        <Button
+          onClick={() => {
+            onDone(null);
+          }}
+        >
+          {t('dialog.cancel')}
+        </Button>
+      </div>
+    </div>
   );
 }

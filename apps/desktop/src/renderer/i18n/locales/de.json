@@ -31,7 +31,33 @@
     "label": "Editor",
     "welcomeTitle": "Willkommen bei Kestrel",
     "welcomeText": "Dein Cockpit für Agenten. Öffne einen Ordner, um mit deinem Projekt und deinem eigenen Agenten zu arbeiten.",
-    "workspaceOpenText": "Wähle links eine Datei aus. Der Editor folgt im nächsten Schritt."
+    "workspaceOpenText": "Wähle links eine Datei aus oder suche mit der Befehlspalette.",
+    "open": "Datei öffnen",
+    "save": "Speichern",
+    "saveAll": "Alle speichern",
+    "closeActive": "Tab schliessen",
+    "closeAll": "Alle Tabs schliessen",
+    "nextTab": "Nächster Tab",
+    "previousTab": "Vorheriger Tab",
+    "loading": "Editor wird geladen …",
+    "binaryTitle": "Binärdatei",
+    "binaryText": "Diese Datei enthält keinen Text und kann im Editor nicht angezeigt werden.",
+    "tooLargeTitle": "Datei zu gross",
+    "tooLargeText": "Die Datei ist {{size}} gross. Dateien über {{limit}} werden nicht im Editor geöffnet, damit Kestrel flüssig bleibt.",
+    "tabs": "Geöffnete Dateien",
+    "unsaved": "ungespeichert",
+    "closeTab": "«{{name}}» schliessen",
+    "closeTabShort": "Tab schliessen",
+    "changedOnDisk": "Die Datei wurde ausserhalb geändert, während du ungespeicherte Änderungen hast.",
+    "deletedOnDisk": "Die Datei wurde ausserhalb gelöscht. Speichern legt sie neu an.",
+    "reloadFromDisk": "Neu laden",
+    "keepMine": "Meine Version behalten",
+    "conflictTitle": "«{{name}}» wurde inzwischen geändert",
+    "conflictMessage": "Die Datei auf der Festplatte ist neuer als deine Version. Überschreiben ersetzt die andere Änderung.",
+    "overwrite": "Überschreiben",
+    "unsavedTitle": "Änderungen an «{{name}}» speichern?",
+    "unsavedMessage": "Ohne Speichern gehen deine Änderungen verloren.",
+    "discard": "Nicht speichern"
   },
   "bottom": {
     "label": "Unteres Panel",
@@ -54,7 +80,8 @@
     "label": "Statusleiste",
     "agentNone": "Kein Agent",
     "modelNone": "Kein Modell",
-    "noProject": "Kein Projekt"
+    "noProject": "Kein Projekt",
+    "cursor": "Z. {{line}}, Sp. {{column}}"
   },
   "theme": {
     "label": "Farbschema",
@@ -77,7 +104,8 @@
       "outside_workspace": "Dieser Pfad liegt ausserhalb des Projektordners.",
       "no_workspace": "Es ist kein Ordner geöffnet.",
       "not_a_directory": "Das ist kein Ordner.",
-      "permission_denied": "Keine Berechtigung."
+      "permission_denied": "Keine Berechtigung.",
+      "invalid_pattern": "Der reguläre Ausdruck ist ungültig."
     }
   },
   "palette": {
@@ -91,7 +119,8 @@
     "category": {
       "view": "Ansicht",
       "preferences": "Einstellungen",
-      "files": "Dateien"
+      "files": "Dateien",
+      "editor": "Editor"
     },
     "palette": "Befehlspalette öffnen",
     "showFiles": "Dateien anzeigen",
@@ -139,5 +168,36 @@
   "dialog": {
     "cancel": "Abbrechen",
     "dismiss": "Meldung schliessen"
+  },
+  "search": {
+    "toggleReplace": "Ersetzen ein- oder ausblenden",
+    "query": "Suchen",
+    "caseSensitive": "Gross-/Kleinschreibung beachten",
+    "wholeWord": "Nur ganze Wörter",
+    "regex": "Regulärer Ausdruck",
+    "replacement": "Ersetzen durch",
+    "replaceAll": "Alle ersetzen",
+    "replaceInFile": "In «{{name}}» ersetzen",
+    "toggleDetails": "Dateifilter ein- oder ausblenden",
+    "include": "Nur diese Dateien (z. B. src/**, *.ts)",
+    "exclude": "Diese Dateien auslassen",
+    "searching": "Suche läuft …",
+    "noResults": "Keine Treffer.",
+    "summary_one": "{{count}} Treffer in {{files}} Datei(en)",
+    "summary_other": "{{count}} Treffer in {{files}} Datei(en)",
+    "truncated": "Sehr viele Treffer: Nur die ersten 2000 werden angezeigt. Verfeinere die Suche.",
+    "results": "Suchergebnisse",
+    "matchLabel": "Zeile {{line}}: {{text}}",
+    "idleTitle": "Im Projekt suchen",
+    "idleText": "Gib einen Suchbegriff ein. Ordner wie node_modules und .git werden übersprungen, .gitignore wird beachtet.",
+    "failed": "Suche fehlgeschlagen",
+    "skippedDirty_one": "{{count}} Datei mit ungespeicherten Änderungen wird übersprungen.",
+    "skippedDirty_other": "{{count}} Dateien mit ungespeicherten Änderungen werden übersprungen.",
+    "replaceConfirmTitle": "{{count}} Treffer in {{files}} Datei(en) ersetzen?",
+    "replaceConfirmMessage": "Die Dateien werden direkt auf der Festplatte geändert.",
+    "replaced_one": "{{count}} Treffer in {{files}} Datei(en) ersetzt.",
+    "replaced_other": "{{count}} Treffer in {{files}} Datei(en) ersetzt.",
+    "replaceFailed_one": "{{count}} Datei konnte nicht geändert werden.",
+    "replaceFailed_other": "{{count}} Dateien konnten nicht geändert werden."
   }
 }

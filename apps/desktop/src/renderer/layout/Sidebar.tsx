@@ -1,3 +1,4 @@
+import { openFile } from '../features/editor';
 import { SearchView } from '../features/search';
 import { FilesView } from '../features/workspace';
 import { useSettingsStore } from '../stores/settings';
@@ -7,7 +8,7 @@ export function Sidebar() {
   const view = useSettingsStore((state) => state.settings.layout.sidebarView);
   return (
     <section className="panel-fill" aria-labelledby="sidebar-title">
-      {view === 'files' ? <FilesView onOpenFile={() => undefined} /> : <SearchView />}
+      {view === 'files' ? <FilesView onOpenFile={(path) => void openFile(path)} /> : <SearchView />}
     </section>
   );
 }
