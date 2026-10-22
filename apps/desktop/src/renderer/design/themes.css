@@ -1,0 +1,48 @@
+/*
+ * Color themes. One accent color, neutral grays, four status colors.
+ * All text/status colors meet WCAG AA (>= 4.5:1) against --bg and --surface.
+ */
+:root,
+[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #0f1115;
+  --surface: #161920;
+  --surface-raised: #1d2129;
+  --surface-hover: #232833;
+  --border: #2a2f3a;
+  --border-strong: #3a4150;
+  --text: #e6e8ec;
+  --text-muted: #a1a8b3;
+  --accent: #7c9cff;
+  --accent-hover: #96b0ff;
+  --accent-contrast: #0f1115;
+  --accent-subtle: rgb(124 156 255 / 0.14);
+  --success: #4ade80;
+  --warning: #fbbf24;
+  --error: #f87171;
+  --info: #38bdf8;
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-md: 0 4px 16px rgb(0 0 0 / 0.45);
+}
+
+[data-theme='light'] {
+  color-scheme: light;
+  --bg: #ffffff;
+  --surface: #f6f7f9;
+  --surface-raised: #ffffff;
+  --surface-hover: #eceef2;
+  --border: #e2e5ea;
+  --border-strong: #c9ced6;
+  --text: #1a1d23;
+  --text-muted: #5b6370;
+  --accent: #3b5bdb;
+  --accent-hover: #3249b8;
+  --accent-contrast: #ffffff;
+  --accent-subtle: rgb(59 91 219 / 0.1);
+  --success: #15803d;
+  --warning: #b45309;
+  --error: #b91c1c;
+  --info: #0369a1;
+  --shadow-sm: 0 1px 2px rgb(16 24 40 / 0.06);
+  --shadow-md: 0 4px 16px rgb(16 24 40 / 0.1);
+}
