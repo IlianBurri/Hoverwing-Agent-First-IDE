@@ -12,6 +12,7 @@ import type { PermissionService } from '../permissions';
 import type { SecretStore } from '../secrets';
 import type { AgentConfigStore } from './configs';
 import { AgentRuntime } from './runtime';
+import type { RuntimeDeps } from './runtime';
 import type { SessionHistory } from './sessions';
 import type { StartTransport } from './transport';
 
@@ -22,6 +23,7 @@ export interface AgentServiceDeps {
   permissions: PermissionService;
   startTransport: StartTransport;
   checkpoint: (root: string, label: string, sessionId: string) => Promise<string | null>;
+  review: RuntimeDeps['review'];
   /** Asks the user (natively) whether this command line may be started. */
   confirmStart: (ownerId: number, config: AgentConfig) => Promise<boolean>;
   events: {
@@ -48,6 +50,7 @@ export class AgentService {
         startTransport: this.deps.startTransport,
         permissions: this.deps.permissions,
         checkpoint: this.deps.checkpoint,
+        review: this.deps.review,
         onSessionStarted: (root, agentId, id, title) => {
           void this.deps.sessions.remember(root, { id, agentId, title, time: Date.now() });
         },

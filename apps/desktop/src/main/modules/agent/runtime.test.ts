@@ -67,12 +67,18 @@ function setup(script: PromptScript, options: { allow?: boolean; authRequired?: 
   const check = vi.fn((_context: unknown, action: { target: string }) =>
     Promise.resolve(action.target === '.env' ? false : (options.allow ?? true)),
   );
-  const permissions = { check, cancel: vi.fn() } as unknown as PermissionService;
+  const permissions = {
+    check,
+    cancel: vi.fn(),
+    denies: (_context: unknown, action: { target: string }) =>
+      Promise.resolve(action.target === '.env'),
+  } as unknown as PermissionService;
   const runtime = new AgentRuntime({
     ownerId: 1,
     startTransport: () => Promise.resolve(inProcessTransport(scriptedAgent(script, options))),
     permissions,
     checkpoint: () => Promise.resolve('c'.repeat(40)),
+    review: { hold: vi.fn(), heldContent: () => undefined, collectApplied: vi.fn() },
     onSessionStarted: vi.fn(),
     events: {
       status: (status) => statuses.push(status),
@@ -225,6 +231,7 @@ describe('AgentRuntime', () => {
       startTransport: () => Promise.reject(new Error('spawn npx ENOENT')),
       permissions: { check: vi.fn(), cancel: vi.fn() } as unknown as PermissionService,
       checkpoint: () => Promise.resolve(null),
+      review: { hold: vi.fn(), heldContent: () => undefined, collectApplied: vi.fn() },
       onSessionStarted: vi.fn(),
       events: { status: vi.fn(), event: vi.fn(), log: vi.fn() },
       clientVersion: '0.0.0',
@@ -240,5 +247,48 @@ describe('sliceLines', () => {
   it('returns the requested lines (1-based)', () => {
     expect(sliceLines('a\nb\nc\nd', 2, 2)).toBe('b\nc');
     expect(sliceLines('a\nb', null, null)).toBe('a\nb');
+  });
+});
+
+describe('AgentRuntime with diff review', () => {
+  it('holds writes back instead of writing to disk', async () => {
+    const hold = vi.fn(() => Promise.resolve());
+    const events: AgentEvent[] = [];
+    const runtime = new AgentRuntime({
+      ownerId: 1,
+      startTransport: () =>
+        Promise.resolve(
+          inProcessTransport(
+            scriptedAgent(async (client, sessionId) => {
+              await client.request('fs/write_text_file', {
+                sessionId,
+                path: join(root, 'a.ts'),
+                content: 'new\n',
+              });
+            }),
+          ),
+        ),
+      permissions: {
+        check: vi.fn(),
+        cancel: vi.fn(),
+        denies: () => Promise.resolve(false),
+      } as unknown as PermissionService,
+      checkpoint: () => Promise.resolve('c'.repeat(40)),
+      review: {
+        hold,
+        heldContent: () => undefined,
+        collectApplied: vi.fn(() => Promise.resolve()),
+      },
+      onSessionStarted: vi.fn(),
+      events: { status: vi.fn(), event: (_session, event) => events.push(event), log: vi.fn() },
+      clientVersion: '0.0.0',
+    });
+    await runtime.start({ ...config, reviewChanges: true }, root, {});
+    await runtime.prompt('edit');
+    await vi.waitFor(() => {
+      expect(events.some((event) => event.type === 'turnEnded')).toBe(true);
+    });
+    expect(hold).toHaveBeenCalledWith(root, 'a.ts', 'new\n');
+    expect(await readFile(join(root, 'a.ts'), 'utf8')).toBe('old\n');
   });
 });

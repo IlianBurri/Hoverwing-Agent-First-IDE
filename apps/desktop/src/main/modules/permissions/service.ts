@@ -80,6 +80,21 @@ export class PermissionService {
     return allowed;
   }
 
+  /**
+   * Checks rules without asking the user (e.g. for writes that are held for
+   * review anyway). Logs and returns true when the action is denied.
+   */
+  async denies(context: PermissionContext, action: PermissionAction): Promise<boolean> {
+    const policy = evaluatePolicy(
+      action.kind,
+      action.target,
+      await this.rules.rulesFor(context.root),
+    );
+    if (policy.level !== 'deny') return false;
+    await this.log(context, action, false, policy.decidedBy ?? 'rule');
+    return true;
+  }
+
   async respond(ownerId: number, requestId: string, decision: PermissionDecision): Promise<void> {
     const entry = this.pending.get(requestId);
     if (entry?.context.ownerId !== ownerId) {

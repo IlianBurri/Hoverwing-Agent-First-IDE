@@ -30,6 +30,12 @@ export interface RuntimeDeps {
   permissions: PermissionService;
   /** Creates a checkpoint before each turn; returns its id (or null). */
   checkpoint: (root: string, label: string, sessionId: string) => Promise<string | null>;
+  /** Diff review: held writes and changes the agent applied itself. */
+  review: {
+    hold(root: string, path: string, content: string): Promise<void>;
+    heldContent(root: string, path: string): string | undefined;
+    collectApplied(root: string, checkpointId: string): Promise<void>;
+  };
   /** Called when a session starts, e.g. to remember it for "resume". */
   onSessionStarted: (root: string, agentId: string, sessionId: string, title: string) => void;
   events: RuntimeEvents;
@@ -104,14 +110,24 @@ export class AgentRuntime {
           target: relativePath,
           title: relativePath,
         });
-        if (!allowed)
-          throw RequestError.invalidRequest(undefined, 'Permission denied by the user or a rule.');
-        const content = await readFile(await resolveInWorkspace(this.root, relativePath), 'utf8');
+        if (!allowed) throw denied();
+        // The agent sees its own held (not yet accepted) version of the file.
+        const content =
+          this.deps.review.heldContent(this.root, relativePath) ??
+          (await readFile(await resolveInWorkspace(this.root, relativePath), 'utf8'));
         return { content: sliceLines(content, params.line ?? null, params.limit ?? null) };
       })
       .onRequest('fs/write_text_file', async ({ params }) => {
         const relativePath = this.projectPath(params.path);
         const absolute = await resolveInWorkspace(this.root, relativePath);
+        if (this.config?.reviewChanges) {
+          // Held back for the diff review: nothing reaches the disk yet, so
+          // only rules (and the secret guard) apply, without asking.
+          const action = { kind: 'file.write' as const, target: relativePath, title: relativePath };
+          if (await this.deps.permissions.denies(context(), action)) throw denied();
+          await this.deps.review.hold(this.root, relativePath, params.content);
+          return {};
+        }
         const previous = await readFile(absolute, 'utf8').catch(() => null);
         const allowed = await this.deps.permissions.check(context(), {
           kind: 'file.write',
@@ -119,8 +135,7 @@ export class AgentRuntime {
           title: relativePath,
           diff: unifiedDiff(relativePath, previous, params.content),
         });
-        if (!allowed)
-          throw RequestError.invalidRequest(undefined, 'Permission denied by the user or a rule.');
+        if (!allowed) throw denied();
         await writeFile(absolute, params.content, 'utf8');
         return {};
       });
@@ -210,7 +225,9 @@ export class AgentRuntime {
       if (resumeSessionId && canLoadSession) {
         // Set first: the agent replays the history as session updates.
         sessionId = resumeSessionId;
-        this.status = { ...this.status, sessionId };
+        // Announce the session first, so the UI starts a fresh transcript
+        // before the agent replays the history into it.
+        this.setStatus({ sessionId });
         await this.agent.request('session/load', {
           sessionId: resumeSessionId,
           cwd: root,
@@ -253,10 +270,15 @@ export class AgentRuntime {
     this.emit({ type: 'turnStarted', checkpointId });
 
     // Runs in the background; the UI follows via events.
+    const root = this.root;
+    const review = this.config?.reviewChanges === true;
     void this.agent
       .request('session/prompt', { sessionId, prompt: [{ type: 'text', text }] })
       .then(
-        (response) => {
+        async (response) => {
+          // Changes the agent wrote itself become reviewable too.
+          if (review && checkpointId)
+            await this.deps.review.collectApplied(root, checkpointId).catch(() => undefined);
           this.emit({ type: 'turnEnded', stopReason: response.stopReason });
         },
         (error: unknown) => {
@@ -317,6 +339,10 @@ function withTimeout<T>(promise: Promise<T>, ms: number, message: string): Promi
   return Promise.race([promise, timeout]).finally(() => {
     clearTimeout(timer);
   });
+}
+
+function denied(): RequestError {
+  return RequestError.invalidRequest(undefined, 'Permission denied by the user or a rule.');
 }
 
 /** ACP "line" is 1-based; "limit" is a number of lines. */

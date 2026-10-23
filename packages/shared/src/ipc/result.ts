@@ -16,7 +16,8 @@ export type IpcErrorCode =
   | 'invalid_pattern'
   | 'checkpoints_unavailable'
   | 'agent_not_running'
-  | 'agent_not_approved';
+  | 'agent_not_approved'
+  | 'review_conflict';
 
 export interface IpcError {
   code: IpcErrorCode;

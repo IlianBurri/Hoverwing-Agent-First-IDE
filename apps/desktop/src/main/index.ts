@@ -27,6 +27,7 @@ import {
   createPermissionHandlers,
 } from './modules/permissions';
 import { CheckpointService, createCheckpointHandlers } from './modules/checkpoints';
+import { ReviewService, createReviewHandlers } from './modules/review';
 import { SearchRunner, createSearchHandlers } from './modules/search';
 import { createSettingsHandlers, createSettingsStore } from './modules/settings';
 import { TerminalManager, createTerminalHandlers, spawnNodePty } from './modules/terminal';
@@ -151,6 +152,19 @@ void app.whenReady().then(async () => {
   });
 
   const dataDir = app.getPath('userData');
+  const review = new ReviewService(
+    {
+      changesSince: (root, id) => checkpoints.repo(root).changesSince(id),
+      fileAt: (root, id, path) => checkpoints.repo(root).fileAt(id, path),
+    },
+    (root) => {
+      for (const window of BrowserWindow.getAllWindows()) {
+        if (workspaces.get(window.webContents.id)?.root === root) {
+          sendEvent(window.webContents, 'review:changed', {});
+        }
+      }
+    },
+  );
   const agents = new AgentService({
     configs: new AgentConfigStore(dataDir),
     secrets: new SecretStore(join(dataDir, 'secrets.json'), safeStorage),
@@ -159,6 +173,7 @@ void app.whenReady().then(async () => {
     startTransport: spawnTransport,
     checkpoint: async (root, label, sessionId) =>
       (await checkpoints.create(root, label, 'turn', sessionId).catch(() => null))?.id ?? null,
+    review,
     confirmStart: async (ownerId, config) => {
       const contents = webContents.fromId(ownerId);
       const window = contents ? BrowserWindow.fromWebContents(contents) : null;
@@ -209,6 +224,7 @@ void app.whenReady().then(async () => {
       ...createPermissionHandlers(permissions, workspaces),
       ...createCheckpointHandlers(checkpoints, workspaces),
       ...createAgentHandlers(agents, workspaces),
+      ...createReviewHandlers(review, workspaces),
       ...createSearchHandlers(search, workspaces),
       'window:setTitleBarTheme': (theme, { sender }) => {
         const window = BrowserWindow.fromWebContents(sender);

@@ -3,6 +3,7 @@ import { agentChannels, agentEvents } from './channels/agent';
 import { appChannels } from './channels/app';
 import { checkpointChannels, checkpointEvents } from './channels/checkpoints';
 import { permissionChannels, permissionEvents } from './channels/permissions';
+import { reviewChannels, reviewEvents } from './channels/review';
 import { searchChannels } from './channels/search';
 import { settingsChannels, settingsEvents } from './channels/settings';
 import { terminalChannels, terminalEvents } from './channels/terminal';
@@ -27,6 +28,7 @@ export const ipcContract = {
   ...appChannels,
   ...checkpointChannels,
   ...permissionChannels,
+  ...reviewChannels,
   ...searchChannels,
   ...settingsChannels,
   ...terminalChannels,
@@ -38,6 +40,7 @@ export const ipcEvents = {
   ...agentEvents,
   ...checkpointEvents,
   ...permissionEvents,
+  ...reviewEvents,
   ...settingsEvents,
   ...terminalEvents,
   ...workspaceEvents,
