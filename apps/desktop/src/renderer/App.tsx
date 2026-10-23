@@ -9,7 +9,10 @@ import { useApplyTheme } from './hooks/useApplyTheme';
 import { DialogHost } from './components/Dialog';
 import { Toasts } from './components/Toasts';
 import { handleExternalChanges, registerEditorCommands } from './features/editor';
+import { ChangesModal, registerCheckpointCommands } from './features/checkpoints';
 import { RulesDialog, registerPermissionCommands } from './features/permissions';
+import { refreshCheckpoints } from './stores/checkpoints';
+import { useWorkspaceStore } from './stores/workspace';
 import { registerTerminalCommands } from './features/terminal';
 import { setPanelOpen } from './stores/layout';
 import { useModalStore } from './stores/modals';
@@ -31,6 +34,18 @@ export function App() {
   useEffect(() => registerEditorCommands(), []);
   useEffect(() => registerTerminalCommands(), []);
   useEffect(() => registerPermissionCommands(), []);
+  useEffect(() => registerCheckpointCommands(), []);
+  const workspaceRoot = useWorkspaceStore((state) => state.info?.root);
+  useEffect(() => {
+    void refreshCheckpoints();
+  }, [workspaceRoot]);
+  useEffect(
+    () =>
+      window.kestrel.on('checkpoints:changed', () => {
+        void refreshCheckpoints();
+      }),
+    [],
+  );
   useEffect(() => {
     void loadPending();
     const offs = [
@@ -84,7 +99,10 @@ export function App() {
     <>
       <AppShell />
       <CommandPalette />
-      {modal === 'permissionRules' && <RulesDialog />}
+      {modal?.id === 'permissionRules' && <RulesDialog />}
+      {modal?.id === 'checkpointChanges' && (
+        <ChangesModal key={modal.checkpoint.id} checkpoint={modal.checkpoint} />
+      )}
       <DialogHost />
       <Toasts />
     </>

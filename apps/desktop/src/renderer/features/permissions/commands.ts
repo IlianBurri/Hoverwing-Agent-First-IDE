@@ -11,7 +11,7 @@ export function registerPermissionCommands(): () => void {
       title: () => i18next.t('permissions.rules.title'),
       icon: ShieldCheck,
       run: () => {
-        openModal('permissionRules');
+        openModal({ id: 'permissionRules' });
       },
     },
   ]);

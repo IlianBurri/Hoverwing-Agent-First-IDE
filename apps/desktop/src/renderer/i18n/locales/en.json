@@ -103,7 +103,8 @@
       "no_workspace": "No folder is open.",
       "not_a_directory": "This is not a folder.",
       "permission_denied": "Permission denied.",
-      "invalid_pattern": "The regular expression is invalid."
+      "invalid_pattern": "The regular expression is invalid.",
+      "checkpoints_unavailable": "Checkpoints are not available. Git must be installed and a folder must be open."
     }
   },
   "palette": {
@@ -286,5 +287,37 @@
       "mcpTool": "MCP tool",
       "docker": "Docker"
     }
+  },
+  "checkpoints": {
+    "title": "Checkpoints",
+    "create": "Create checkpoint now",
+    "created": "Checkpoint created.",
+    "manualLabel": "Manual checkpoint",
+    "empty": "No checkpoints yet. One is created automatically before every agent turn.",
+    "noGit": "Checkpoints need Git. Install Git to be able to jump back to earlier states.",
+    "kind": {
+      "turn": "Agent turn",
+      "manual": "Manual checkpoint",
+      "beforeRestore": "Before restore"
+    },
+    "changesTitle": "Since “{{label}}”",
+    "changesIntro": "These files changed since then. Restoring brings back the checkpoint’s state. The current state is saved first.",
+    "loading": "Looking for changes …",
+    "noChanges": "Nothing changed since this checkpoint.",
+    "changedFiles": "Changed files",
+    "status": {
+      "added": "new",
+      "modified": "changed",
+      "deleted": "deleted"
+    },
+    "restore": "Restore",
+    "restoreAll": "Restore everything to this state",
+    "restoreFile": "Restore “{{path}}”",
+    "restoreAllTitle": "Restore the project to this checkpoint?",
+    "restoreFilesTitle_one": "Restore {{count}} file?",
+    "restoreFilesTitle_other": "Restore {{count}} files?",
+    "restoreMessage": "The current state is saved as a checkpoint first, so you can undo this too.",
+    "restored_one": "Restored {{count}} file.",
+    "restored_other": "Restored {{count}} files."
   }
 }

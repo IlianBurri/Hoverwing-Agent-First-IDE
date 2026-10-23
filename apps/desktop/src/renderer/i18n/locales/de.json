@@ -103,7 +103,8 @@
       "no_workspace": "Es ist kein Ordner geöffnet.",
       "not_a_directory": "Das ist kein Ordner.",
       "permission_denied": "Keine Berechtigung.",
-      "invalid_pattern": "Der reguläre Ausdruck ist ungültig."
+      "invalid_pattern": "Der reguläre Ausdruck ist ungültig.",
+      "checkpoints_unavailable": "Checkpoints sind nicht verfügbar. Dafür muss Git installiert und ein Ordner geöffnet sein."
     }
   },
   "palette": {
@@ -286,5 +287,37 @@
       "mcpTool": "MCP-Tool",
       "docker": "Docker"
     }
+  },
+  "checkpoints": {
+    "title": "Checkpoints",
+    "create": "Checkpoint jetzt erstellen",
+    "created": "Checkpoint erstellt.",
+    "manualLabel": "Manueller Checkpoint",
+    "empty": "Noch keine Checkpoints. Vor jeder Agent-Runde wird automatisch einer erstellt.",
+    "noGit": "Checkpoints brauchen Git. Installiere Git, um zu früheren Zuständen zurückspringen zu können.",
+    "kind": {
+      "turn": "Agent-Runde",
+      "manual": "Manueller Checkpoint",
+      "beforeRestore": "Vor dem Zurücksetzen"
+    },
+    "changesTitle": "Seit «{{label}}»",
+    "changesIntro": "Diese Dateien haben sich seither geändert. Zurücksetzen stellt den Stand des Checkpoints her. Der aktuelle Stand wird vorher gesichert.",
+    "loading": "Änderungen werden ermittelt …",
+    "noChanges": "Seit diesem Checkpoint hat sich nichts geändert.",
+    "changedFiles": "Geänderte Dateien",
+    "status": {
+      "added": "neu",
+      "modified": "geändert",
+      "deleted": "gelöscht"
+    },
+    "restore": "Zurücksetzen",
+    "restoreAll": "Alles auf diesen Stand zurücksetzen",
+    "restoreFile": "«{{path}}» zurücksetzen",
+    "restoreAllTitle": "Projekt auf diesen Checkpoint zurücksetzen?",
+    "restoreFilesTitle_one": "{{count}} Datei zurücksetzen?",
+    "restoreFilesTitle_other": "{{count}} Dateien zurücksetzen?",
+    "restoreMessage": "Der aktuelle Stand wird vorher als Checkpoint gesichert. Du kannst also auch das wieder rückgängig machen.",
+    "restored_one": "{{count}} Datei zurückgesetzt.",
+    "restored_other": "{{count}} Dateien zurückgesetzt."
   }
 }

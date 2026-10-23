@@ -1,12 +1,14 @@
 import { create } from 'zustand';
+import type { Checkpoint } from '@kestrel/shared';
 
-/** Which app-level modal is open (one at a time). */
-export type ModalId = 'permissionRules';
+/** The app-level modal that is open (one at a time), with its data. */
+export type ModalState =
+  { id: 'permissionRules' } | { id: 'checkpointChanges'; checkpoint: Checkpoint } | null;
 
-export const useModalStore = create<{ open: ModalId | null }>()(() => ({ open: null }));
+export const useModalStore = create<{ open: ModalState }>()(() => ({ open: null }));
 
-export function openModal(id: ModalId): void {
-  useModalStore.setState({ open: id });
+export function openModal(modal: NonNullable<ModalState>): void {
+  useModalStore.setState({ open: modal });
 }
 
 export function closeModal(): void {

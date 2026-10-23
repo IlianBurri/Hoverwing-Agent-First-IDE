@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { EmptyState } from '../../components/EmptyState';
 import { PanelHeader } from '../../layout/PanelHeader';
 import { usePermissionStore } from '../../stores/permissions';
+import { CheckpointTimeline } from '../checkpoints';
 import { PermissionCard } from '../permissions';
 import styles from './AgentPanel.module.css';
 
@@ -26,8 +27,11 @@ export function AgentPanel() {
         </div>
       )}
       {pending.length === 0 && (
-        <EmptyState icon={Bot} title={t('agent.emptyTitle')} description={t('agent.emptyText')} />
+        <div className={styles['body']}>
+          <EmptyState icon={Bot} title={t('agent.emptyTitle')} description={t('agent.emptyText')} />
+        </div>
       )}
+      <CheckpointTimeline />
     </section>
   );
 }

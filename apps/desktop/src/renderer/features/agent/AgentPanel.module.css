@@ -5,3 +5,9 @@
   padding: 0 var(--space-3) var(--space-3);
   overflow: auto;
 }
+
+.body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}

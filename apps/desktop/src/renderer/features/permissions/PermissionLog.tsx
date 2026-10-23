@@ -31,7 +31,7 @@ export function PermissionLog() {
         <Button
           variant="ghost"
           onClick={() => {
-            openModal('permissionRules');
+            openModal({ id: 'permissionRules' });
           }}
         >
           <Settings2 size={14} aria-hidden="true" />
