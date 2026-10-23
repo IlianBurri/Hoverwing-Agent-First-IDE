@@ -9,7 +9,11 @@ import { useApplyTheme } from './hooks/useApplyTheme';
 import { DialogHost } from './components/Dialog';
 import { Toasts } from './components/Toasts';
 import { handleExternalChanges, registerEditorCommands } from './features/editor';
+import { RulesDialog, registerPermissionCommands } from './features/permissions';
 import { registerTerminalCommands } from './features/terminal';
+import { setPanelOpen } from './stores/layout';
+import { useModalStore } from './stores/modals';
+import { addLogEntry, addPending, loadPending, removePending } from './stores/permissions';
 import { registerWorkspaceCommands } from './features/workspace';
 import { deliverOutput, markExited } from './stores/terminal';
 import { hasDirtyFiles } from './stores/editor';
@@ -26,6 +30,25 @@ export function App() {
   useEffect(() => registerWorkspaceCommands(), []);
   useEffect(() => registerEditorCommands(), []);
   useEffect(() => registerTerminalCommands(), []);
+  useEffect(() => registerPermissionCommands(), []);
+  useEffect(() => {
+    void loadPending();
+    const offs = [
+      window.kestrel.on('permissions:request', (request) => {
+        addPending(request);
+        // Questions must never go unnoticed: show the agent panel.
+        setPanelOpen('agent', true);
+      }),
+      window.kestrel.on('permissions:resolved', ({ id }) => {
+        removePending(id);
+      }),
+      window.kestrel.on('permissions:logged', addLogEntry),
+    ];
+    return () => {
+      for (const off of offs) off();
+    };
+  }, []);
+  const modal = useModalStore((state) => state.open);
   useEffect(() => {
     const offData = window.kestrel.on('terminal:data', ({ id, data }) => {
       deliverOutput(id, data);
@@ -61,6 +84,7 @@ export function App() {
     <>
       <AppShell />
       <CommandPalette />
+      {modal === 'permissionRules' && <RulesDialog />}
       <DialogHost />
       <Toasts />
     </>

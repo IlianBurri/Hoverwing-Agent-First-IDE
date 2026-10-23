@@ -63,5 +63,5 @@ test('switches bottom panel tabs with the keyboard', async () => {
   await page.getByRole('tab', { name: 'Terminal' }).focus();
   await page.keyboard.press('ArrowRight');
   await expect(page.getByRole('tab', { name: 'Logs' })).toHaveAttribute('aria-selected', 'true');
-  await expect(page.getByText('No logs')).toBeVisible();
+  await expect(page.getByText('No entries yet')).toBeVisible();
 });

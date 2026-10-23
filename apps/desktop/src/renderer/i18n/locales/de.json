@@ -66,8 +66,6 @@
     "problems": "Probleme",
     "terminalEmptyTitle": "Noch kein Terminal",
     "terminalEmptyText": "Terminals starten im Projektordner (ohne Projekt im Home-Ordner) mit deiner Standard-Shell.",
-    "logsEmptyTitle": "Keine Logs",
-    "logsEmptyText": "Hier erscheinen später Ausgaben von Agenten, Docker und MCP-Servern.",
     "problemsEmptyTitle": "Keine Probleme",
     "problemsEmptyText": "Fehler und Warnungen aus deinem Code erscheinen hier, sobald die Sprachunterstützung aktiv ist."
   },
@@ -121,7 +119,8 @@
       "preferences": "Einstellungen",
       "files": "Dateien",
       "editor": "Editor",
-      "terminal": "Terminal"
+      "terminal": "Terminal",
+      "agent": "Agent"
     },
     "palette": "Befehlspalette öffnen",
     "showFiles": "Dateien anzeigen",
@@ -168,7 +167,8 @@
   },
   "dialog": {
     "cancel": "Abbrechen",
-    "dismiss": "Meldung schliessen"
+    "dismiss": "Meldung schliessen",
+    "close": "Schliessen"
   },
   "search": {
     "toggleReplace": "Ersetzen ein- oder ausblenden",
@@ -208,5 +208,83 @@
     "ended": "beendet",
     "exited": "[Prozess beendet mit Code {{code}}]",
     "inputLabel": "Terminal-Eingabe"
+  },
+  "permissions": {
+    "pendingLabel": "Offene Berechtigungsanfragen",
+    "wants": "{{agent}} möchte {{action}}",
+    "agentSays": "Beschreibung des Agenten:",
+    "diffLabel": "Vorgeschlagene Änderung",
+    "allowOnce": "Einmal erlauben",
+    "allowAlways": "Immer erlauben (dieses Projekt)",
+    "deny": "Ablehnen",
+    "kind": {
+      "fileRead": "eine Datei lesen",
+      "fileWrite": "eine Datei ändern",
+      "fileDelete": "eine Datei löschen",
+      "commandRun": "einen Befehl ausführen",
+      "network": "auf das Netzwerk zugreifen",
+      "browser": "den Browser nutzen",
+      "mcpTool": "ein MCP-Tool nutzen",
+      "docker": "eine Docker-Aktion ausführen"
+    },
+    "why": {
+      "fileRead": "Der Inhalt wird an das Modell des Agenten gesendet.",
+      "fileWrite": "Die Datei in deinem Projekt wird verändert. Du kannst die Änderung danach prüfen und zurücksetzen.",
+      "fileDelete": "Die Datei wird aus deinem Projekt entfernt.",
+      "commandRun": "Befehle laufen mit deinen Rechten auf deinem System und können alles tun, was du auch tun kannst.",
+      "network": "Daten könnten dein Gerät verlassen.",
+      "browser": "Der Agent sieht Inhalte von Webseiten. Diese gelten als nicht vertrauenswürdig.",
+      "mcpTool": "Das Tool läuft ausserhalb von Kestrel und kann eigene Aktionen ausführen.",
+      "docker": "Container und Images auf deinem System werden verändert."
+    },
+    "level": {
+      "allow": "Erlauben",
+      "ask": "Nachfragen",
+      "deny": "Verbieten"
+    },
+    "scope": {
+      "project": "Dieses Projekt",
+      "global": "Alle Projekte"
+    },
+    "rules": {
+      "title": "Berechtigungen verwalten",
+      "intro": "Ohne passende Regel fragt Kestrel nach. «Verbieten» gewinnt immer gegen «Erlauben». Dateien mit Geheimnissen (.env, Schlüssel, .ssh …) sind für Agenten immer gesperrt.",
+      "empty": "Noch keine Regeln. Regeln entstehen auch, wenn du «Immer erlauben» wählst.",
+      "kind": "Art",
+      "pattern": "Muster",
+      "level": "Stufe",
+      "scope": "Gültig für",
+      "add": "Regel hinzufügen",
+      "delete": "Löschen",
+      "deleteRule": "Regel «{{pattern}}» löschen",
+      "patternHint": "Für Dateien ein Muster wie src/** oder *.md. Für Befehle der genaue Befehl. ** steht für alles."
+    },
+    "log": {
+      "title": "Berechtigungsprotokoll",
+      "emptyTitle": "Noch keine Einträge",
+      "emptyText": "Hier steht jede Aktion eines Agenten, die erlaubt oder abgelehnt wurde.",
+      "time": "Zeit",
+      "agent": "Agent",
+      "target": "Ziel",
+      "outcome": "Ergebnis",
+      "allowed": "Erlaubt",
+      "denied": "Abgelehnt",
+      "by": {
+        "rule": "Regel",
+        "user": "von dir",
+        "sensitive": "Geheimnis-Schutz",
+        "cancelled": "abgebrochen"
+      }
+    },
+    "kindName": {
+      "fileRead": "Datei lesen",
+      "fileWrite": "Datei ändern",
+      "fileDelete": "Datei löschen",
+      "commandRun": "Befehl ausführen",
+      "network": "Netzwerk",
+      "browser": "Browser",
+      "mcpTool": "MCP-Tool",
+      "docker": "Docker"
+    }
   }
 }

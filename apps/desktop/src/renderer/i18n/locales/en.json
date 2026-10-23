@@ -66,8 +66,6 @@
     "problems": "Problems",
     "terminalEmptyTitle": "No terminal yet",
     "terminalEmptyText": "Terminals start in the project folder (or your home folder) with your default shell.",
-    "logsEmptyTitle": "No logs",
-    "logsEmptyText": "Output from agents, Docker and MCP servers will appear here.",
     "problemsEmptyTitle": "No problems",
     "problemsEmptyText": "Errors and warnings from your code appear here once language support is active."
   },
@@ -121,7 +119,8 @@
       "preferences": "Preferences",
       "files": "Files",
       "editor": "Editor",
-      "terminal": "Terminal"
+      "terminal": "Terminal",
+      "agent": "Agent"
     },
     "palette": "Open command palette",
     "showFiles": "Show files",
@@ -168,7 +167,8 @@
   },
   "dialog": {
     "cancel": "Cancel",
-    "dismiss": "Dismiss message"
+    "dismiss": "Dismiss message",
+    "close": "Close"
   },
   "search": {
     "toggleReplace": "Toggle replace",
@@ -208,5 +208,83 @@
     "ended": "ended",
     "exited": "[Process exited with code {{code}}]",
     "inputLabel": "Terminal input"
+  },
+  "permissions": {
+    "pendingLabel": "Open permission requests",
+    "wants": "{{agent}} wants to {{action}}",
+    "agentSays": "Agent’s description:",
+    "diffLabel": "Proposed change",
+    "allowOnce": "Allow once",
+    "allowAlways": "Always allow (this project)",
+    "deny": "Deny",
+    "kind": {
+      "fileRead": "read a file",
+      "fileWrite": "change a file",
+      "fileDelete": "delete a file",
+      "commandRun": "run a command",
+      "network": "access the network",
+      "browser": "use the browser",
+      "mcpTool": "use an MCP tool",
+      "docker": "run a Docker action"
+    },
+    "why": {
+      "fileRead": "The content is sent to the agent’s model.",
+      "fileWrite": "The file in your project will change. You can review and revert the change afterwards.",
+      "fileDelete": "The file will be removed from your project.",
+      "commandRun": "Commands run with your rights on your system and can do anything you can do.",
+      "network": "Data could leave your device.",
+      "browser": "The agent sees web content. It is treated as untrusted.",
+      "mcpTool": "The tool runs outside Kestrel and can take its own actions.",
+      "docker": "Containers and images on your system will change."
+    },
+    "level": {
+      "allow": "Allow",
+      "ask": "Ask",
+      "deny": "Deny"
+    },
+    "scope": {
+      "project": "This project",
+      "global": "All projects"
+    },
+    "rules": {
+      "title": "Manage permissions",
+      "intro": "Without a matching rule, Kestrel asks. “Deny” always wins over “Allow”. Files with secrets (.env, keys, .ssh …) are always blocked for agents.",
+      "empty": "No rules yet. Rules are also created when you choose “Always allow”.",
+      "kind": "Kind",
+      "pattern": "Pattern",
+      "level": "Level",
+      "scope": "Applies to",
+      "add": "Add rule",
+      "delete": "Delete",
+      "deleteRule": "Delete rule “{{pattern}}”",
+      "patternHint": "For files a pattern like src/** or *.md. For commands the exact command. ** means everything."
+    },
+    "log": {
+      "title": "Permission log",
+      "emptyTitle": "No entries yet",
+      "emptyText": "Every agent action that was allowed or denied is listed here.",
+      "time": "Time",
+      "agent": "Agent",
+      "target": "Target",
+      "outcome": "Outcome",
+      "allowed": "Allowed",
+      "denied": "Denied",
+      "by": {
+        "rule": "rule",
+        "user": "by you",
+        "sensitive": "secret guard",
+        "cancelled": "cancelled"
+      }
+    },
+    "kindName": {
+      "fileRead": "Read file",
+      "fileWrite": "Change file",
+      "fileDelete": "Delete file",
+      "commandRun": "Run command",
+      "network": "Network",
+      "browser": "Browser",
+      "mcpTool": "MCP tool",
+      "docker": "Docker"
+    }
   }
 }

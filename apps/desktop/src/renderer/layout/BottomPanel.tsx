@@ -1,9 +1,10 @@
-import { CircleAlert, ScrollText, X } from 'lucide-react';
+import { CircleAlert, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { BottomView } from '@kestrel/shared';
 import { EmptyState } from '../components/EmptyState';
 import { IconButton } from '../components/IconButton';
 import { Tabs } from '../components/Tabs';
+import { PermissionLog } from '../features/permissions';
 import { TerminalView } from '../features/terminal';
 import { setPanelOpen } from '../stores/layout';
 import { useSettingsStore } from '../stores/settings';
@@ -37,13 +38,7 @@ export function BottomPanel() {
         }
       >
         {layout.bottomView === 'terminal' && <TerminalView />}
-        {layout.bottomView === 'logs' && (
-          <EmptyState
-            icon={ScrollText}
-            title={t('bottom.logsEmptyTitle')}
-            description={t('bottom.logsEmptyText')}
-          />
-        )}
+        {layout.bottomView === 'logs' && <PermissionLog />}
         {layout.bottomView === 'problems' && (
           <EmptyState
             icon={CircleAlert}

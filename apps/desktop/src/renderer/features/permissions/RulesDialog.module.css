@@ -1,0 +1,79 @@
+.intro,
+.empty,
+.hint {
+  margin: 0 0 var(--space-4);
+  color: var(--text-muted);
+}
+
+.table {
+  width: 100%;
+  margin-bottom: var(--space-5);
+  border-collapse: collapse;
+}
+
+.table th {
+  padding: var(--space-1) var(--space-2);
+  border-bottom: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  text-align: left;
+}
+
+.table td {
+  padding: var(--space-1) var(--space-2);
+  border-bottom: 1px solid var(--border);
+  overflow-wrap: anywhere;
+}
+
+.kind {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.allow {
+  color: var(--success);
+}
+
+.deny {
+  color: var(--error);
+}
+
+.form {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-2) var(--space-3);
+  align-items: center;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border);
+}
+
+.formTitle {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.form select,
+.form input {
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+}
+
+.hint {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: var(--font-size-xs);
+}
+
+.actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+}
