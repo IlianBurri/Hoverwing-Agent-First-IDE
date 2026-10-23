@@ -140,7 +140,8 @@
       "authRequired": "{{agent}} braucht eine Anmeldung. Melde dich im Agenten selbst an (für Claude Code: im Terminal «claude» starten und «/login» eingeben) und starte dann neu.",
       "crashed": "{{agent}} wurde unerwartet beendet.",
       "protocol": "Fehler in der Kommunikation mit {{agent}}."
-    }
+    },
+    "secretsNote": "Hinweis: Kestrel sperrt .env, Schlüssel & Co. für alles, was über Kestrel läuft. Agenten wie Claude Code lesen Projektdateien aber auch selbst. Vollständigen Schutz bietet erst die Agent-Sandbox (kommt in Phase 3)."
   },
   "status": {
     "label": "Statusleiste",

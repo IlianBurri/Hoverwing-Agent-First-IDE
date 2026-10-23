@@ -140,7 +140,8 @@
       "authRequired": "{{agent}} needs a login. Log in within the agent itself (for Claude Code: run “claude” in the terminal and type “/login”), then start again.",
       "crashed": "{{agent}} stopped unexpectedly.",
       "protocol": "Communication error with {{agent}}."
-    }
+    },
+    "secretsNote": "Note: Kestrel blocks .env, keys and similar files for everything that goes through Kestrel. Agents like Claude Code also read project files themselves, though. Full protection comes with the agent sandbox (phase 3)."
   },
   "status": {
     "label": "Status bar",

@@ -69,6 +69,7 @@ export function StartView() {
         </div>
       )}
       <p className={styles['privacy']}>{t('agent.privacyNote')}</p>
+      <p className={styles['privacy']}>{t('agent.secretsNote')}</p>
     </div>
   );
 }
