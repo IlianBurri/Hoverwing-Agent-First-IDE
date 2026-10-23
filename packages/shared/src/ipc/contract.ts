@@ -1,5 +1,6 @@
 import type { z } from 'zod';
 import { appChannels } from './channels/app';
+import { permissionChannels, permissionEvents } from './channels/permissions';
 import { searchChannels } from './channels/search';
 import { settingsChannels, settingsEvents } from './channels/settings';
 import { terminalChannels, terminalEvents } from './channels/terminal';
@@ -21,6 +22,7 @@ import { workspaceChannels, workspaceEvents } from './channels/workspace';
  */
 export const ipcContract = {
   ...appChannels,
+  ...permissionChannels,
   ...searchChannels,
   ...settingsChannels,
   ...terminalChannels,
@@ -29,6 +31,7 @@ export const ipcContract = {
 } as const satisfies Record<string, { request: z.ZodType; response: z.ZodType }>;
 
 export const ipcEvents = {
+  ...permissionEvents,
   ...settingsEvents,
   ...terminalEvents,
   ...workspaceEvents,

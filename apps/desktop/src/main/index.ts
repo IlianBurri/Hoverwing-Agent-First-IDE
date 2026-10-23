@@ -3,6 +3,12 @@ import { join } from 'node:path';
 import { BrowserWindow, app, nativeTheme, session, webContents } from 'electron';
 import type { Settings } from '@kestrel/shared';
 import { createAppHandlers } from './modules/app/handlers';
+import {
+  AuditLog,
+  PermissionService,
+  RuleStore,
+  createPermissionHandlers,
+} from './modules/permissions';
 import { SearchRunner, createSearchHandlers } from './modules/search';
 import { createSettingsHandlers, createSettingsStore } from './modules/settings';
 import { TerminalManager, createTerminalHandlers, spawnNodePty } from './modules/terminal';
@@ -66,6 +72,25 @@ void app.whenReady().then(async () => {
     },
   });
   const search = new SearchRunner();
+  const permissionsDir = join(app.getPath('userData'), 'permissions');
+  const permissions = new PermissionService(
+    new RuleStore(permissionsDir),
+    new AuditLog(permissionsDir),
+    {
+      request: (ownerId, request) => {
+        const contents = webContents.fromId(ownerId);
+        if (contents) sendEvent(contents, 'permissions:request', request);
+      },
+      resolved: (ownerId, id) => {
+        const contents = webContents.fromId(ownerId);
+        if (contents) sendEvent(contents, 'permissions:resolved', { id });
+      },
+      logged: (ownerId, entry) => {
+        const contents = webContents.fromId(ownerId);
+        if (contents) sendEvent(contents, 'permissions:logged', entry);
+      },
+    },
+  );
   const sendTo = (ownerId: number) => webContents.fromId(ownerId);
   const terminals = new TerminalManager(spawnNodePty, {
     onData: (ownerId, id, data) => {
@@ -83,6 +108,7 @@ void app.whenReady().then(async () => {
       void workspaces.close(contents.id);
       search.cancel(contents.id);
       terminals.killAll(contents.id);
+      permissions.cancel(contents.id);
     };
     contents.on('destroyed', release);
     contents.on('did-start-navigation', (details) => {
@@ -102,6 +128,7 @@ void app.whenReady().then(async () => {
         terminals.killAll(ownerId);
       }),
       ...createTerminalHandlers(terminals, workspaces),
+      ...createPermissionHandlers(permissions, workspaces),
       ...createSearchHandlers(search, workspaces),
       'window:setTitleBarTheme': (theme, { sender }) => {
         const window = BrowserWindow.fromWebContents(sender);
