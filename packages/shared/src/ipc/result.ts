@@ -19,7 +19,9 @@ export type IpcErrorCode =
   | 'agent_not_approved'
   | 'review_conflict'
   | 'sandbox_unavailable'
-  | 'sandbox_build_failed';
+  | 'sandbox_build_failed'
+  | 'docker_conflict'
+  | 'docker_failed';
 
 export interface IpcError {
   code: IpcErrorCode;

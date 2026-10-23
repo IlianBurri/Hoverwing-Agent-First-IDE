@@ -1,4 +1,13 @@
-export type { AttachedContainer, ContainerMount, ContainerSpec, DockerApi } from './api';
+export type {
+  AttachedContainer,
+  ContainerInfo,
+  ContainerMount,
+  ContainerSpec,
+  DockerApi,
+  ImageInfo,
+} from './api';
+export { createDockerHandlers } from './handlers';
+export { DockerPanelService } from './panel';
 export { createDockerApi } from './dockerode';
 export {
   DEFAULT_SANDBOX_PACKAGES,

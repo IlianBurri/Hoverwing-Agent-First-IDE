@@ -7,6 +7,7 @@ import { defaultAgentSandbox } from '@kestrel/shared';
 import type { AgentConfig } from '@kestrel/shared';
 import type { AttachedContainer, ContainerSpec, DockerApi } from '../docker';
 import { classifyDockerError } from '../docker';
+import { fakeDockerApi } from '../docker/testing';
 import { SandboxService } from './service';
 import { containerPty, containerTransport } from './transport';
 
@@ -47,7 +48,7 @@ function fakeDocker(overrides: Partial<DockerApi> = {}) {
     images.add(tag);
   });
   const removeContainer = vi.fn<DockerApi['removeContainer']>(() => Promise.resolve());
-  const api: DockerApi = {
+  const api: DockerApi = fakeDockerApi({
     ping: () => Promise.resolve(),
     version: () => Promise.resolve('29.0.0'),
     imageExists: (tag) => Promise.resolve(images.has(tag)),
@@ -59,7 +60,7 @@ function fakeDocker(overrides: Partial<DockerApi> = {}) {
       return Promise.resolve(fakeContainer().container);
     },
     ...overrides,
-  };
+  });
   return { api, buildImage, removeContainer, runs };
 }
 

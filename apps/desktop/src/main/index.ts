@@ -25,6 +25,8 @@ import { SecretStore } from './modules/secrets';
 import { SandboxService, createSandboxHandlers } from './modules/sandbox';
 import {
   DEFAULT_SANDBOX_PACKAGES,
+  DockerPanelService,
+  createDockerHandlers,
   classifyDockerError,
   createDockerApi,
   dockerInstallPaths,
@@ -182,6 +184,7 @@ void app.whenReady().then(async () => {
       terminals.killAll(contents.id);
       permissions.cancel(contents.id);
       void agents.release(contents.id);
+      dockerPanel.release(contents.id);
     };
     contents.on('destroyed', release);
     contents.on('did-start-navigation', (details) => {
@@ -207,8 +210,9 @@ void app.whenReady().then(async () => {
       }
     },
   );
+  const dockerApi = createDockerApi({ socketPath: await findDockerSocket() });
   const sandbox = new SandboxService({
-    docker: createDockerApi({ socketPath: await findDockerSocket() }),
+    docker: dockerApi,
     dataDir: join(dataDir, 'sandbox'),
     platform: process.platform,
     identity: {
@@ -229,6 +233,24 @@ void app.whenReady().then(async () => {
     },
   });
   void sandbox.removeOrphans().catch(() => undefined);
+  const dockerPanel = new DockerPanelService({
+    docker: dockerApi,
+    state: () => sandbox.dockerState(),
+    onChanged: () => {
+      broadcastEvent('docker:changed', {});
+    },
+    onOutput: (ownerId, streamId, data) => {
+      const contents = webContents.fromId(ownerId);
+      if (contents) sendEvent(contents, 'docker:output', { streamId, data });
+    },
+    onStreamEnded: (ownerId, streamId, ok) => {
+      const contents = webContents.fromId(ownerId);
+      if (contents) sendEvent(contents, 'docker:streamEnded', { streamId, ok });
+    },
+    onLog: (line) => {
+      broadcastEvent('sandbox:log', { line, time: Date.now() });
+    },
+  });
   const agentConfigs = new AgentConfigStore(dataDir, () => sandbox.isAvailable());
   const agents = new AgentService({
     configs: agentConfigs,
@@ -294,6 +316,7 @@ void app.whenReady().then(async () => {
       ...createCheckpointHandlers(checkpoints, workspaces),
       ...createAgentHandlers(agents, workspaces),
       ...createReviewHandlers(review, workspaces),
+      ...createDockerHandlers(dockerPanel, workspaces),
       ...createSandboxHandlers(
         sandbox,
         terminals,

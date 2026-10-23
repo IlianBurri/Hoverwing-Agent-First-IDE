@@ -13,7 +13,8 @@
   "activity": {
     "label": "Aktivitäten",
     "files": "Dateien",
-    "search": "Suche"
+    "search": "Suche",
+    "docker": "Docker"
   },
   "sidebar": {
     "files": {
@@ -67,7 +68,8 @@
     "terminalEmptyTitle": "Noch kein Terminal",
     "terminalEmptyText": "Terminals starten im Projektordner (ohne Projekt im Home-Ordner) mit deiner Standard-Shell.",
     "problemsEmptyTitle": "Keine Probleme",
-    "problemsEmptyText": "Fehler und Warnungen aus deinem Code erscheinen hier, sobald die Sprachunterstützung aktiv ist."
+    "problemsEmptyText": "Fehler und Warnungen aus deinem Code erscheinen hier, sobald die Sprachunterstützung aktiv ist.",
+    "docker": "Docker"
   },
   "agent": {
     "title": "Agent",
@@ -187,7 +189,9 @@
       "agent_not_approved": "Der Start des Agenten wurde nicht erlaubt.",
       "review_conflict": "Die Datei wurde inzwischen geändert. Die Ansicht wurde aktualisiert, bitte prüfe sie erneut.",
       "sandbox_unavailable": "Docker ist nicht verfügbar. Starte Docker (oder Docker Desktop) und versuche es erneut.",
-      "sandbox_build_failed": "Das Sandbox-Image konnte nicht gebaut werden. Details stehen in den Logs."
+      "sandbox_build_failed": "Das Sandbox-Image konnte nicht gebaut werden. Details stehen in den Logs.",
+      "docker_conflict": "Docker hat abgelehnt: wird noch verwendet (z. B. ein Image, das ein Container nutzt).",
+      "docker_failed": "Die Docker-Aktion ist fehlgeschlagen. Details stehen unter Logs › Docker."
     }
   },
   "palette": {
@@ -407,7 +411,7 @@
     "label": "Art des Protokolls",
     "permissions": "Berechtigungen",
     "agent": "Agent-Ausgabe",
-    "sandbox": "Sandbox"
+    "sandbox": "Docker"
   },
   "agentLog": {
     "title": "Agent-Ausgabe",

@@ -13,7 +13,8 @@
   "activity": {
     "label": "Activities",
     "files": "Files",
-    "search": "Search"
+    "search": "Search",
+    "docker": "Docker"
   },
   "sidebar": {
     "files": {
@@ -67,7 +68,8 @@
     "terminalEmptyTitle": "No terminal yet",
     "terminalEmptyText": "Terminals start in the project folder (or your home folder) with your default shell.",
     "problemsEmptyTitle": "No problems",
-    "problemsEmptyText": "Errors and warnings from your code appear here once language support is active."
+    "problemsEmptyText": "Errors and warnings from your code appear here once language support is active.",
+    "docker": "Docker"
   },
   "agent": {
     "title": "Agent",
@@ -187,7 +189,9 @@
       "agent_not_approved": "Starting the agent was not allowed.",
       "review_conflict": "The file changed in the meantime. The view was refreshed, please review it again.",
       "sandbox_unavailable": "Docker is not available. Start Docker (or Docker Desktop) and try again.",
-      "sandbox_build_failed": "The sandbox image could not be built. Details are in the logs."
+      "sandbox_build_failed": "The sandbox image could not be built. Details are in the logs.",
+      "docker_conflict": "Docker refused: it is still in use (e.g. an image used by a container).",
+      "docker_failed": "The Docker action failed. Details are in Logs › Docker."
     }
   },
   "palette": {
@@ -407,7 +411,7 @@
     "label": "Log type",
     "permissions": "Permissions",
     "agent": "Agent output",
-    "sandbox": "Sandbox"
+    "sandbox": "Docker"
   },
   "agentLog": {
     "title": "Agent output",

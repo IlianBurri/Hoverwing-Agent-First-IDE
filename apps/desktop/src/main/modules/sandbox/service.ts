@@ -72,8 +72,18 @@ export class SandboxService {
     };
   }
 
+  /** Only whether Docker can be used (cheaper than `status`). */
+  async dockerState(): Promise<SandboxStatus['docker']> {
+    try {
+      await this.deps.docker.ping();
+      return 'available';
+    } catch (error) {
+      return this.deps.classifyError(error, await this.deps.isInstalled());
+    }
+  }
+
   async isAvailable(): Promise<boolean> {
-    return (await this.status()).docker === 'available';
+    return (await this.dockerState()) === 'available';
   }
 
   private async requireDocker(): Promise<void> {

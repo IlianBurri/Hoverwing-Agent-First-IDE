@@ -9,3 +9,4 @@ export * from './schemas/checkpoints';
 export * from './schemas/agent';
 export * from './schemas/review';
 export * from './schemas/sandbox';
+export * from './schemas/docker';

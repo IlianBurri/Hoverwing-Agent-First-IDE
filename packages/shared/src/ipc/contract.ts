@@ -2,6 +2,7 @@ import type { z } from 'zod';
 import { agentChannels, agentEvents } from './channels/agent';
 import { appChannels } from './channels/app';
 import { checkpointChannels, checkpointEvents } from './channels/checkpoints';
+import { dockerChannels, dockerEvents } from './channels/docker';
 import { permissionChannels, permissionEvents } from './channels/permissions';
 import { reviewChannels, reviewEvents } from './channels/review';
 import { sandboxChannels, sandboxEvents } from './channels/sandbox';
@@ -28,6 +29,7 @@ export const ipcContract = {
   ...agentChannels,
   ...appChannels,
   ...checkpointChannels,
+  ...dockerChannels,
   ...permissionChannels,
   ...reviewChannels,
   ...sandboxChannels,
@@ -41,6 +43,7 @@ export const ipcContract = {
 export const ipcEvents = {
   ...agentEvents,
   ...checkpointEvents,
+  ...dockerEvents,
   ...permissionEvents,
   ...reviewEvents,
   ...sandboxEvents,
