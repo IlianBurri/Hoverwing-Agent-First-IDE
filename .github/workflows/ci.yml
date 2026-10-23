@@ -23,7 +23,14 @@ jobs:
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test
+        env:
+          # Also run the sandbox tests against the runner's Docker daemon.
+          KESTREL_DOCKER_TESTS: '1'
+          KESTREL_SANDBOX_BASE_IMAGE: mirror.gcr.io/library/node:22-bookworm-slim
       # Ubuntu 24.04 blocks unprivileged user namespaces, which Chromium's
       # sandbox needs. Re-enable them so E2E runs with the sandbox on.
       - run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
       - run: xvfb-run -a pnpm test:e2e
+        env:
+          KESTREL_E2E_DOCKER: '1'
+          KESTREL_E2E_SANDBOX_BASE_IMAGE: mirror.gcr.io/library/node:22-bookworm-slim

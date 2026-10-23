@@ -4,10 +4,10 @@ Kestrel is an agent-first desktop IDE. It does not ship its own AI. You bring yo
 own agent (e.g. Claude Code via the Agent Client Protocol), your own API key or a
 local model, and Kestrel makes working with it visible, safe and easy to undo.
 
-> Status: **phase 2 done** – workspace, editor, search, terminal, plus agents via
-> the Agent Client Protocol with permissions, checkpoints and diff review. The
-> agent sandbox (Docker) follows in phase 3. See [`SPEC.md`](SPEC.md) for the
-> full specification and roadmap.
+> Status: **phase 3 done** – workspace, editor, search, terminal, agents via the
+> Agent Client Protocol with permissions, checkpoints and diff review, and an
+> optional Docker sandbox for agents. See [`SPEC.md`](SPEC.md) for the full
+> specification and roadmap.
 
 ## What works today
 
@@ -38,12 +38,25 @@ local model, and Kestrel makes working with it visible, safe and easy to undo.
   touched). Jump back to any checkpoint, completely or per file.
 - **Diff review:** agent changes are listed for review; accept or reject per
   file or per section. Rejected changes leave the file exactly as it was.
+- **Agent sandbox (Docker):** per agent, “Run in the Docker sandbox” starts the
+  agent in a container that sees only the project (secret files such as `.env`
+  are covered with an empty file, `.ssh`/`.aws`/`.gnupg` folders with an empty
+  tmpfs) and its own home volume – not your home folder or other files. The
+  container has a read-only root file system, no capabilities, memory/CPU
+  limits, and runs as your user on Linux. A badge always shows whether an agent
+  runs in the sandbox or directly on the system. Log in to the agent in a
+  sandbox terminal (Manage agents → “Log in in the sandbox terminal”); the login
+  stays in the agent's Docker volume and Kestrel never reads it.
 
 ## Requirements
 
 - Node.js ≥ 22.12 (see `.nvmrc`)
 - pnpm 10 (`corepack enable` picks the version pinned in `package.json`)
 - Git (for checkpoints)
+- Docker (optional, for the agent sandbox): Docker Desktop on macOS/Windows,
+  Docker Engine on Linux (your user in the `docker` group). Colima and Rancher
+  Desktop work too. The sandbox image is built from a Debian-based Node image
+  (`node:22-bookworm-slim` by default; a mirror can be set in Manage agents).
 - **Linux only:** a C/C++ toolchain and Python 3 (`build-essential`, `python3`) –
   `node-pty` is compiled during install. macOS and Windows use prebuilt binaries.
 - Headless Linux (E2E tests): `xvfb-run`
@@ -76,6 +89,15 @@ node node_modules/electron/install.js
 
 On a Linux machine without a display use `xvfb-run -a pnpm test:e2e`.
 
+Tests against a real Docker daemon are opt-in:
+
+```bash
+KESTREL_DOCKER_TESTS=1 pnpm test                  # sandbox integration test
+KESTREL_E2E_DOCKER=1 xvfb-run -a pnpm test:e2e    # agent in a real container
+# optional: KESTREL_SANDBOX_BASE_IMAGE / KESTREL_E2E_SANDBOX_BASE_IMAGE=<mirror>,
+#           KESTREL_SANDBOX_PACKAGES="" where apt cannot reach Debian
+```
+
 ## Keyboard shortcuts
 
 `Mod` is `Cmd` on macOS and `Ctrl` elsewhere.
@@ -102,11 +124,13 @@ Shortcuts can be changed in `settings.json` in the app data folder:
 ```
 apps/desktop/          Electron app
   src/main/            Main process: windows, security, IPC, modules
-    modules/           app, settings, workspace, search, terminal
+    modules/           app, settings, workspace, search, terminal, permissions,
+                       checkpoints, agent, review, docker, sandbox
   src/preload/         Minimal typed bridge (window.kestrel)
   src/renderer/        React UI
     layout/            App shell, title/activity/status bar, panels
-    features/          commands, workspace, editor, search, terminal, agent
+    features/          commands, workspace, editor, search, terminal, agent,
+                       permissions, checkpoints, review, sandbox
     components/        Reusable UI (dialogs, tabs, menus, buttons …)
     stores/            Zustand stores
     design/            Design tokens and themes
@@ -124,6 +148,10 @@ packages/shared/       Code shared by all processes (IPC contract, schemas)
   rejects anything outside it (including symlinks that point outside).
 - A strict Content-Security-Policy is applied (Monaco is bundled locally, no CDN);
   navigation and new windows are blocked.
+- Sandboxed agents get only their own configured variables (and proxy
+  settings), never your environment. Note: like anything passed to Docker, these
+  values are visible to users who can run `docker inspect`. Secret files created
+  after the agent started are not covered until the next start.
 
 ## Note on trademarks
 

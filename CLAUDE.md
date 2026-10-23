@@ -4,9 +4,9 @@ Guidance for working on Kestrel. Read `SPEC.md` for the product spec and phases.
 
 ## Current phase
 
-Phases 0 (foundation), 1 (layout, palette, workspace, Monaco, search, terminal)
-and 2 (permissions, agents via ACP, checkpoints, diff review) are done. Next:
-phase 3 (agent sandbox in a Docker container). Every phase: present a plan, wait for OK, implement in
+Phases 0 (foundation), 1 (layout, palette, workspace, Monaco, search, terminal),
+2 (permissions, agents via ACP, checkpoints, diff review) and 3 (agent sandbox in
+Docker) are done. Next: phase 4 (see SPEC.md). Every phase: present a plan, wait for OK, implement in
 small commits, keep lint/typecheck/tests green, update this file.
 
 ## Commands
@@ -19,6 +19,8 @@ pnpm typecheck        # tsc in all packages
 pnpm test             # vitest unit tests
 pnpm test:e2e         # build + playwright electron tests
 xvfb-run -a pnpm test:e2e   # headless Linux / cloud containers
+KESTREL_DOCKER_TESTS=1 pnpm test               # + sandbox integration test (Docker)
+KESTREL_E2E_DOCKER=1 xvfb-run -a pnpm test:e2e # + agent in a real container
 pnpm format           # prettier
 ```
 
@@ -26,6 +28,11 @@ Running as root (containers): Chromium needs `--no-sandbox`; the E2E launcher
 adds it automatically and the app then skips `app.enableSandbox()`.
 `node-pty` is compiled on Linux during install (needs build tools); it is listed
 in `onlyBuiltDependencies` in `pnpm-workspace.yaml`.
+
+Cloud containers: start Docker with `(dockerd > /tmp/dockerd.log 2>&1 &)`.
+Docker Hub may rate-limit (429) and apt cannot reach Debian through the proxy,
+so use `KESTREL_SANDBOX_BASE_IMAGE` / `KESTREL_E2E_SANDBOX_BASE_IMAGE` =
+`mirror.gcr.io/library/node:22-bookworm-slim` and `KESTREL_SANDBOX_PACKAGES=""`.
 
 ## Architecture rules
 
@@ -86,6 +93,19 @@ in `onlyBuiltDependencies` in `pnpm-workspace.yaml`.
   agent changed itself are collected from the turn checkpoint ("applied").
   Resolving keeps selected hunks (`hunks.ts`, `diff` package) and refuses to
   overwrite files that changed meanwhile (`review_conflict`).
+- **Sandbox:** `modules/docker` wraps dockerode behind the small `DockerApi`
+  interface (no Docker CLI needed; socket auto-detection incl. Docker Desktop,
+  Colima, Rancher). `modules/sandbox`: `plan.ts` (pure) builds the
+  `ContainerSpec` – project bind-mounted at the same path (`/workspace` on
+  Windows; runtime keeps `agentRoot` vs. host `root`), secret files covered by
+  an empty read-only file, secret dirs by a tmpfs (`scan.ts`), home = volume
+  `kestrel-home-<agentId>`, npm cache volume, read-only rootfs, `CapDrop ALL`,
+  `no-new-privileges`, limits, host uid:gid on Linux, AutoRemove, labels
+  `dev.kestrel.sandbox*` (orphans of this user-data dir are removed on start).
+  Containers get only the agent's own env plus proxy variables. The image
+  (`kestrel-sandbox:<hash>`) is built from an inline Dockerfile on first use;
+  output goes to `sandbox:log`. A sandboxed agent never falls back to running
+  directly; the approval fingerprint includes `sandbox.enabled`.
 - **Commands:** every user action is a `Command` registered by its feature
   (`register<Feature>Commands`), with an i18n title, optional default keybinding(s)
   (`Mod+…`, overridable via `settings.keybindings`) and a `when` condition. One
@@ -120,8 +140,10 @@ in `onlyBuiltDependencies` in `pnpm-workspace.yaml`.
   `stubTrash` and `stubMessageBox` replace native UI. Agent tests use the
   scripted ACP agent `e2e/fixtures/mock-agent.mjs` (configured with
   `configureMockAgent`); prompts like `hello`, `edit <path> <text>`,
-  `direct <path> <text>`, `twohunks <path>`, `secret`, `run <cmd>`, `slow`
-  trigger fixed behaviour. A failing test restarts the worker (and the app),
+  `direct <path> <text>`, `twohunks <path>`, `secret`, `run <cmd>`, `slow`,
+  `peek <path>`, `whoami` trigger fixed behaviour. Sandbox E2E bundles the mock
+  agent into the project (`bundleMockAgent`, via Vite) because the container
+  only sees the project. A failing test restarts the worker (and the app),
   so later tests in the file fail as follow-ups – fix the first failure first.
 - Commits: Conventional Commits (`feat:`, `fix:`, `chore:`, `test:`, `docs:`).
 - Branding: never use "Claude"/"Anthropic" in product name or logo. A factual
@@ -139,7 +161,9 @@ monaco-editor 0.57 (imports via `monaco-editor/<path>`, TS API under
 
 @agentclientprotocol/sdk 2.0.1 (stable v1 entry point; API: `client()`,
 `onRequest`, `connect(stream)`, `ndJsonStream`; no request timeout option),
-diff 9, react-markdown 10 + remark-gfm 4. Agent templates: Claude Code via
+diff 9, react-markdown 10 + remark-gfm 4, dockerode 5.0.1 (+ @types/dockerode
+4.0.2; `buildImage` takes `{ context, src }`, build errors arrive as JSON lines,
+`docker.modem.demuxStream` splits stdout/stderr). Agent templates: Claude Code via
 `npx -y @agentclientprotocol/claude-agent-acp@0.94.0`, Gemini CLI via
 `npx -y @google/gemini-cli@0.65.0 --experimental-acp` (the `@zed-industries/*`
 package names are deprecated). Checkpoints need system `git`.
