@@ -10,4 +10,7 @@ onlyBuiltDependencies:
 # Native fallbacks we do not need: prebuilt binaries are used instead.
 ignoredBuiltDependencies:
   - '@parcel/watcher'
+  - cpu-features
   - electron-winstaller
+  - protobufjs
+  - ssh2
