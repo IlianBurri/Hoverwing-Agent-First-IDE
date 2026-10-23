@@ -8,6 +8,8 @@ export const nativeTexts = {
     agentMessage: 'Agent «{name}» starten?',
     agentDetail:
       'Kestrel startet dieses Programm in deinem Projektordner. Es läuft mit deinen Rechten. Starte nur Agenten, denen du vertraust.\n\n{command}',
+    agentSandboxDetail:
+      'Kestrel startet dieses Programm in der Docker-Sandbox. Es sieht nur deinen Projektordner (ohne Geheimdateien) und kann ihn ändern. Starte nur Agenten, denen du vertraust.\n\n{command}',
     agentStart: 'Starten',
   },
   en: {
@@ -18,6 +20,8 @@ export const nativeTexts = {
     agentMessage: 'Start agent “{name}”?',
     agentDetail:
       'Kestrel will start this program in your project folder. It runs with your rights. Only start agents you trust.\n\n{command}',
+    agentSandboxDetail:
+      'Kestrel will start this program in the Docker sandbox. It only sees your project folder (without secret files) and can change it. Only start agents you trust.\n\n{command}',
     agentStart: 'Start',
   },
 } as const;

@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { join } from 'node:path';
 import { z } from 'zod';
-import { agentConfigSchema } from '@kestrel/shared';
+import { agentConfigSchema, defaultAgentSandbox } from '@kestrel/shared';
 import type { AgentConfig } from '@kestrel/shared';
 import { readJsonFile, writeJsonFile } from '../../lib/jsonFile';
 
@@ -14,6 +14,7 @@ export const AGENT_TEMPLATES: readonly AgentConfig[] = [
     args: ['-y', '@agentclientprotocol/claude-agent-acp@0.94.0'],
     env: [],
     reviewChanges: true,
+    sandbox: defaultAgentSandbox,
   },
   {
     id: 'gemini-cli',
@@ -22,6 +23,7 @@ export const AGENT_TEMPLATES: readonly AgentConfig[] = [
     args: ['-y', '@google/gemini-cli@0.65.0', '--experimental-acp'],
     env: [],
     reviewChanges: true,
+    sandbox: defaultAgentSandbox,
   },
 ];
 
@@ -31,10 +33,16 @@ const fileSchema = z.object({
   approved: z.array(z.string()),
 });
 
-/** Identifies an exact command line (program + arguments). */
-export function commandFingerprint(config: Pick<AgentConfig, 'command' | 'args'>): string {
+/**
+ * Identifies an exact command line (program + arguments) and where it runs:
+ * switching an agent from the sandbox to the system needs a new approval.
+ */
+export function commandFingerprint(
+  config: Pick<AgentConfig, 'command' | 'args' | 'sandbox'>,
+): string {
+  const line = [config.command, ...config.args];
   return createHash('sha256')
-    .update(JSON.stringify([config.command, ...config.args]))
+    .update(JSON.stringify(config.sandbox.enabled ? ['sandbox', ...line] : line))
     .digest('hex');
 }
 
@@ -42,15 +50,35 @@ export class AgentConfigStore {
   private data: z.infer<typeof fileSchema> | null = null;
   private readonly file: string;
 
-  constructor(dir: string) {
+  /**
+   * `sandboxByDefault` decides (once, when there is no agents.json yet)
+   * whether the templates run in the sandbox: yes when Docker is available.
+   */
+  constructor(
+    dir: string,
+    private readonly sandboxByDefault: () => Promise<boolean> = () => Promise.resolve(false),
+  ) {
     this.file = join(dir, 'agents.json');
   }
 
   private async load() {
-    this.data ??= await readJsonFile(this.file, fileSchema, {
-      agents: [...AGENT_TEMPLATES],
-      approved: [],
-    });
+    if (this.data) return this.data;
+    const missing = { agents: [], approved: [] };
+    const stored = await readJsonFile(this.file, fileSchema, missing);
+    if (stored === missing) {
+      const enabled = await this.sandboxByDefault().catch(() => false);
+      this.data = {
+        agents: AGENT_TEMPLATES.map((agent) => ({
+          ...agent,
+          sandbox: { ...agent.sandbox, enabled },
+        })),
+        approved: [],
+      };
+      // Stored right away, so the choice does not change on the next start.
+      await writeJsonFile(this.file, this.data);
+    } else {
+      this.data = stored;
+    }
     return this.data;
   }
 

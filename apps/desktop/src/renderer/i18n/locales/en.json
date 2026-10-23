@@ -136,6 +136,7 @@
     },
     "error": {
       "spawnFailed": "{{agent}} could not be started. Is the program installed?",
+      "sandboxFailed": "{{agent}} could not be started in the sandbox. Is Docker running? Details are in the logs.",
       "initFailed": "{{agent}} did not answer as expected.",
       "authRequired": "{{agent}} needs a login. Log in within the agent itself (for Claude Code: run “claude” in the terminal and type “/login”), then start again.",
       "crashed": "{{agent}} stopped unexpectedly.",
@@ -184,7 +185,9 @@
       "checkpoints_unavailable": "Checkpoints are not available. Git must be installed and a folder must be open.",
       "agent_not_running": "No agent is running.",
       "agent_not_approved": "Starting the agent was not allowed.",
-      "review_conflict": "The file changed in the meantime. The view was refreshed, please review it again."
+      "review_conflict": "The file changed in the meantime. The view was refreshed, please review it again.",
+      "sandbox_unavailable": "Docker is not available. Start Docker (or Docker Desktop) and try again.",
+      "sandbox_build_failed": "The sandbox image could not be built. Details are in the logs."
     }
   },
   "palette": {

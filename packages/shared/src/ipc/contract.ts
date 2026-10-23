@@ -4,6 +4,7 @@ import { appChannels } from './channels/app';
 import { checkpointChannels, checkpointEvents } from './channels/checkpoints';
 import { permissionChannels, permissionEvents } from './channels/permissions';
 import { reviewChannels, reviewEvents } from './channels/review';
+import { sandboxChannels, sandboxEvents } from './channels/sandbox';
 import { searchChannels } from './channels/search';
 import { settingsChannels, settingsEvents } from './channels/settings';
 import { terminalChannels, terminalEvents } from './channels/terminal';
@@ -29,6 +30,7 @@ export const ipcContract = {
   ...checkpointChannels,
   ...permissionChannels,
   ...reviewChannels,
+  ...sandboxChannels,
   ...searchChannels,
   ...settingsChannels,
   ...terminalChannels,
@@ -41,6 +43,7 @@ export const ipcEvents = {
   ...checkpointEvents,
   ...permissionEvents,
   ...reviewEvents,
+  ...sandboxEvents,
   ...settingsEvents,
   ...terminalEvents,
   ...workspaceEvents,

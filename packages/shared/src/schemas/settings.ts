@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { DEFAULT_SANDBOX_BASE_IMAGE, imageReferenceSchema } from './sandbox';
 
 export const themePreferenceSchema = z.enum(['dark', 'light', 'system']);
 export type ThemePreference = z.infer<typeof themePreferenceSchema>;
@@ -33,6 +34,8 @@ export const settingsSchema = z.object({
   keybindings: keybindingsSchema,
   /** Absolute paths, most recent first. Written by the main process only. */
   recentWorkspaces: z.array(z.string().max(4096)).max(10),
+  /** Base image of the agent sandbox (e.g. a mirror of node:22-bookworm-slim). */
+  sandboxBaseImage: imageReferenceSchema,
 });
 export type Settings = z.infer<typeof settingsSchema>;
 
@@ -50,6 +53,7 @@ export const defaultSettings: Settings = {
   },
   keybindings: {},
   recentWorkspaces: [],
+  sandboxBaseImage: DEFAULT_SANDBOX_BASE_IMAGE,
 };
 
 /** Applies a patch; keys that are missing or undefined stay unchanged. */

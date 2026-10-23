@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import { RequestError, agent } from '@agentclientprotocol/sdk';
 import type { AgentContext } from '@agentclientprotocol/sdk';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { defaultAgentSandbox } from '@kestrel/shared';
 import type { AgentConfig, AgentEvent, AgentStatus } from '@kestrel/shared';
 import type { PermissionService } from '../permissions';
 import { AgentRuntime, sliceLines } from './runtime';
@@ -28,6 +29,7 @@ const config: AgentConfig = {
   args: [],
   env: [],
   reviewChanges: false,
+  sandbox: defaultAgentSandbox,
 };
 
 type PromptScript = (

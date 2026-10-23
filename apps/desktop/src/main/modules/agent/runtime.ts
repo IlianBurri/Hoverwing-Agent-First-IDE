@@ -10,7 +10,7 @@ import type { PermissionService } from '../permissions';
 import { resolveInWorkspace } from '../workspace/paths';
 import { actionForToolCall, outcomeFor } from './permissionMapping';
 import { displayPath, mergeToolCall, translateUpdate, unifiedDiff } from './translate';
-import type { AgentTransport, SpawnOptions } from './transport';
+import type { AgentTransport, IsolatedStart, SpawnOptions } from './transport';
 
 /** Starting can include an `npx` download, so be patient. */
 const INIT_TIMEOUT_MS = 180_000;
@@ -53,6 +53,8 @@ export class AgentRuntime {
   private connection: ClientConnection | null = null;
   private config: AgentConfig | null = null;
   private root = '';
+  /** The project path as the agent sees it (differs in the sandbox on Windows). */
+  private agentRoot = '';
   private readonly toolCalls = new Map<string, ToolCallView>();
   private readonly stderrTail: string[] = [];
   private cancelTimer: ReturnType<typeof setTimeout> | null = null;
@@ -91,7 +93,7 @@ export class AgentRuntime {
     return client({ name: 'Kestrel' })
       .onNotification('session/update', ({ params }) => {
         if (params.sessionId !== sessionCheck()) return;
-        const event = translateUpdate(this.root, params.update, this.toolCalls);
+        const event = translateUpdate(this.agentRoot, params.update, this.toolCalls);
         if (event) this.emit(event);
       })
       .onRequest('session/request_permission', async ({ params }) => {
@@ -142,14 +144,14 @@ export class AgentRuntime {
   }
 
   private rememberToolCall(update: ToolCallUpdate): ToolCallView {
-    const view = mergeToolCall(this.root, this.toolCalls.get(update.toolCallId), update);
+    const view = mergeToolCall(this.agentRoot, this.toolCalls.get(update.toolCallId), update);
     this.toolCalls.set(view.id, view);
     return view;
   }
 
   /** Agent paths are absolute; only paths inside the project are allowed. */
   private projectPath(path: string): string {
-    const relativePath = displayPath(this.root, path);
+    const relativePath = displayPath(this.agentRoot, path);
     if (isAbsolute(relativePath)) {
       throw RequestError.invalidParams(undefined, 'Only files inside the project are allowed.');
     }
@@ -161,10 +163,12 @@ export class AgentRuntime {
     root: string,
     env: Record<string, string>,
     resumeSessionId?: string,
+    isolated?: IsolatedStart,
   ): Promise<AgentStatus> {
     await this.stop();
     this.config = config;
     this.root = root;
+    this.agentRoot = root;
     this.toolCalls.clear();
     this.stderrTail.length = 0;
     this.setStatus({
@@ -172,20 +176,27 @@ export class AgentRuntime {
       state: 'starting',
       agentId: config.id,
       agentName: config.name,
+      sandboxed: isolated !== undefined,
     });
 
     let transport: AgentTransport;
     try {
-      transport = await this.deps.startTransport({
-        command: config.command,
-        args: config.args,
-        cwd: root,
-        env,
-      });
+      if (isolated) {
+        const launch = await isolated.start();
+        transport = launch.transport;
+        this.agentRoot = launch.agentRoot;
+      } else {
+        transport = await this.deps.startTransport({
+          command: config.command,
+          args: config.args,
+          cwd: root,
+          env,
+        });
+      }
     } catch (error) {
       return this.setStatus({
         state: 'error',
-        error: 'spawnFailed',
+        error: isolated ? 'sandboxFailed' : 'spawnFailed',
         detail: redact(String(error)),
       });
     }
@@ -230,11 +241,14 @@ export class AgentRuntime {
         this.setStatus({ sessionId });
         await this.agent.request('session/load', {
           sessionId: resumeSessionId,
-          cwd: root,
+          cwd: this.agentRoot,
           mcpServers: [],
         });
       } else {
-        const session = await this.agent.request('session/new', { cwd: root, mcpServers: [] });
+        const session = await this.agent.request('session/new', {
+          cwd: this.agentRoot,
+          mcpServers: [],
+        });
         sessionId = session.sessionId;
       }
       this.deps.onSessionStarted(root, config.id, sessionId, '');

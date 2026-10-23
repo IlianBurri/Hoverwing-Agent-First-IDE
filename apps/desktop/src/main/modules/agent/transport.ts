@@ -23,6 +23,11 @@ export interface SpawnOptions {
 
 export type StartTransport = (options: SpawnOptions) => Promise<AgentTransport>;
 
+/** An agent started somewhere else than on the host (the Docker sandbox). */
+export interface IsolatedStart {
+  start(): Promise<{ transport: AgentTransport; agentRoot: string }>;
+}
+
 /** Starts the agent as a child process speaking ACP over stdin/stdout. */
 export const spawnTransport: StartTransport = (options) =>
   new Promise((resolve, reject) => {

@@ -1,4 +1,7 @@
+import { access } from 'node:fs/promises';
+import { homedir } from 'node:os';
 import { pathToFileURL } from 'node:url';
+import { createHash } from 'node:crypto';
 import { join } from 'node:path';
 import {
   BrowserWindow,
@@ -19,6 +22,15 @@ import {
   spawnTransport,
 } from './modules/agent';
 import { SecretStore } from './modules/secrets';
+import { SandboxService, createSandboxHandlers } from './modules/sandbox';
+import {
+  DEFAULT_SANDBOX_PACKAGES,
+  classifyDockerError,
+  createDockerApi,
+  dockerInstallPaths,
+  dockerSocketCandidates,
+  isValidPackageName,
+} from './modules/docker';
 import { nativeTexts } from './nativeTexts';
 import {
   AuditLog,
@@ -59,6 +71,36 @@ if (!app.commandLine.hasSwitch('no-sandbox')) app.enableSandbox();
 // E2E tests point this at a temp dir so they never touch real user data.
 const userDataOverride = process.env['KESTREL_USER_DATA_DIR'];
 if (userDataOverride) app.setPath('userData', userDataOverride);
+
+async function anyExists(paths: readonly string[]): Promise<boolean> {
+  for (const path of paths) {
+    try {
+      await access(path);
+      return true;
+    } catch {
+      // try the next one
+    }
+  }
+  return false;
+}
+
+/** The first Docker socket that exists (undefined: library default). */
+async function findDockerSocket(): Promise<string | undefined> {
+  const candidates = dockerSocketCandidates(process.platform, homedir(), process.env);
+  if (!candidates) return undefined;
+  for (const candidate of candidates) if (await anyExists([candidate])) return candidate;
+  return candidates[0];
+}
+
+/**
+ * Packages of the sandbox image. KESTREL_SANDBOX_PACKAGES replaces the list
+ * (e.g. "" for networks where apt cannot reach Debian, or in E2E tests).
+ */
+function sandboxPackages(): readonly string[] {
+  const override = process.env['KESTREL_SANDBOX_PACKAGES'];
+  if (override === undefined) return DEFAULT_SANDBOX_PACKAGES;
+  return override.split(/\s+/).filter((name) => name && isValidPackageName(name));
+}
 
 function dialogLanguage(settings: Settings): 'de' | 'en' {
   return settings.language ?? (app.getLocale().startsWith('de') ? 'de' : 'en');
@@ -165,8 +207,32 @@ void app.whenReady().then(async () => {
       }
     },
   );
+  const sandbox = new SandboxService({
+    docker: createDockerApi({ socketPath: await findDockerSocket() }),
+    dataDir: join(dataDir, 'sandbox'),
+    platform: process.platform,
+    identity: {
+      uid: process.getuid?.() ?? null,
+      gid: process.getgid?.() ?? null,
+    },
+    hostEnv: process.env,
+    isInstalled: () => anyExists(dockerInstallPaths(process.platform, process.env)),
+    classifyError: classifyDockerError,
+    baseImage: () => settings.get().sandboxBaseImage,
+    packages: sandboxPackages(),
+    instance: createHash('sha256').update(dataDir).digest('hex').slice(0, 16),
+    onLog: (line) => {
+      broadcastEvent('sandbox:log', { line, time: Date.now() });
+    },
+    onStatus: (status) => {
+      broadcastEvent('sandbox:status', status);
+    },
+  });
+  void sandbox.removeOrphans().catch(() => undefined);
+  const agentConfigs = new AgentConfigStore(dataDir, () => sandbox.isAvailable());
   const agents = new AgentService({
-    configs: new AgentConfigStore(dataDir),
+    configs: agentConfigs,
+    sandbox,
     secrets: new SecretStore(join(dataDir, 'secrets.json'), safeStorage),
     sessions: new SessionHistory(join(dataDir, 'agent-sessions')),
     permissions,
@@ -181,7 +247,10 @@ void app.whenReady().then(async () => {
       const options = {
         type: 'question' as const,
         message: text.agentMessage.replace('{name}', config.name),
-        detail: text.agentDetail.replace('{command}', [config.command, ...config.args].join(' ')),
+        detail: (config.sandbox.enabled ? text.agentSandboxDetail : text.agentDetail).replace(
+          '{command}',
+          [config.command, ...config.args].join(' '),
+        ),
         buttons: [text.cancel, text.agentStart],
         defaultId: 0,
         cancelId: 0,
@@ -225,6 +294,11 @@ void app.whenReady().then(async () => {
       ...createCheckpointHandlers(checkpoints, workspaces),
       ...createAgentHandlers(agents, workspaces),
       ...createReviewHandlers(review, workspaces),
+      ...createSandboxHandlers(
+        sandbox,
+        terminals,
+        async (agentId) => (await agentConfigs.get(agentId)) !== undefined,
+      ),
       ...createSearchHandlers(search, workspaces),
       'window:setTitleBarTheme': (theme, { sender }) => {
         const window = BrowserWindow.fromWebContents(sender);

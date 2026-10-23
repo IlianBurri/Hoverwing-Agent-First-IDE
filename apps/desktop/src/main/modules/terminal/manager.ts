@@ -45,8 +45,12 @@ export class TerminalManager {
     shell: ShellCommand,
     options: { cwd: string; cols: number; rows: number; env: Record<string, string> },
   ): string {
+    return this.attach(ownerId, this.spawnPty(shell, options));
+  }
+
+  /** Registers a terminal that was started elsewhere (e.g. in a container). */
+  attach(ownerId: number, pty: PtyProcess): string {
     const id = `t${String(this.nextId++)}`;
-    const pty = this.spawnPty(shell, options);
     const output = new OutputBatcher((data) => {
       this.events.onData(ownerId, id, data);
     });

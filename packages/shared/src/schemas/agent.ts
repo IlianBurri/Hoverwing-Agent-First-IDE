@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { agentSandboxSchema, defaultAgentSandbox } from './sandbox';
 
 export const agentConfigSchema = z.object({
   id: z.string().regex(/^[a-z0-9-]{1,64}$/),
@@ -10,6 +11,8 @@ export const agentConfigSchema = z.object({
   env: z.array(z.string().regex(/^[A-Za-z_][A-Za-z0-9_]*$/)).max(32),
   /** Hold back file writes until the user accepted them in the diff review. */
   reviewChanges: z.boolean(),
+  /** Older configs have no sandbox settings: they keep running directly. */
+  sandbox: agentSandboxSchema.default(defaultAgentSandbox),
 });
 export type AgentConfig = z.infer<typeof agentConfigSchema>;
 
@@ -84,10 +87,14 @@ export const agentStatusSchema = z.object({
   agentName: z.string().nullable(),
   sessionId: z.string().nullable(),
   /** Short, translated-on-the-UI-side reason for errors. */
-  error: z.enum(['spawnFailed', 'initFailed', 'authRequired', 'crashed', 'protocol']).nullable(),
+  error: z
+    .enum(['spawnFailed', 'sandboxFailed', 'initFailed', 'authRequired', 'crashed', 'protocol'])
+    .nullable(),
   /** Extra details for the user (e.g. stderr tail); never contains secrets. */
   detail: z.string().nullable(),
   canLoadSession: z.boolean(),
+  /** Where the agent runs: in the Docker sandbox or directly on the system. */
+  sandboxed: z.boolean(),
 });
 export type AgentStatus = z.infer<typeof agentStatusSchema>;
 
@@ -107,4 +114,5 @@ export const idleAgentStatus: AgentStatus = {
   error: null,
   detail: null,
   canLoadSession: false,
+  sandboxed: false,
 };

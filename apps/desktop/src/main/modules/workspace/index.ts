@@ -10,3 +10,4 @@ export {
 export { WorkspaceManager, addRecent } from './manager';
 export { watchWorkspace } from './watcher';
 export { createWorkspaceHandlers } from './handlers';
+export { isHeavyDirectory } from './heavy';

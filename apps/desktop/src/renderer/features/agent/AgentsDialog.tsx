@@ -2,6 +2,7 @@ import { useEffect, useId, useState } from 'react';
 import type { SubmitEvent } from 'react';
 import { KeyRound, Plus, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { defaultAgentSandbox } from '@kestrel/shared';
 import type { AgentConfig, AgentConfigView } from '@kestrel/shared';
 import { Button } from '../../components/Button';
 import { IconButton } from '../../components/IconButton';
@@ -31,6 +32,7 @@ const emptyConfig = (): AgentConfig => ({
   args: [],
   env: [],
   reviewChanges: true,
+  sandbox: defaultAgentSandbox,
 });
 
 /** Add, edit and remove agents (name, command, arguments, secret variables). */

@@ -14,7 +14,7 @@ import type { AgentConfigStore } from './configs';
 import { AgentRuntime } from './runtime';
 import type { RuntimeDeps } from './runtime';
 import type { SessionHistory } from './sessions';
-import type { StartTransport } from './transport';
+import type { AgentTransport, StartTransport } from './transport';
 
 export interface AgentServiceDeps {
   configs: AgentConfigStore;
@@ -22,6 +22,14 @@ export interface AgentServiceDeps {
   sessions: SessionHistory;
   permissions: PermissionService;
   startTransport: StartTransport;
+  /** Runs agents with `sandbox.enabled` in a Docker container. */
+  sandbox: {
+    startAgent(
+      config: AgentConfig,
+      root: string,
+      env: Record<string, string>,
+    ): Promise<{ transport: AgentTransport; agentRoot: string }>;
+  };
   checkpoint: (root: string, label: string, sessionId: string) => Promise<string | null>;
   review: RuntimeDeps['review'];
   /** Asks the user (natively) whether this command line may be started. */
@@ -114,11 +122,18 @@ export class AgentService {
       }
       await this.deps.configs.approve(config);
     }
-    const env = childEnv(process.env);
+    const secrets: Record<string, string> = {};
     for (const name of config.env) {
       const value = await this.deps.secrets.get(secretKey(config.id, name));
-      if (value !== null) env[name] = value;
+      if (value !== null) secrets[name] = value;
     }
+    if (config.sandbox.enabled) {
+      // The container gets only the agent's own variables, not the host's.
+      return this.runtime(ownerId).start(config, root, secrets, resumeSessionId, {
+        start: () => this.deps.sandbox.startAgent(config, root, secrets),
+      });
+    }
+    const env = { ...childEnv(process.env), ...secrets };
     return this.runtime(ownerId).start(config, root, env, resumeSessionId);
   }
 
