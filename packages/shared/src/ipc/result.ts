@@ -14,7 +14,9 @@ export type IpcErrorCode =
   | 'not_a_directory'
   | 'permission_denied'
   | 'invalid_pattern'
-  | 'checkpoints_unavailable';
+  | 'checkpoints_unavailable'
+  | 'agent_not_running'
+  | 'agent_not_approved';
 
 export interface IpcError {
   code: IpcErrorCode;

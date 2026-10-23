@@ -1,4 +1,5 @@
 import type { z } from 'zod';
+import { agentChannels, agentEvents } from './channels/agent';
 import { appChannels } from './channels/app';
 import { checkpointChannels, checkpointEvents } from './channels/checkpoints';
 import { permissionChannels, permissionEvents } from './channels/permissions';
@@ -22,6 +23,7 @@ import { workspaceChannels, workspaceEvents } from './channels/workspace';
  * concrete, narrow action.
  */
 export const ipcContract = {
+  ...agentChannels,
   ...appChannels,
   ...checkpointChannels,
   ...permissionChannels,
@@ -33,6 +35,7 @@ export const ipcContract = {
 } as const satisfies Record<string, { request: z.ZodType; response: z.ZodType }>;
 
 export const ipcEvents = {
+  ...agentEvents,
   ...checkpointEvents,
   ...permissionEvents,
   ...settingsEvents,

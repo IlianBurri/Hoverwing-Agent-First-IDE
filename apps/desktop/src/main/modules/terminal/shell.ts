@@ -1,3 +1,5 @@
+import { childEnv } from '../../lib/env';
+
 export interface ShellCommand {
   file: string;
   args: string[];
@@ -16,23 +18,11 @@ export function defaultShell(
   return { file, args: platform === 'darwin' ? ['-l'] : [] };
 }
 
-/** Variables that belong to Kestrel/Electron and must not leak into shells. */
-const internalVariables = [
-  'ELECTRON_RUN_AS_NODE',
-  'ELECTRON_NO_ATTACH_CONSOLE',
-  'ELECTRON_RENDERER_URL',
-  'KESTREL_USER_DATA_DIR',
-  'CHROME_DESKTOP',
-];
-
 export function terminalEnv(
   base: Readonly<Record<string, string | undefined>>,
   version: string,
 ): Record<string, string> {
-  const env: Record<string, string> = {};
-  for (const [key, value] of Object.entries(base)) {
-    if (value !== undefined && !internalVariables.includes(key)) env[key] = value;
-  }
+  const env = childEnv(base);
   env['TERM'] = 'xterm-256color';
   env['COLORTERM'] = 'truecolor';
   env['TERM_PROGRAM'] = 'Kestrel';

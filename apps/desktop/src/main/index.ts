@@ -1,8 +1,25 @@
 import { pathToFileURL } from 'node:url';
 import { join } from 'node:path';
-import { BrowserWindow, app, nativeTheme, session, webContents } from 'electron';
+import {
+  BrowserWindow,
+  app,
+  dialog,
+  nativeTheme,
+  safeStorage,
+  session,
+  webContents,
+} from 'electron';
 import type { Settings } from '@kestrel/shared';
 import { createAppHandlers } from './modules/app/handlers';
+import {
+  AgentConfigStore,
+  AgentService,
+  SessionHistory,
+  createAgentHandlers,
+  spawnTransport,
+} from './modules/agent';
+import { SecretStore } from './modules/secrets';
+import { nativeTexts } from './nativeTexts';
 import {
   AuditLog,
   PermissionService,
@@ -121,6 +138,7 @@ void app.whenReady().then(async () => {
       search.cancel(contents.id);
       terminals.killAll(contents.id);
       permissions.cancel(contents.id);
+      void agents.release(contents.id);
     };
     contents.on('destroyed', release);
     contents.on('did-start-navigation', (details) => {
@@ -132,16 +150,65 @@ void app.whenReady().then(async () => {
     terminals.killAll();
   });
 
+  const dataDir = app.getPath('userData');
+  const agents = new AgentService({
+    configs: new AgentConfigStore(dataDir),
+    secrets: new SecretStore(join(dataDir, 'secrets.json'), safeStorage),
+    sessions: new SessionHistory(join(dataDir, 'agent-sessions')),
+    permissions,
+    startTransport: spawnTransport,
+    checkpoint: async (root, label, sessionId) =>
+      (await checkpoints.create(root, label, 'turn', sessionId).catch(() => null))?.id ?? null,
+    confirmStart: async (ownerId, config) => {
+      const contents = webContents.fromId(ownerId);
+      const window = contents ? BrowserWindow.fromWebContents(contents) : null;
+      const text = nativeTexts[dialogLanguage(settings.get())];
+      const options = {
+        type: 'question' as const,
+        message: text.agentMessage.replace('{name}', config.name),
+        detail: text.agentDetail.replace('{command}', [config.command, ...config.args].join(' ')),
+        buttons: [text.cancel, text.agentStart],
+        defaultId: 0,
+        cancelId: 0,
+        noLink: true,
+      };
+      const result = window
+        ? await dialog.showMessageBox(window, options)
+        : await dialog.showMessageBox(options);
+      return result.response === 1;
+    },
+    events: {
+      status: (ownerId, status) => {
+        const contents = webContents.fromId(ownerId);
+        if (contents) sendEvent(contents, 'agent:status', status);
+      },
+      event: (ownerId, sessionId, event) => {
+        const contents = webContents.fromId(ownerId);
+        if (contents) sendEvent(contents, 'agent:event', { sessionId, event });
+      },
+      log: (ownerId, line) => {
+        const contents = webContents.fromId(ownerId);
+        if (contents) sendEvent(contents, 'agent:log', { line, time: Date.now() });
+      },
+    },
+    clientVersion: app.getVersion(),
+  });
+  app.on('before-quit', () => {
+    for (const window of BrowserWindow.getAllWindows()) void agents.release(window.webContents.id);
+  });
+
   registerIpc(
     {
       ...createAppHandlers(),
       ...createSettingsHandlers(settings),
       ...createWorkspaceHandlers(workspaces, settings, (ownerId) => {
         terminals.killAll(ownerId);
+        void agents.stop(ownerId);
       }),
       ...createTerminalHandlers(terminals, workspaces),
       ...createPermissionHandlers(permissions, workspaces),
       ...createCheckpointHandlers(checkpoints, workspaces),
+      ...createAgentHandlers(agents, workspaces),
       ...createSearchHandlers(search, workspaces),
       'window:setTitleBarTheme': (theme, { sender }) => {
         const window = BrowserWindow.fromWebContents(sender);

@@ -6,3 +6,4 @@ export * from './schemas/search';
 export * from './schemas/glob';
 export * from './schemas/permissions';
 export * from './schemas/checkpoints';
+export * from './schemas/agent';

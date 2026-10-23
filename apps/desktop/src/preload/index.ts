@@ -20,17 +20,30 @@ function invoke<C extends IpcChannel>(
   >;
 }
 
+/**
+ * One IPC listener for all events, dispatching by event name. (One listener
+ * per subscription would pile up on the same channel.)
+ */
+const listeners = new Map<string, Set<(payload: unknown) => void>>();
+
+ipcRenderer.on(IPC_EVENT_CHANNEL, (_event: IpcRendererEvent, name: unknown, payload: unknown) => {
+  if (typeof name !== 'string') return;
+  for (const listener of listeners.get(name) ?? []) listener(payload);
+});
+
 function on<E extends IpcEvent>(
   event: E,
   listener: (payload: IpcEventPayload<E>) => void,
 ): () => void {
-  const handler = (_event: IpcRendererEvent, name: unknown, payload: unknown) => {
-    // Payloads are produced by the typed `sendEvent` helper in main.
-    if (name === event) listener(payload as IpcEventPayload<E>);
+  // Payloads are produced by the typed `sendEvent` helper in main.
+  const wrapped = (payload: unknown) => {
+    listener(payload as IpcEventPayload<E>);
   };
-  ipcRenderer.on(IPC_EVENT_CHANNEL, handler);
+  const set = listeners.get(event) ?? new Set();
+  set.add(wrapped);
+  listeners.set(event, set);
   return () => {
-    ipcRenderer.removeListener(IPC_EVENT_CHANNEL, handler);
+    set.delete(wrapped);
   };
 }
 
