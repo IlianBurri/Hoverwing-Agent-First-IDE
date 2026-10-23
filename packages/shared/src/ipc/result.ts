@@ -13,7 +13,8 @@ export type IpcErrorCode =
   | 'no_workspace'
   | 'not_a_directory'
   | 'permission_denied'
-  | 'invalid_pattern';
+  | 'invalid_pattern'
+  | 'checkpoints_unavailable';
 
 export interface IpcError {
   code: IpcErrorCode;

@@ -5,3 +5,4 @@ export * from './schemas/workspace';
 export * from './schemas/search';
 export * from './schemas/glob';
 export * from './schemas/permissions';
+export * from './schemas/checkpoints';

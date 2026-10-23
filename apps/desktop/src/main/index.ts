@@ -9,6 +9,7 @@ import {
   RuleStore,
   createPermissionHandlers,
 } from './modules/permissions';
+import { CheckpointService, createCheckpointHandlers } from './modules/checkpoints';
 import { SearchRunner, createSearchHandlers } from './modules/search';
 import { createSettingsHandlers, createSettingsStore } from './modules/settings';
 import { TerminalManager, createTerminalHandlers, spawnNodePty } from './modules/terminal';
@@ -72,6 +73,17 @@ void app.whenReady().then(async () => {
     },
   });
   const search = new SearchRunner();
+  const checkpoints = new CheckpointService(
+    join(app.getPath('userData'), 'checkpoints'),
+    (root) => {
+      // Tell every window that shows this project.
+      for (const window of BrowserWindow.getAllWindows()) {
+        if (workspaces.get(window.webContents.id)?.root === root) {
+          sendEvent(window.webContents, 'checkpoints:changed', {});
+        }
+      }
+    },
+  );
   const permissionsDir = join(app.getPath('userData'), 'permissions');
   const permissions = new PermissionService(
     new RuleStore(permissionsDir),
@@ -129,6 +141,7 @@ void app.whenReady().then(async () => {
       }),
       ...createTerminalHandlers(terminals, workspaces),
       ...createPermissionHandlers(permissions, workspaces),
+      ...createCheckpointHandlers(checkpoints, workspaces),
       ...createSearchHandlers(search, workspaces),
       'window:setTitleBarTheme': (theme, { sender }) => {
         const window = BrowserWindow.fromWebContents(sender);
