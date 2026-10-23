@@ -107,7 +107,7 @@ describe.skipIf(!enabled)('sandbox with real Docker', () => {
       rootFs: 'EROFS',
       project: 'ok',
     });
-    expect((value as { ssh: string }).ssh).toMatch(/ENOENT|EACCES/);
+    expect(JSON.stringify(value)).toMatch(/"ssh":"(ENOENT|EACCES)"/);
     expect(stderr).toContain('to stderr');
     // Written as the host user, so the file stays editable outside.
     expect(await readFile(join(project, 'created.txt'), 'utf8')).toBe('x');

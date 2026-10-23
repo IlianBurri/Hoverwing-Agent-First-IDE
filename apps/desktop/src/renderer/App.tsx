@@ -13,6 +13,8 @@ import { AgentsDialog, registerAgentCommands } from './features/agent';
 import { ChangesModal, registerCheckpointCommands } from './features/checkpoints';
 import { appendLog, applyEvent, setStatus as setAgentStatus } from './stores/agent';
 import { RulesDialog, registerPermissionCommands } from './features/permissions';
+import { refreshSandboxStatus, registerSandboxCommands } from './features/sandbox';
+import { appendSandboxLog, setSandboxStatus } from './stores/sandbox';
 import { refreshCheckpoints } from './stores/checkpoints';
 import { refreshReview } from './stores/review';
 import { useWorkspaceStore } from './stores/workspace';
@@ -39,6 +41,17 @@ export function App() {
   useEffect(() => registerPermissionCommands(), []);
   useEffect(() => registerCheckpointCommands(), []);
   useEffect(() => registerAgentCommands(), []);
+  useEffect(() => registerSandboxCommands(), []);
+  useEffect(() => {
+    void refreshSandboxStatus();
+    const offs = [
+      window.kestrel.on('sandbox:status', setSandboxStatus),
+      window.kestrel.on('sandbox:log', appendSandboxLog),
+    ];
+    return () => {
+      for (const off of offs) off();
+    };
+  }, []);
   useEffect(() => {
     void window.kestrel.invoke('agent:status').then((result) => {
       if (result.ok) setAgentStatus(result.data);

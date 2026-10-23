@@ -7,6 +7,8 @@
 //   secret                 -> tries to read .env through Kestrel
 //   run <command>          -> asks permission to run a command (does not run it)
 //   slow                   -> waits until cancelled
+//   peek <path>            -> reads a file itself and reports its content (sandbox tests)
+//   whoami                 -> reports HOME and whether it runs in the sandbox
 import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { Readable, Writable } from 'node:stream';
@@ -121,6 +123,17 @@ const app = agent({ name: 'mock-agent' })
       lines[24] = 'changed near the bottom';
       await writeFile(absolute, lines.join('\n'));
       await say(client, sessionId, `Changed two places in ${path}.`);
+    } else if (command === 'peek') {
+      const content = await readFile(join(session.cwd, path), 'utf8').catch(
+        (error) => `<${String(error.code)}>`,
+      );
+      await say(client, sessionId, `Content of ${path}: [${content.trim()}]`);
+    } else if (command === 'whoami') {
+      await say(
+        client,
+        sessionId,
+        `HOME=${String(process.env.HOME)} SANDBOX=${String(process.env.KESTREL_SANDBOX ?? 'no')}`,
+      );
     } else if (command === 'secret') {
       try {
         await client.request('fs/read_text_file', { sessionId, path: join(session.cwd, '.env') });

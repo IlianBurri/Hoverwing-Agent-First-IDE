@@ -11,7 +11,9 @@ import { notifyError } from '../../lib/errors';
 import { useAgentStore } from '../../stores/agent';
 import { confirm } from '../../stores/dialogs';
 import { closeModal } from '../../stores/modals';
+import { dockerAvailable } from '../../stores/sandbox';
 import { notify } from '../../stores/toasts';
+import { SandboxSection } from '../sandbox';
 import { loadAgentConfigs } from './actions';
 import styles from './AgentsDialog.module.css';
 
@@ -32,7 +34,8 @@ const emptyConfig = (): AgentConfig => ({
   args: [],
   env: [],
   reviewChanges: true,
-  sandbox: defaultAgentSandbox,
+  // New agents run in the sandbox whenever Docker can be used.
+  sandbox: { ...defaultAgentSandbox, enabled: dockerAvailable() },
 });
 
 /** Add, edit and remove agents (name, command, arguments, secret variables). */
@@ -251,6 +254,14 @@ export function AgentsDialog() {
             />
             {t('agents.reviewLabel')}
           </label>
+
+          <SandboxSection
+            sandbox={draft.sandbox}
+            onChange={(sandbox) => {
+              setDraft({ ...draft, sandbox });
+            }}
+            saved={current ? { id: current.id, name: current.name } : null}
+          />
 
           <div className={styles['actions']}>
             {current && (

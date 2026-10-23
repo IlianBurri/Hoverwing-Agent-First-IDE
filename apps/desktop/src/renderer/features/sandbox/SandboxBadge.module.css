@@ -1,0 +1,19 @@
+.root {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0 var(--space-2);
+  border: 1px solid currentcolor;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.sandbox {
+  color: var(--success);
+}
+
+.direct {
+  color: var(--warning);
+}

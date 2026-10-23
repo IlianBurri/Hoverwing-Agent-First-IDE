@@ -3,11 +3,12 @@ import { useTranslation } from 'react-i18next';
 import { SegmentedControl } from '../components/SegmentedControl';
 import { AgentLog } from '../features/agent';
 import { PermissionLog } from '../features/permissions';
+import { SandboxLog } from '../features/sandbox';
 import styles from './LogsView.module.css';
 
-type LogKind = 'permissions' | 'agent';
+type LogKind = 'permissions' | 'agent' | 'sandbox';
 
-/** Bottom panel "Logs": permission decisions and agent diagnostics. */
+/** Bottom panel "Logs": permission decisions, agent diagnostics, sandbox builds. */
 export function LogsView() {
   const { t } = useTranslation();
   const [kind, setKind] = useState<LogKind>('permissions');
@@ -19,13 +20,16 @@ export function LogsView() {
           options={[
             { value: 'permissions', label: t('logs.permissions') },
             { value: 'agent', label: t('logs.agent') },
+            { value: 'sandbox', label: t('logs.sandbox') },
           ]}
           value={kind}
           onChange={setKind}
         />
       </div>
       <div className={styles['content']}>
-        {kind === 'permissions' ? <PermissionLog /> : <AgentLog />}
+        {kind === 'permissions' && <PermissionLog />}
+        {kind === 'agent' && <AgentLog />}
+        {kind === 'sandbox' && <SandboxLog />}
       </div>
     </div>
   );

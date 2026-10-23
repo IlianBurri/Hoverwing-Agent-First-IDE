@@ -13,6 +13,7 @@ import { useWorkspaceStore } from '../../stores/workspace';
 import { CheckpointTimeline } from '../checkpoints';
 import { PermissionCard } from '../permissions';
 import { ChangesList } from '../review';
+import { SandboxBadge } from '../sandbox';
 import { loadAgentConfigs, startAgent, stopAgent } from './actions';
 import { PlanView } from './PlanView';
 import { PromptInput } from './PromptInput';
@@ -98,6 +99,9 @@ export function AgentPanel() {
         />
       ) : inSession ? (
         <div className={styles['session']}>
+          <div className={styles['where']}>
+            <SandboxBadge sandboxed={status.sandboxed} />
+          </div>
           {plan.length > 0 && (
             <div className={styles['plan']}>
               <PlanView entries={plan} />

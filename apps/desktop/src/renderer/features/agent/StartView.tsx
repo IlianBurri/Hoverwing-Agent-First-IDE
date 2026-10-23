@@ -5,6 +5,8 @@ import { Button } from '../../components/Button';
 import { StatusMessage } from '../../components/StatusMessage';
 import { useAgentStore } from '../../stores/agent';
 import { openModal } from '../../stores/modals';
+import { useSandboxStore } from '../../stores/sandbox';
+import { DockerHelp, SandboxBadge } from '../sandbox';
 import { startAgent } from './actions';
 import styles from './StartView.module.css';
 
@@ -14,6 +16,9 @@ export function StartView() {
   const selectId = useId();
   const { configs, selectedAgentId, status } = useAgentStore();
   const starting = status.state === 'starting';
+  const docker = useSandboxStore((state) => state.status?.docker ?? null);
+  const selected = configs.find((config) => config.id === selectedAgentId) ?? null;
+  const sandboxed = selected?.sandbox.enabled === true;
 
   return (
     <div className={styles['root']}>
@@ -49,6 +54,8 @@ export function StartView() {
           {starting ? t('agent.starting') : t('agent.start')}
         </Button>
       </div>
+      {selected && <SandboxBadge sandboxed={sandboxed} />}
+      {sandboxed && docker && docker !== 'available' && <DockerHelp state={docker} />}
       <Button
         variant="ghost"
         onClick={() => {

@@ -406,7 +406,8 @@
   "logs": {
     "label": "Log type",
     "permissions": "Permissions",
-    "agent": "Agent output"
+    "agent": "Agent output",
+    "sandbox": "Sandbox"
   },
   "agentLog": {
     "title": "Agent output",
@@ -468,5 +469,61 @@
     "applySelection": "Apply {{count}} of {{total}} sections",
     "hunks": "Sections",
     "hunkLabel": "Section {{index}} (lines {{from}}–{{to}})"
+  },
+  "sandbox": {
+    "section": "Where it runs",
+    "enabled": "Run in the Docker sandbox (recommended)",
+    "enabledHint": "The agent runs in a container. It sees only this project (without secret files such as .env) and its own home folder, nothing else of your computer.",
+    "directHint": "The agent runs directly on your system, with your user rights. It can reach everything you can.",
+    "memory": "Memory (GB)",
+    "cpus": "CPU cores",
+    "baseImage": "Base image (all agents)",
+    "baseImageHint": "A Debian-based Node.js image, e.g. node:22-bookworm-slim or a mirror of it. Changing it builds a new sandbox image.",
+    "imageReady": "Sandbox is ready.",
+    "imageMissing": "The sandbox image is not built yet. It is built on the first start, or now.",
+    "preparing": "Building the sandbox image … (see Logs › Sandbox)",
+    "prepare": "Prepare sandbox",
+    "prepared": "The sandbox is ready.",
+    "login": "Log in in the sandbox terminal",
+    "loginCommand": "Open sandbox login terminal for {{agent}}",
+    "loginTab": "{{agent}} login",
+    "loginHint": "Opens a terminal in this agent's sandbox, without your project. Log in to the agent there yourself, e.g. for Claude Code: run “npx -y @anthropic-ai/claude-code” and type “/login”. The login stays in the agent's Docker volume; Kestrel never reads it.",
+    "badgeSandbox": "Sandbox",
+    "badgeDirect": "Directly on the system",
+    "badgeSandboxHint": "The agent runs in a Docker container and only sees this project.",
+    "badgeDirectHint": "The agent runs directly on your system with your user rights.",
+    "logTitle": "Sandbox build output",
+    "logEmptyTitle": "No sandbox output yet",
+    "logEmptyText": "When the sandbox image is built, the output appears here.",
+    "docker": {
+      "notInstalled": "Docker is not installed.",
+      "notRunning": "Docker is not running.",
+      "noPermission": "Kestrel may not use Docker.",
+      "error": "Docker could not be reached."
+    },
+    "help": {
+      "openDocs": "Open instructions",
+      "retry": "Check again",
+      "notInstalled": {
+        "mac": "Install Docker Desktop (or Colima), start it and check again.",
+        "windows": "Install Docker Desktop with the WSL 2 backend, start it and check again.",
+        "linux": "Install Docker Engine from your distribution or docker.com, start it (systemctl start docker) and check again."
+      },
+      "notRunning": {
+        "mac": "Start Docker Desktop (or “colima start”) and check again.",
+        "windows": "Start Docker Desktop and wait until it says “Engine running”.",
+        "linux": "Start the Docker service, e.g. “sudo systemctl start docker”, and check again."
+      },
+      "noPermission": {
+        "mac": "Restart Docker Desktop; if that does not help, reset its settings to the defaults.",
+        "windows": "Make sure your user is in the “docker-users” group, then sign out and in again.",
+        "linux": "Add your user to the “docker” group (sudo usermod -aG docker $USER), then sign out and in again."
+      },
+      "error": {
+        "mac": "Restart Docker Desktop and check again. Details are in the logs.",
+        "windows": "Restart Docker Desktop and check again. Details are in the logs.",
+        "linux": "Restart the Docker service and check again."
+      }
+    }
   }
 }

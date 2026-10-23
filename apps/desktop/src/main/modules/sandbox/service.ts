@@ -139,6 +139,10 @@ export class SandboxService {
     env: Record<string, string>,
   ): Promise<SandboxLaunch> {
     await this.prepare();
+    const hidden = await findSensitivePaths(root);
+    this.deps.onLog(
+      `Starting ${config.name} in ${this.imageTag()} (${String(config.sandbox.memoryMb)} MB, ${String(config.sandbox.cpus)} CPUs); covering ${String(hidden.files.length + hidden.dirs.length)} secret file(s) or folder(s).`,
+    );
     const plan = agentContainerPlan({
       platform: this.deps.platform,
       root,
@@ -149,7 +153,7 @@ export class SandboxService {
       env,
       hostEnv: this.deps.hostEnv,
       identity: this.deps.identity,
-      hidden: await findSensitivePaths(root),
+      hidden,
       emptyFile: await this.emptyFile(),
       limits: config.sandbox,
       labels: this.labels,

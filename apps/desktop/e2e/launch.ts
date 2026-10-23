@@ -10,7 +10,10 @@ export function createUserDataDir(): string {
 }
 
 /** Launches the built app (out/) the same way a user would, in English. */
-export function launchApp(userDataDir = createUserDataDir()): Promise<ElectronApplication> {
+export function launchApp(
+  userDataDir = createUserDataDir(),
+  env: Record<string, string> = {},
+): Promise<ElectronApplication> {
   return electron.launch({
     args: [
       join(import.meta.dirname, '..'),
@@ -18,6 +21,11 @@ export function launchApp(userDataDir = createUserDataDir()): Promise<ElectronAp
       // Chromium refuses its OS sandbox when running as root (CI containers).
       ...(process.getuid?.() === 0 ? ['--no-sandbox'] : []),
     ],
-    env: { ...process.env, ELECTRON_RENDERER_URL: '', KESTREL_USER_DATA_DIR: userDataDir },
+    env: {
+      ...process.env,
+      ...env,
+      ELECTRON_RENDERER_URL: '',
+      KESTREL_USER_DATA_DIR: userDataDir,
+    },
   });
 }

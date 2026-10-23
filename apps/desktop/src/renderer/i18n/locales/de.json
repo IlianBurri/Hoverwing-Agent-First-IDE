@@ -406,7 +406,8 @@
   "logs": {
     "label": "Art des Protokolls",
     "permissions": "Berechtigungen",
-    "agent": "Agent-Ausgabe"
+    "agent": "Agent-Ausgabe",
+    "sandbox": "Sandbox"
   },
   "agentLog": {
     "title": "Agent-Ausgabe",
@@ -468,5 +469,61 @@
     "applySelection": "{{count}} von {{total}} Abschnitten übernehmen",
     "hunks": "Abschnitte",
     "hunkLabel": "Abschnitt {{index}} (Zeile {{from}}–{{to}})"
+  },
+  "sandbox": {
+    "section": "Ausführung",
+    "enabled": "In der Docker-Sandbox ausführen (empfohlen)",
+    "enabledHint": "Der Agent läuft in einem Container. Er sieht nur dieses Projekt (ohne Geheimdateien wie .env) und seinen eigenen Home-Ordner, sonst nichts von deinem Computer.",
+    "directHint": "Der Agent läuft direkt auf deinem System, mit deinen Benutzerrechten. Er erreicht alles, was du erreichst.",
+    "memory": "Arbeitsspeicher (GB)",
+    "cpus": "CPU-Kerne",
+    "baseImage": "Basisimage (alle Agenten)",
+    "baseImageHint": "Ein Debian-basiertes Node.js-Image, z. B. node:22-bookworm-slim oder ein Mirror davon. Eine Änderung baut ein neues Sandbox-Image.",
+    "imageReady": "Die Sandbox ist bereit.",
+    "imageMissing": "Das Sandbox-Image ist noch nicht gebaut. Es wird beim ersten Start gebaut, oder jetzt.",
+    "preparing": "Sandbox-Image wird gebaut … (siehe Logs › Sandbox)",
+    "prepare": "Sandbox vorbereiten",
+    "prepared": "Die Sandbox ist bereit.",
+    "login": "Im Sandbox-Terminal anmelden",
+    "loginCommand": "Sandbox-Login-Terminal für {{agent}} öffnen",
+    "loginTab": "{{agent}}-Login",
+    "loginHint": "Öffnet ein Terminal in der Sandbox dieses Agenten, ohne dein Projekt. Melde dich dort selbst beim Agenten an, z. B. für Claude Code: «npx -y @anthropic-ai/claude-code» starten und «/login» eingeben. Die Anmeldung bleibt im Docker-Volume des Agenten; Kestrel liest sie nie.",
+    "badgeSandbox": "Sandbox",
+    "badgeDirect": "Direkt auf dem System",
+    "badgeSandboxHint": "Der Agent läuft in einem Docker-Container und sieht nur dieses Projekt.",
+    "badgeDirectHint": "Der Agent läuft direkt auf deinem System mit deinen Benutzerrechten.",
+    "logTitle": "Ausgabe des Sandbox-Builds",
+    "logEmptyTitle": "Noch keine Sandbox-Ausgabe",
+    "logEmptyText": "Wenn das Sandbox-Image gebaut wird, erscheint die Ausgabe hier.",
+    "docker": {
+      "notInstalled": "Docker ist nicht installiert.",
+      "notRunning": "Docker läuft nicht.",
+      "noPermission": "Kestrel darf Docker nicht verwenden.",
+      "error": "Docker ist nicht erreichbar."
+    },
+    "help": {
+      "openDocs": "Anleitung öffnen",
+      "retry": "Erneut prüfen",
+      "notInstalled": {
+        "mac": "Installiere Docker Desktop (oder Colima), starte es und prüfe erneut.",
+        "windows": "Installiere Docker Desktop mit WSL-2-Backend, starte es und prüfe erneut.",
+        "linux": "Installiere Docker Engine aus deiner Distribution oder von docker.com, starte es (systemctl start docker) und prüfe erneut."
+      },
+      "notRunning": {
+        "mac": "Starte Docker Desktop (oder «colima start») und prüfe erneut.",
+        "windows": "Starte Docker Desktop und warte, bis «Engine running» angezeigt wird.",
+        "linux": "Starte den Docker-Dienst, z. B. «sudo systemctl start docker», und prüfe erneut."
+      },
+      "noPermission": {
+        "mac": "Starte Docker Desktop neu; hilft das nicht, setze seine Einstellungen zurück.",
+        "windows": "Stelle sicher, dass dein Benutzer in der Gruppe «docker-users» ist, und melde dich neu an.",
+        "linux": "Füge deinen Benutzer zur Gruppe «docker» hinzu (sudo usermod -aG docker $USER) und melde dich neu an."
+      },
+      "error": {
+        "mac": "Starte Docker Desktop neu und prüfe erneut. Details stehen in den Logs.",
+        "windows": "Starte Docker Desktop neu und prüfe erneut. Details stehen in den Logs.",
+        "linux": "Starte den Docker-Dienst neu und prüfe erneut."
+      }
+    }
   }
 }
