@@ -1,4 +1,4 @@
-import { MessageSquare, Play, Power, Settings2, Square } from 'lucide-react';
+import { CheckCheck, MessageSquare, Undo2, Play, Power, Settings2, Square } from 'lucide-react';
 import { i18next } from '../../i18n';
 import { useAgentStore } from '../../stores/agent';
 import { setPanelOpen } from '../../stores/layout';
@@ -7,6 +7,8 @@ import { useWorkspaceStore } from '../../stores/workspace';
 import { registerCommands } from '../commands';
 import { cancelTurn, startAgent, stopAgent } from './actions';
 import { focusAgentInput } from './PromptInput';
+import { resolveAllChanges } from '../review';
+import { useReviewStore } from '../../stores/review';
 
 export function registerAgentCommands(): () => void {
   const category = () => i18next.t('commands.category.agent');
@@ -49,6 +51,22 @@ export function registerAgentCommands(): () => void {
       icon: Power,
       when: () => state() === 'ready' || state() === 'working',
       run: stopAgent,
+    },
+    {
+      id: 'review.acceptAll',
+      category,
+      title: () => i18next.t('review.acceptAll'),
+      icon: CheckCheck,
+      when: () => useReviewStore.getState().files.length > 0,
+      run: () => resolveAllChanges('all'),
+    },
+    {
+      id: 'review.rejectAll',
+      category,
+      title: () => i18next.t('review.rejectAll'),
+      icon: Undo2,
+      when: () => useReviewStore.getState().files.length > 0,
+      run: () => resolveAllChanges('none'),
     },
     {
       id: 'agent.manage',

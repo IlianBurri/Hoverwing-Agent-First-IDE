@@ -1,4 +1,4 @@
-import { X } from 'lucide-react';
+import { FileDiff, X } from 'lucide-react';
 import { useRef } from 'react';
 import type { KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -46,12 +46,17 @@ export function EditorTabs() {
       onKeyDown={onKeyDown}
     >
       {files.map((file) => {
-        const name = baseName(file.path);
+        const isReview = file.kind === 'review' && file.reviewPath !== undefined;
+        const name = isReview
+          ? t('review.tabName', { name: baseName(file.reviewPath ?? '') })
+          : baseName(file.path);
         const selected = file.path === active;
-        const Icon = iconForEntry(
-          { name, path: file.path, kind: 'file', symlink: false, heavy: false },
-          false,
-        );
+        const Icon = isReview
+          ? FileDiff
+          : iconForEntry(
+              { name, path: file.path, kind: 'file', symlink: false, heavy: false },
+              false,
+            );
         const state = file.dirty ? t('editor.unsaved') : undefined;
         return (
           <div

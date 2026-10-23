@@ -14,6 +14,7 @@ import { ChangesModal, registerCheckpointCommands } from './features/checkpoints
 import { appendLog, applyEvent, setStatus as setAgentStatus } from './stores/agent';
 import { RulesDialog, registerPermissionCommands } from './features/permissions';
 import { refreshCheckpoints } from './stores/checkpoints';
+import { refreshReview } from './stores/review';
 import { useWorkspaceStore } from './stores/workspace';
 import { registerTerminalCommands } from './features/terminal';
 import { setPanelOpen } from './stores/layout';
@@ -56,7 +57,15 @@ export function App() {
   const workspaceRoot = useWorkspaceStore((state) => state.info?.root);
   useEffect(() => {
     void refreshCheckpoints();
+    void refreshReview();
   }, [workspaceRoot]);
+  useEffect(
+    () =>
+      window.kestrel.on('review:changed', () => {
+        void refreshReview();
+      }),
+    [],
+  );
   useEffect(
     () =>
       window.kestrel.on('checkpoints:changed', () => {

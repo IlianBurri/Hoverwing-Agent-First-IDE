@@ -12,6 +12,7 @@ import { usePermissionStore } from '../../stores/permissions';
 import { useWorkspaceStore } from '../../stores/workspace';
 import { CheckpointTimeline } from '../checkpoints';
 import { PermissionCard } from '../permissions';
+import { ChangesList } from '../review';
 import { loadAgentConfigs, startAgent, stopAgent } from './actions';
 import { PlanView } from './PlanView';
 import { PromptInput } from './PromptInput';
@@ -103,6 +104,7 @@ export function AgentPanel() {
             </div>
           )}
           <Transcript items={items} />
+          <ChangesList />
           {pending.length > 0 && (
             <div
               className={styles['permissions']}

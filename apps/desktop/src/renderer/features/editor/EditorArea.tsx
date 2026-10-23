@@ -5,6 +5,7 @@ import { EmptyState } from '../../components/EmptyState';
 import { useEditorStore } from '../../stores/editor';
 import { EditorTabs } from './EditorTabs';
 import { ExternalChangeBanner } from './ExternalChangeBanner';
+import { ReviewView } from '../review/ReviewView';
 import { Kbd } from '../../components/Kbd';
 import { KestrelMark } from '../../components/KestrelMark';
 import { Button } from '../../components/Button';
@@ -87,7 +88,8 @@ export function EditorArea() {
             <MonacoHost path={file.path} />
           </Suspense>
         )}
-        {file && file.kind !== 'text' && (
+        {file?.kind === 'review' && file.reviewPath && <ReviewView path={file.reviewPath} />}
+        {file && (file.kind === 'binary' || file.kind === 'tooLarge') && (
           <EmptyState
             icon={FileWarning}
             title={file.kind === 'binary' ? t('editor.binaryTitle') : t('editor.tooLargeTitle')}

@@ -182,7 +182,8 @@
       "invalid_pattern": "Der reguläre Ausdruck ist ungültig.",
       "checkpoints_unavailable": "Checkpoints sind nicht verfügbar. Dafür muss Git installiert und ein Ordner geöffnet sein.",
       "agent_not_running": "Es läuft kein Agent.",
-      "agent_not_approved": "Der Start des Agenten wurde nicht erlaubt."
+      "agent_not_approved": "Der Start des Agenten wurde nicht erlaubt.",
+      "review_conflict": "Die Datei wurde inzwischen geändert. Die Ansicht wurde aktualisiert, bitte prüfe sie erneut."
     }
   },
   "palette": {
@@ -433,5 +434,35 @@
     "delete": "Löschen",
     "deleteTitle": "«{{name}}» löschen?",
     "deleteMessage": "Die Konfiguration und ihre gespeicherten Werte werden entfernt."
+  },
+  "review": {
+    "title_one": "{{count}} Änderung zu prüfen",
+    "title_other": "{{count}} Änderungen zu prüfen",
+    "acceptAll": "Alle annehmen",
+    "rejectAll": "Alle ablehnen",
+    "acceptFile": "Änderung an «{{path}}» annehmen",
+    "rejectFile": "Änderung an «{{path}}» ablehnen",
+    "source": {
+      "held": "zurückgehalten",
+      "applied": "bereits angewendet"
+    },
+    "decide": "Änderung übernehmen",
+    "accepted": "Änderung an «{{path}}» übernommen.",
+    "rejected": "Änderung an «{{path}}» verworfen.",
+    "acceptedAll_one": "{{count}} Änderung übernommen.",
+    "acceptedAll_other": "{{count}} Änderungen übernommen.",
+    "rejectedAll_one": "{{count}} Änderung verworfen.",
+    "rejectedAll_other": "{{count}} Änderungen verworfen.",
+    "tabName": "{{name}} (Review)",
+    "loading": "Änderung wird geladen …",
+    "doneTitle": "Keine offene Änderung",
+    "doneText": "Für diese Datei wartet keine Änderung mehr auf eine Entscheidung.",
+    "heldInfo": "Noch nicht gespeichert: Die Datei auf der Festplatte ist unverändert, bis du annimmst.",
+    "appliedInfo": "Der Agent hat diese Datei selbst geändert. Ablehnen stellt den vorherigen Stand wieder her.",
+    "rejectChange": "Ablehnen",
+    "acceptChange": "Annehmen",
+    "applySelection": "{{count}} von {{total}} Abschnitten übernehmen",
+    "hunks": "Abschnitte",
+    "hunkLabel": "Abschnitt {{index}} (Zeile {{from}}–{{to}})"
   }
 }

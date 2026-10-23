@@ -3,6 +3,7 @@
 //   hello                  -> plan + streamed answer
 //   edit <path> <text>     -> asks permission, then writes via Kestrel (fs/write_text_file)
 //   direct <path> <text>   -> writes the file itself, like Claude Code does
+//   twohunks <path>        -> changes lines 2 and 25 itself (two separate hunks)
 //   secret                 -> tries to read .env through Kestrel
 //   run <command>          -> asks permission to run a command (does not run it)
 //   slow                   -> waits until cancelled
@@ -113,6 +114,13 @@ const app = agent({ name: 'mock-agent' })
         sessionId,
         ok ? `Changed ${path}.` : `I was not allowed to change ${path}.`,
       );
+    } else if (command === 'twohunks') {
+      const absolute = join(session.cwd, path);
+      const lines = (await readFile(absolute, 'utf8')).split('\n');
+      lines[1] = 'changed near the top';
+      lines[24] = 'changed near the bottom';
+      await writeFile(absolute, lines.join('\n'));
+      await say(client, sessionId, `Changed two places in ${path}.`);
     } else if (command === 'secret') {
       try {
         await client.request('fs/read_text_file', { sessionId, path: join(session.cwd, '.env') });

@@ -4,8 +4,10 @@ export type ExternalState = 'none' | 'changed' | 'deleted';
 
 export interface OpenFile {
   path: string;
-  /** What the editor can show: text in Monaco, or a notice for the others. */
-  kind: 'text' | 'binary' | 'tooLarge';
+  /** What the editor shows: text in Monaco, an agent change to review, or a notice. */
+  kind: 'text' | 'binary' | 'tooLarge' | 'review';
+  /** For review tabs: the project file whose change is reviewed. */
+  reviewPath?: string;
   size?: number;
   dirty: boolean;
   /** Modification time of the version on disk we last read or wrote. */

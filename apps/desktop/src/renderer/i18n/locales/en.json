@@ -182,7 +182,8 @@
       "invalid_pattern": "The regular expression is invalid.",
       "checkpoints_unavailable": "Checkpoints are not available. Git must be installed and a folder must be open.",
       "agent_not_running": "No agent is running.",
-      "agent_not_approved": "Starting the agent was not allowed."
+      "agent_not_approved": "Starting the agent was not allowed.",
+      "review_conflict": "The file changed in the meantime. The view was refreshed, please review it again."
     }
   },
   "palette": {
@@ -433,5 +434,35 @@
     "delete": "Delete",
     "deleteTitle": "Delete “{{name}}”?",
     "deleteMessage": "The configuration and its stored values are removed."
+  },
+  "review": {
+    "title_one": "{{count}} change to review",
+    "title_other": "{{count}} changes to review",
+    "acceptAll": "Accept all",
+    "rejectAll": "Reject all",
+    "acceptFile": "Accept change to “{{path}}”",
+    "rejectFile": "Reject change to “{{path}}”",
+    "source": {
+      "held": "held back",
+      "applied": "already applied"
+    },
+    "decide": "Apply change",
+    "accepted": "Change to “{{path}}” applied.",
+    "rejected": "Change to “{{path}}” discarded.",
+    "acceptedAll_one": "Applied {{count}} change.",
+    "acceptedAll_other": "Applied {{count}} changes.",
+    "rejectedAll_one": "Discarded {{count}} change.",
+    "rejectedAll_other": "Discarded {{count}} changes.",
+    "tabName": "{{name}} (Review)",
+    "loading": "Loading change …",
+    "doneTitle": "No pending change",
+    "doneText": "No change is waiting for a decision for this file anymore.",
+    "heldInfo": "Not saved yet: the file on disk is unchanged until you accept.",
+    "appliedInfo": "The agent changed this file itself. Rejecting restores the previous state.",
+    "rejectChange": "Reject",
+    "acceptChange": "Accept",
+    "applySelection": "Apply {{count}} of {{total}} sections",
+    "hunks": "Sections",
+    "hunkLabel": "Section {{index}} (lines {{from}}–{{to}})"
   }
 }
