@@ -4,8 +4,9 @@ Kestrel is an agent-first desktop IDE. It does not ship its own AI. You bring yo
 own agent (e.g. Claude Code via the Agent Client Protocol), your own API key or a
 local model, and Kestrel makes working with it visible, safe and easy to undo.
 
-> Status: **phase 1 done** – layout, command palette, workspace, editor, search and
-> terminal work. Agents (ACP) follow in phase 2. See [`SPEC.md`](SPEC.md) for the
+> Status: **phase 2 done** – workspace, editor, search, terminal, plus agents via
+> the Agent Client Protocol with permissions, checkpoints and diff review. The
+> agent sandbox (Docker) follows in phase 3. See [`SPEC.md`](SPEC.md) for the
 > full specification and roadmap.
 
 ## What works today
@@ -25,10 +26,24 @@ local model, and Kestrel makes working with it visible, safe and easy to undo.
 - **Terminal** (`` Ctrl+` ``): several terminals with your default shell, started in
   the project folder.
 
+- **Agents** (ACP): start your own agent (templates for Claude Code and Gemini
+  CLI) in the project folder. Streaming answers, plan, tool calls, stop button,
+  resume earlier sessions. Log in inside the agent itself – Kestrel never
+  handles your credentials.
+- **Permissions:** every risky agent action asks first (allow once / always for
+  this project / deny). Secret files (`.env`, keys, `.ssh` …) are always blocked
+  for access through Kestrel. Every decision is logged (bottom panel → Logs).
+- **Checkpoints:** before every agent turn, the project state is saved in a
+  separate git repository in the app data folder (your own `.git` is never
+  touched). Jump back to any checkpoint, completely or per file.
+- **Diff review:** agent changes are listed for review; accept or reject per
+  file or per section. Rejected changes leave the file exactly as it was.
+
 ## Requirements
 
 - Node.js ≥ 22.12 (see `.nvmrc`)
 - pnpm 10 (`corepack enable` picks the version pinned in `package.json`)
+- Git (for checkpoints)
 - **Linux only:** a C/C++ toolchain and Python 3 (`build-essential`, `python3`) –
   `node-pty` is compiled during install. macOS and Windows use prebuilt binaries.
 - Headless Linux (E2E tests): `xvfb-run`

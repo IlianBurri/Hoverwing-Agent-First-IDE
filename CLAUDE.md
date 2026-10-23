@@ -4,9 +4,9 @@ Guidance for working on Kestrel. Read `SPEC.md` for the product spec and phases.
 
 ## Current phase
 
-Phases 0 (foundation) and 1 (layout, command palette, workspace, Monaco, search,
-terminal) are done. Next: phase 2 (permission system + agents via ACP with diff
-review and checkpoints). Every phase: present a plan, wait for OK, implement in
+Phases 0 (foundation), 1 (layout, palette, workspace, Monaco, search, terminal)
+and 2 (permissions, agents via ACP, checkpoints, diff review) are done. Next:
+phase 3 (agent sandbox in a Docker container). Every phase: present a plan, wait for OK, implement in
 small commits, keep lint/typecheck/tests green, update this file.
 
 ## Commands
@@ -60,6 +60,32 @@ in `onlyBuiltDependencies` in `pnpm-workspace.yaml`.
 - **Renderer:** `layout/` app shell, `components/` reusable UI, `features/<name>/`
   one folder per feature (view, actions, commands), `stores/` Zustand stores,
   `design/` tokens and themes, `i18n/` texts, `lib/` small helpers.
+- **Permissions:** every risky agent action calls `PermissionService.check`
+  (or `denies` for writes held for review). Policy is in
+  `packages/shared/src/schemas/permissions.ts`: secret files are always denied,
+  deny beats allow, otherwise ask. Rules and the audit log live in the app data
+  folder (never in the project, so agents cannot edit them); "always allow"
+  stores an exact-target project rule. Logged targets are passed through
+  `lib/redact.ts`.
+- **Agents (ACP):** `modules/agent`. `AgentRuntime` is the ACP _client_ (stable
+  v1 of `@agentclientprotocol/sdk`): it answers `session/request_permission`,
+  `fs/read_text_file`, `fs/write_text_file` (no `terminal/*`), translates
+  `session/update` into Kestrel's own `AgentEvent`s (`translate.ts`) – the
+  renderer never sees ACP. Transport is injected: `spawnTransport` (child
+  process) or `inProcessTransport` (unit tests). Agent configs live in
+  `agents.json`; a new command line must be confirmed in a native main-process
+  dialog (fingerprint stored), so a compromised renderer cannot start arbitrary
+  programs. Secret env values: `SecretStore` (safeStorage; memory-only without a
+  keychain). Kestrel never handles Claude credentials.
+- **Checkpoints:** `modules/checkpoints` uses a shadow git dir in app data with
+  the project as work tree and an isolated git config; the project's own `.git`
+  is never touched. Heavy folders and secret files are excluded. One checkpoint
+  is created before every agent turn; restoring saves the current state first.
+- **Diff review:** `modules/review`. With `reviewChanges`, ACP writes are held
+  (disk unchanged, agent reads the held version); after each turn, files the
+  agent changed itself are collected from the turn checkpoint ("applied").
+  Resolving keeps selected hunks (`hunks.ts`, `diff` package) and refuses to
+  overwrite files that changed meanwhile (`review_conflict`).
 - **Commands:** every user action is a `Command` registered by its feature
   (`register<Feature>Commands`), with an i18n title, optional default keybinding(s)
   (`Mod+…`, overridable via `settings.keybindings`) and a `when` condition. One
@@ -90,8 +116,12 @@ in `onlyBuiltDependencies` in `pnpm-workspace.yaml`.
   Collapsed panels hide their content with `hidden` (state stays mounted).
 - Tests: `*.test.ts(x)` next to the code (Vitest; add
   `// @vitest-environment jsdom` for DOM tests). E2E in `apps/desktop/e2e`:
-  `launchApp()` uses a fresh user-data dir and English; `stubOpenDialog` and
-  `stubTrash` replace native UI. A failing test restarts the worker (and the app),
+  `launchApp()` uses a fresh user-data dir and English; `stubOpenDialog`,
+  `stubTrash` and `stubMessageBox` replace native UI. Agent tests use the
+  scripted ACP agent `e2e/fixtures/mock-agent.mjs` (configured with
+  `configureMockAgent`); prompts like `hello`, `edit <path> <text>`,
+  `direct <path> <text>`, `twohunks <path>`, `secret`, `run <cmd>`, `slow`
+  trigger fixed behaviour. A failing test restarts the worker (and the app),
   so later tests in the file fail as follow-ups – fix the first failure first.
 - Commits: Conventional Commits (`feat:`, `fix:`, `chore:`, `test:`, `docs:`).
 - Branding: never use "Claude"/"Anthropic" in product name or logo. A factual
@@ -107,6 +137,9 @@ monaco-editor 0.57 (imports via `monaco-editor/<path>`, TS API under
 `monaco.typescript`), @xterm/xterm 6, node-pty 1.1, @parcel/watcher 2.6,
 @vscode/ripgrep 1.18 (binary via npm platform package, no download).
 
-Renamed packages to use later: ACP SDK = `@agentclientprotocol/sdk`, Claude Code
-adapter = `@agentclientprotocol/claude-agent-acp` (the `@zed-industries/*`
-names are deprecated).
+@agentclientprotocol/sdk 2.0.1 (stable v1 entry point; API: `client()`,
+`onRequest`, `connect(stream)`, `ndJsonStream`; no request timeout option),
+diff 9, react-markdown 10 + remark-gfm 4. Agent templates: Claude Code via
+`npx -y @agentclientprotocol/claude-agent-acp@0.94.0`, Gemini CLI via
+`npx -y @google/gemini-cli@0.65.0 --experimental-acp` (the `@zed-industries/*`
+package names are deprecated). Checkpoints need system `git`.
