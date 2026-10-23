@@ -4,9 +4,9 @@ Kestrel is an agent-first desktop IDE. It does not ship its own AI. You bring yo
 own agent (e.g. Claude Code via the Agent Client Protocol), your own API key or a
 local model, and Kestrel makes working with it visible, safe and easy to undo.
 
-> Status: **phase 3 done** – workspace, editor, search, terminal, agents via the
-> Agent Client Protocol with permissions, checkpoints and diff review, and an
-> optional Docker sandbox for agents. See [`SPEC.md`](SPEC.md) for the full
+> Status: **phase 4 done** – workspace, editor, search, terminal, agents via the
+> Agent Client Protocol with permissions, checkpoints and diff review, an
+> optional Docker sandbox for agents, and a Docker panel. See [`SPEC.md`](SPEC.md) for the full
 > specification and roadmap.
 
 ## What works today
@@ -47,6 +47,13 @@ local model, and Kestrel makes working with it visible, safe and easy to undo.
   runs in the sandbox or directly on the system. Log in to the agent in a
   sandbox terminal (Manage agents → “Log in in the sandbox terminal”); the login
   stays in the agent's Docker volume and Kestrel never reads it.
+- **Docker panel** (`Mod+Shift+D`): containers (state, ports, start/stop/
+  restart, live logs, remove with confirmation), images (size, remove) and the
+  project's Dockerfiles with “Build” (live output). Click a published port to
+  open `http://localhost:<port>` (system browser until the integrated browser
+  arrives). Filter “Only this project” shows Compose projects and containers
+  with a mounted folder inside the project. The status bar counts running
+  containers.
 
 ## Requirements
 
@@ -112,6 +119,7 @@ KESTREL_E2E_DOCKER=1 xvfb-run -a pnpm test:e2e    # agent in a real container
 | `Mod+S`, `Mod+Alt+S`             | Save, save all                |
 | `Mod+W`, `Ctrl+Tab`              | Close tab, next tab           |
 | `` Ctrl+` `` / ``Ctrl+Shift+` `` | Show terminal / new terminal  |
+| `Mod+Shift+D`                    | Docker panel                  |
 
 Inside a terminal on Windows/Linux, `Ctrl+<letter>` goes to the shell (e.g. `Ctrl+C`,
 `Ctrl+R`); use `Ctrl+Shift+P` for the palette there. Copy with `Ctrl+Shift+C`.

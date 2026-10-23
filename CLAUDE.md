@@ -5,8 +5,9 @@ Guidance for working on Kestrel. Read `SPEC.md` for the product spec and phases.
 ## Current phase
 
 Phases 0 (foundation), 1 (layout, palette, workspace, Monaco, search, terminal),
-2 (permissions, agents via ACP, checkpoints, diff review) and 3 (agent sandbox in
-Docker) are done. Next: phase 4 (see SPEC.md). Every phase: present a plan, wait for OK, implement in
+2 (permissions, agents via ACP, checkpoints, diff review), 3 (agent sandbox in
+Docker) and 4 (Docker panel) are done. Next: phase 5 (integrated browser incl.
+agent access; switch "open port" from the system browser to it). Every phase: present a plan, wait for OK, implement in
 small commits, keep lint/typecheck/tests green, update this file.
 
 ## Commands
@@ -106,6 +107,16 @@ so use `KESTREL_SANDBOX_BASE_IMAGE` / `KESTREL_E2E_SANDBOX_BASE_IMAGE` =
   (`kestrel-sandbox:<hash>`) is built from an inline Dockerfile on first use;
   output goes to `sandbox:log`. A sandboxed agent never falls back to running
   directly; the approval fingerprint includes `sandbox.enabled`.
+- **Docker panel:** `DockerPanelService` (`modules/docker/panel.ts`) on the same
+  `DockerApi`: overview (containers marked `inProject` via compose working dir
+  or bind mount, `sandbox` via label), start/stop/restart/remove, Docker event
+  stream -> debounced `docker:changed`, log streams and builds per window
+  (`docker:output` / `docker:streamEnded`, released with the window; closing a
+  build aborts it). Builds only from Dockerfiles inside the project (path
+  guard + Dockerfile name), context = the Dockerfile's folder, `.dockerignore`
+  honoured. Docker's error text goes to Logs › Docker (`sandbox:log`), the UI
+  gets `docker_conflict` / `docker_failed`. Agents have no access to it. Use
+  `fakeDockerApi()` (`modules/docker/testing.ts`) in unit tests.
 - **Commands:** every user action is a `Command` registered by its feature
   (`register<Feature>Commands`), with an i18n title, optional default keybinding(s)
   (`Mod+…`, overridable via `settings.keybindings`) and a `when` condition. One
