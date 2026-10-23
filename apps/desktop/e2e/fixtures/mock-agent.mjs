@@ -1,0 +1,155 @@
+// A scripted ACP agent for E2E tests. It speaks the real protocol over
+// stdin/stdout. Behaviour depends on the prompt text:
+//   hello                  -> plan + streamed answer
+//   edit <path> <text>     -> asks permission, then writes via Kestrel (fs/write_text_file)
+//   direct <path> <text>   -> writes the file itself, like Claude Code does
+//   secret                 -> tries to read .env through Kestrel
+//   run <command>          -> asks permission to run a command (does not run it)
+//   slow                   -> waits until cancelled
+import { readFile, writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
+import { Readable, Writable } from 'node:stream';
+import { RequestError, agent, ndJsonStream } from '@agentclientprotocol/sdk';
+
+const sessions = new Map();
+let toolId = 0;
+
+const say = (client, sessionId, text) =>
+  client.notify('session/update', {
+    sessionId,
+    update: { sessionUpdate: 'agent_message_chunk', content: { type: 'text', text } },
+  });
+
+const app = agent({ name: 'mock-agent' })
+  .onRequest('initialize', () => ({
+    protocolVersion: 1,
+    agentCapabilities: { loadSession: true },
+    agentInfo: { name: 'mock-agent', version: '1.0.0' },
+  }))
+  .onRequest('session/new', ({ params }) => {
+    if (process.env.MOCK_AUTH_REQUIRED === '1') throw RequestError.authRequired();
+    const sessionId = `mock-${String(sessions.size + 1)}`;
+    sessions.set(sessionId, { cwd: params.cwd, cancelled: false });
+    return { sessionId };
+  })
+  .onRequest('session/load', async ({ params, client }) => {
+    sessions.set(params.sessionId, { cwd: params.cwd, cancelled: false });
+    await client.notify('session/update', {
+      sessionId: params.sessionId,
+      update: {
+        sessionUpdate: 'user_message_chunk',
+        content: { type: 'text', text: 'earlier question' },
+      },
+    });
+    await say(client, params.sessionId, 'Restored answer from the earlier session.');
+    return {};
+  })
+  .onNotification('session/cancel', ({ params }) => {
+    const session = sessions.get(params.sessionId);
+    if (session) session.cancelled = true;
+  })
+  .onRequest('session/prompt', async ({ params, client }) => {
+    const { sessionId } = params;
+    const session = sessions.get(sessionId);
+    session.cancelled = false;
+    const text = params.prompt.map((block) => (block.type === 'text' ? block.text : '')).join('');
+    const [command, path, ...rest] = text.trim().split(' ');
+
+    if (command === 'hello') {
+      await client.notify('session/update', {
+        sessionId,
+        update: {
+          sessionUpdate: 'plan',
+          entries: [
+            { content: 'Read the question', status: 'completed', priority: 'high' },
+            { content: 'Answer politely', status: 'in_progress', priority: 'medium' },
+          ],
+        },
+      });
+      for (const chunk of ['Hello ', 'from the ', '**mock agent**.'])
+        await say(client, sessionId, chunk);
+    } else if (command === 'edit' || command === 'direct') {
+      const absolute = join(session.cwd, path);
+      const oldText = await readFile(absolute, 'utf8').catch(() => null);
+      const newText = `${rest.join(' ')}\n`;
+      const toolCallId = `tool-${String(++toolId)}`;
+      const diff = [{ type: 'diff', path: absolute, oldText, newText }];
+      await client.notify('session/update', {
+        sessionId,
+        update: {
+          sessionUpdate: 'tool_call',
+          toolCallId,
+          title: `Edit ${path}`,
+          kind: 'edit',
+          status: 'pending',
+          locations: [{ path: absolute }],
+          content: diff,
+        },
+      });
+      let ok = true;
+      if (command === 'edit') {
+        try {
+          await client.request('fs/write_text_file', {
+            sessionId,
+            path: absolute,
+            content: newText,
+          });
+        } catch {
+          ok = false;
+        }
+      } else {
+        await writeFile(absolute, newText);
+      }
+      await client.notify('session/update', {
+        sessionId,
+        update: {
+          sessionUpdate: 'tool_call_update',
+          toolCallId,
+          status: ok ? 'completed' : 'failed',
+        },
+      });
+      await say(
+        client,
+        sessionId,
+        ok ? `Changed ${path}.` : `I was not allowed to change ${path}.`,
+      );
+    } else if (command === 'secret') {
+      try {
+        await client.request('fs/read_text_file', { sessionId, path: join(session.cwd, '.env') });
+        await say(client, sessionId, 'I could read the secret file.');
+      } catch {
+        await say(client, sessionId, 'Reading .env was blocked.');
+      }
+    } else if (command === 'run') {
+      const response = await client.request('session/request_permission', {
+        sessionId,
+        toolCall: {
+          toolCallId: `tool-${String(++toolId)}`,
+          title: `Run ${[path, ...rest].join(' ')}`,
+          kind: 'execute',
+          rawInput: { command: [path, ...rest].join(' ') },
+        },
+        options: [
+          { optionId: 'allow', name: 'Allow', kind: 'allow_once' },
+          { optionId: 'reject', name: 'Reject', kind: 'reject_once' },
+        ],
+      });
+      const allowed =
+        response.outcome.outcome === 'selected' && response.outcome.optionId === 'allow';
+      await say(client, sessionId, allowed ? 'Command allowed.' : 'Command rejected.');
+    } else if (command === 'slow') {
+      await say(client, sessionId, 'Working on it…');
+      for (let waited = 0; waited < 30_000 && !session.cancelled; waited += 50) {
+        await new Promise((resolve) => setTimeout(resolve, 50));
+      }
+    } else {
+      await say(client, sessionId, `Unknown command: ${text}`);
+    }
+    return { stopReason: session.cancelled ? 'cancelled' : 'end_turn' };
+  });
+
+process.stderr.write('mock agent ready\n');
+const connection = app.connect(
+  ndJsonStream(Writable.toWeb(process.stdout), Readable.toWeb(process.stdin)),
+);
+await connection.closed;

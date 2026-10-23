@@ -9,7 +9,9 @@ import { useApplyTheme } from './hooks/useApplyTheme';
 import { DialogHost } from './components/Dialog';
 import { Toasts } from './components/Toasts';
 import { handleExternalChanges, registerEditorCommands } from './features/editor';
+import { AgentsDialog, registerAgentCommands } from './features/agent';
 import { ChangesModal, registerCheckpointCommands } from './features/checkpoints';
+import { appendLog, applyEvent, setStatus as setAgentStatus } from './stores/agent';
 import { RulesDialog, registerPermissionCommands } from './features/permissions';
 import { refreshCheckpoints } from './stores/checkpoints';
 import { useWorkspaceStore } from './stores/workspace';
@@ -35,6 +37,22 @@ export function App() {
   useEffect(() => registerTerminalCommands(), []);
   useEffect(() => registerPermissionCommands(), []);
   useEffect(() => registerCheckpointCommands(), []);
+  useEffect(() => registerAgentCommands(), []);
+  useEffect(() => {
+    void window.kestrel.invoke('agent:status').then((result) => {
+      if (result.ok) setAgentStatus(result.data);
+    });
+    const offs = [
+      window.kestrel.on('agent:status', setAgentStatus),
+      window.kestrel.on('agent:event', ({ sessionId, event }) => {
+        applyEvent(sessionId, event);
+      }),
+      window.kestrel.on('agent:log', appendLog),
+    ];
+    return () => {
+      for (const off of offs) off();
+    };
+  }, []);
   const workspaceRoot = useWorkspaceStore((state) => state.info?.root);
   useEffect(() => {
     void refreshCheckpoints();
@@ -100,6 +118,7 @@ export function App() {
       <AppShell />
       <CommandPalette />
       {modal?.id === 'permissionRules' && <RulesDialog />}
+      {modal?.id === 'agents' && <AgentsDialog />}
       {modal?.id === 'checkpointChanges' && (
         <ChangesModal key={modal.checkpoint.id} checkpoint={modal.checkpoint} />
       )}

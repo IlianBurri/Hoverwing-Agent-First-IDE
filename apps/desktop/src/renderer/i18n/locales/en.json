@@ -72,14 +72,90 @@
   "agent": {
     "title": "Agent",
     "emptyTitle": "No agent connected yet",
-    "emptyText": "This is where you work with your own agent: chat, plan, tool calls, permissions and checkpoints. The connection follows in the next step."
+    "noWorkspaceTitle": "No folder open",
+    "noWorkspaceText": "Agents work inside a project folder. Open a folder first.",
+    "startTitle": "Work with your agent",
+    "startText": "Kestrel starts your own agent in the project folder. Every risky action goes through your permissions, and a checkpoint is created before every turn.",
+    "choose": "Choose agent",
+    "start": "Start",
+    "startSelected": "Start agent",
+    "starting": "Starting …",
+    "startingHint": "On the first start, npx downloads the agent. This can take a minute.",
+    "manage": "Manage agents",
+    "privacyNote": "Kestrel does not store your agent’s credentials. Log in directly in the agent, e.g. for Claude Code run “claude” and “/login” in the terminal.",
+    "newSession": "New session",
+    "history": "Earlier sessions",
+    "noHistory": "No earlier sessions yet",
+    "untitledSession": "Untitled session",
+    "end": "End agent",
+    "send": "Send",
+    "stop": "Stop",
+    "inputLabel": "Message to the agent",
+    "inputPlaceholder": "What should the agent do?",
+    "workingPlaceholder": "The agent is working … (Esc to stop)",
+    "inputHint": "Enter to send · Shift+Enter new line",
+    "focusInput": "Focus agent input",
+    "conversation": "Conversation with the agent",
+    "you": "You",
+    "thought": "Thoughts",
+    "checkpointSet": "Checkpoint set",
+    "plan": "Plan",
+    "planProgress": "{{done}} of {{total}} done",
+    "planStatus": {
+      "pending": "open",
+      "in_progress": "in progress",
+      "completed": "done"
+    },
+    "openLocation": "Open “{{path}}”",
+    "diffOf": "Change to {{path}}",
+    "toolOutput": "Tool output",
+    "toolKind": {
+      "read": "Read file",
+      "edit": "Edit file",
+      "delete": "Delete file",
+      "move": "Move file",
+      "search": "Search",
+      "execute": "Run command",
+      "think": "Think",
+      "fetch": "Fetch web page",
+      "switch_mode": "Switch mode",
+      "other": "Tool"
+    },
+    "toolStatus": {
+      "pending": "waiting",
+      "in_progress": "running",
+      "completed": "done",
+      "failed": "failed"
+    },
+    "stopReason": {
+      "cancelled": "Stopped.",
+      "refusal": "The agent declined the task.",
+      "max_tokens": "The answer was cut off because of the length limit.",
+      "max_turn_requests": "The agent reached the maximum number of steps.",
+      "error": "The turn ended with an error."
+    },
+    "error": {
+      "spawnFailed": "{{agent}} could not be started. Is the program installed?",
+      "initFailed": "{{agent}} did not answer as expected.",
+      "authRequired": "{{agent}} needs a login. Log in within the agent itself (for Claude Code: run “claude” in the terminal and type “/login”), then start again.",
+      "crashed": "{{agent}} stopped unexpectedly.",
+      "protocol": "Communication error with {{agent}}."
+    }
   },
   "status": {
     "label": "Status bar",
     "agentNone": "No agent",
     "modelNone": "No model",
     "noProject": "No project",
-    "cursor": "Ln {{line}}, Col {{column}}"
+    "cursor": "Ln {{line}}, Col {{column}}",
+    "agentState": {
+      "idle": "ready to start",
+      "starting": "starting …",
+      "ready": "ready",
+      "working": "working …",
+      "stopped": "stopped",
+      "error": "error"
+    }
   },
   "theme": {
     "label": "Color theme",
@@ -104,7 +180,9 @@
       "not_a_directory": "This is not a folder.",
       "permission_denied": "Permission denied.",
       "invalid_pattern": "The regular expression is invalid.",
-      "checkpoints_unavailable": "Checkpoints are not available. Git must be installed and a folder must be open."
+      "checkpoints_unavailable": "Checkpoints are not available. Git must be installed and a folder must be open.",
+      "agent_not_running": "No agent is running.",
+      "agent_not_approved": "Starting the agent was not allowed."
     }
   },
   "palette": {
@@ -319,5 +397,41 @@
     "restoreMessage": "The current state is saved as a checkpoint first, so you can undo this too.",
     "restored_one": "Restored {{count}} file.",
     "restored_other": "Restored {{count}} files."
+  },
+  "logs": {
+    "label": "Log type",
+    "permissions": "Permissions",
+    "agent": "Agent output"
+  },
+  "agentLog": {
+    "title": "Agent output",
+    "emptyTitle": "No output",
+    "emptyText": "Diagnostic messages of the agent appear here, e.g. when it does not start."
+  },
+  "agents": {
+    "title": "Manage agents",
+    "list": "Agents",
+    "add": "New agent",
+    "name": "Name",
+    "command": "Command",
+    "args": "Arguments",
+    "argsHint": "One argument per line.",
+    "env": "Environment",
+    "envEmpty": "No secret variables.",
+    "envValue": "Value for {{name}}",
+    "envIsSet": "set (leave empty = unchanged)",
+    "envNotSet": "not set",
+    "envClear": "Clear",
+    "envRemove": "Remove variable {{name}}",
+    "envNew": "Name of the new variable",
+    "envAdd": "Add",
+    "envHint": "Values are stored encrypted in the system keychain and never shown.",
+    "review": "Review",
+    "reviewLabel": "Review changes before applying them (recommended)",
+    "save": "Save",
+    "saved": "“{{name}}” saved.",
+    "delete": "Delete",
+    "deleteTitle": "Delete “{{name}}”?",
+    "deleteMessage": "The configuration and its stored values are removed."
   }
 }

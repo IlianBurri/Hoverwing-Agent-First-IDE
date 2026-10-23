@@ -1,0 +1,69 @@
+.root {
+  overflow-wrap: anywhere;
+}
+
+.root > :first-child {
+  margin-top: 0;
+}
+
+.root > :last-child {
+  margin-bottom: 0;
+}
+
+.root p,
+.root ul,
+.root ol {
+  margin: var(--space-2) 0;
+}
+
+.root ul,
+.root ol {
+  padding-left: var(--space-5);
+}
+
+.root code {
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-sm);
+  background: var(--surface-hover);
+  font-size: 0.92em;
+}
+
+.root pre {
+  margin: var(--space-2) 0;
+  padding: var(--space-2) var(--space-3);
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-code);
+}
+
+.root pre code {
+  padding: 0;
+  background: none;
+}
+
+.root a {
+  color: var(--accent);
+}
+
+.root table {
+  border-collapse: collapse;
+}
+
+.root th,
+.root td {
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--border);
+}
+
+.root blockquote {
+  margin: var(--space-2) 0;
+  padding-left: var(--space-3);
+  border-left: 2px solid var(--border-strong);
+  color: var(--text-muted);
+}
+
+.image {
+  color: var(--text-muted);
+}

@@ -1,0 +1,104 @@
+.layout {
+  display: grid;
+  grid-template-columns: calc(var(--space-10) * 3) 1fr;
+  gap: var(--space-5);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.item {
+  padding: var(--space-1) var(--space-2);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.item:hover {
+  background: var(--surface-hover);
+}
+
+.item[aria-current='true'] {
+  background: var(--accent-subtle);
+}
+
+.form {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-2) var(--space-3);
+  align-items: start;
+}
+
+.form input:not([type='checkbox']),
+.form textarea {
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+}
+
+.form textarea {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+}
+
+.label {
+  padding-top: var(--space-1);
+}
+
+.hint {
+  grid-column: 2;
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.env {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.env .hint {
+  grid-column: auto;
+}
+
+.envRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.envRow input {
+  flex: 1;
+  min-width: 0;
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding-top: var(--space-1);
+}
+
+.actions {
+  display: flex;
+  grid-column: 1 / -1;
+  justify-content: space-between;
+}
+
+.actions > :only-child {
+  margin-left: auto;
+}
+
+.delete {
+  color: var(--error);
+}

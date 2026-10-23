@@ -1,0 +1,52 @@
+.root {
+  margin: 0 var(--space-3) var(--space-3);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--bg);
+}
+
+.root:focus-within {
+  border-color: var(--accent);
+}
+
+.input {
+  display: block;
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  resize: none;
+}
+
+.input:focus-visible {
+  outline: none;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-1) var(--space-1) var(--space-3);
+}
+
+.hint {
+  color: var(--text-muted);
+  font-size: var(--font-size-2xs);
+}
+
+.send:not(:disabled) {
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.send:not(:disabled):hover {
+  background: var(--accent-hover);
+  color: var(--accent-contrast);
+}
+
+.stop {
+  background: var(--error);
+  color: var(--accent-contrast);
+}

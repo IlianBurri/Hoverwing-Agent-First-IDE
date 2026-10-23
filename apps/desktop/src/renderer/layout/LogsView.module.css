@@ -1,0 +1,14 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.switch {
+  padding: var(--space-2) var(--space-3) 0;
+}
+
+.content {
+  flex: 1;
+  min-height: 0;
+}

@@ -127,7 +127,7 @@ test('reopens the folder from the recent list', async () => {
   await page.keyboard.press('Control+K');
   await page.keyboard.type('Close folder');
   await page.keyboard.press('Enter');
-  await expect(page.getByText('No folder open')).toBeVisible();
+  await expect(page.getByText('No folder open').first()).toBeVisible();
   const name = root.split('/').pop() ?? '';
   await page
     .getByRole('navigation', { name: 'Recently opened' })

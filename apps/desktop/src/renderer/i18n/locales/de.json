@@ -72,14 +72,90 @@
   "agent": {
     "title": "Agent",
     "emptyTitle": "Noch kein Agent verbunden",
-    "emptyText": "Hier arbeitest du mit deinem eigenen Agenten: Chat, Plan, Tool-Aufrufe, Berechtigungen und Checkpoints. Die Anbindung folgt im nächsten Schritt."
+    "noWorkspaceTitle": "Kein Ordner geöffnet",
+    "noWorkspaceText": "Agenten arbeiten in einem Projektordner. Öffne zuerst einen Ordner.",
+    "startTitle": "Mit deinem Agenten arbeiten",
+    "startText": "Kestrel startet deinen eigenen Agenten im Projektordner. Jede riskante Aktion läuft über deine Berechtigungen, vor jeder Runde wird ein Checkpoint erstellt.",
+    "choose": "Agent auswählen",
+    "start": "Starten",
+    "startSelected": "Agent starten",
+    "starting": "Startet …",
+    "startingHint": "Beim ersten Start lädt npx den Agenten herunter. Das kann eine Minute dauern.",
+    "manage": "Agenten verwalten",
+    "privacyNote": "Kestrel speichert keine Zugangsdaten deines Agenten. Melde dich direkt im Agenten an, z. B. bei Claude Code mit «claude» und «/login» im Terminal.",
+    "newSession": "Neue Session",
+    "history": "Frühere Sessions",
+    "noHistory": "Noch keine früheren Sessions",
+    "untitledSession": "Session ohne Titel",
+    "end": "Agent beenden",
+    "send": "Senden",
+    "stop": "Stoppen",
+    "inputLabel": "Nachricht an den Agenten",
+    "inputPlaceholder": "Was soll der Agent tun?",
+    "workingPlaceholder": "Der Agent arbeitet … (Esc zum Stoppen)",
+    "inputHint": "Enter senden · Shift+Enter neue Zeile",
+    "focusInput": "Zum Agenten-Eingabefeld",
+    "conversation": "Unterhaltung mit dem Agenten",
+    "you": "Du",
+    "thought": "Gedanken",
+    "checkpointSet": "Checkpoint gesetzt",
+    "plan": "Plan",
+    "planProgress": "{{done}} von {{total}} erledigt",
+    "planStatus": {
+      "pending": "offen",
+      "in_progress": "in Arbeit",
+      "completed": "erledigt"
+    },
+    "openLocation": "«{{path}}» öffnen",
+    "diffOf": "Änderung an {{path}}",
+    "toolOutput": "Ausgabe des Tools",
+    "toolKind": {
+      "read": "Datei lesen",
+      "edit": "Datei ändern",
+      "delete": "Datei löschen",
+      "move": "Datei verschieben",
+      "search": "Suchen",
+      "execute": "Befehl ausführen",
+      "think": "Nachdenken",
+      "fetch": "Webseite abrufen",
+      "switch_mode": "Modus wechseln",
+      "other": "Tool"
+    },
+    "toolStatus": {
+      "pending": "wartet",
+      "in_progress": "läuft",
+      "completed": "fertig",
+      "failed": "fehlgeschlagen"
+    },
+    "stopReason": {
+      "cancelled": "Gestoppt.",
+      "refusal": "Der Agent hat die Aufgabe abgelehnt.",
+      "max_tokens": "Die Antwort wurde wegen der Längenbegrenzung abgebrochen.",
+      "max_turn_requests": "Der Agent hat die maximale Anzahl Schritte erreicht.",
+      "error": "Die Runde ist mit einem Fehler beendet worden."
+    },
+    "error": {
+      "spawnFailed": "{{agent}} konnte nicht gestartet werden. Ist das Programm installiert?",
+      "initFailed": "{{agent}} hat nicht wie erwartet geantwortet.",
+      "authRequired": "{{agent}} braucht eine Anmeldung. Melde dich im Agenten selbst an (für Claude Code: im Terminal «claude» starten und «/login» eingeben) und starte dann neu.",
+      "crashed": "{{agent}} wurde unerwartet beendet.",
+      "protocol": "Fehler in der Kommunikation mit {{agent}}."
+    }
   },
   "status": {
     "label": "Statusleiste",
     "agentNone": "Kein Agent",
     "modelNone": "Kein Modell",
     "noProject": "Kein Projekt",
-    "cursor": "Z. {{line}}, Sp. {{column}}"
+    "cursor": "Z. {{line}}, Sp. {{column}}",
+    "agentState": {
+      "idle": "bereit zum Start",
+      "starting": "startet …",
+      "ready": "bereit",
+      "working": "arbeitet …",
+      "stopped": "beendet",
+      "error": "Fehler"
+    }
   },
   "theme": {
     "label": "Farbschema",
@@ -104,7 +180,9 @@
       "not_a_directory": "Das ist kein Ordner.",
       "permission_denied": "Keine Berechtigung.",
       "invalid_pattern": "Der reguläre Ausdruck ist ungültig.",
-      "checkpoints_unavailable": "Checkpoints sind nicht verfügbar. Dafür muss Git installiert und ein Ordner geöffnet sein."
+      "checkpoints_unavailable": "Checkpoints sind nicht verfügbar. Dafür muss Git installiert und ein Ordner geöffnet sein.",
+      "agent_not_running": "Es läuft kein Agent.",
+      "agent_not_approved": "Der Start des Agenten wurde nicht erlaubt."
     }
   },
   "palette": {
@@ -319,5 +397,41 @@
     "restoreMessage": "Der aktuelle Stand wird vorher als Checkpoint gesichert. Du kannst also auch das wieder rückgängig machen.",
     "restored_one": "{{count}} Datei zurückgesetzt.",
     "restored_other": "{{count}} Dateien zurückgesetzt."
+  },
+  "logs": {
+    "label": "Art des Protokolls",
+    "permissions": "Berechtigungen",
+    "agent": "Agent-Ausgabe"
+  },
+  "agentLog": {
+    "title": "Agent-Ausgabe",
+    "emptyTitle": "Keine Ausgabe",
+    "emptyText": "Hier erscheinen Diagnosemeldungen des Agenten, z. B. wenn er nicht startet."
+  },
+  "agents": {
+    "title": "Agenten verwalten",
+    "list": "Agenten",
+    "add": "Neuer Agent",
+    "name": "Name",
+    "command": "Befehl",
+    "args": "Argumente",
+    "argsHint": "Ein Argument pro Zeile.",
+    "env": "Umgebung",
+    "envEmpty": "Keine geheimen Variablen.",
+    "envValue": "Wert für {{name}}",
+    "envIsSet": "gesetzt (leer lassen = unverändert)",
+    "envNotSet": "nicht gesetzt",
+    "envClear": "Löschen",
+    "envRemove": "Variable {{name}} entfernen",
+    "envNew": "Name der neuen Variable",
+    "envAdd": "Hinzufügen",
+    "envHint": "Werte werden verschlüsselt im Schlüsselbund des Systems gespeichert und nie angezeigt.",
+    "review": "Prüfen",
+    "reviewLabel": "Änderungen vor dem Übernehmen prüfen (empfohlen)",
+    "save": "Speichern",
+    "saved": "«{{name}}» gespeichert.",
+    "delete": "Löschen",
+    "deleteTitle": "«{{name}}» löschen?",
+    "deleteMessage": "Die Konfiguration und ihre gespeicherten Werte werden entfernt."
   }
 }
