@@ -159,7 +159,9 @@
       "working": "arbeitet …",
       "stopped": "beendet",
       "error": "Fehler"
-    }
+    },
+    "containers_one": "{{count}} Container läuft",
+    "containers_other": "{{count}} Container laufen"
   },
   "theme": {
     "label": "Farbschema",
@@ -208,7 +210,8 @@
       "files": "Dateien",
       "editor": "Editor",
       "terminal": "Terminal",
-      "agent": "Agent"
+      "agent": "Agent",
+      "docker": "Docker"
     },
     "palette": "Befehlspalette öffnen",
     "showFiles": "Dateien anzeigen",
@@ -496,7 +499,7 @@
     "badgeDirect": "Direkt auf dem System",
     "badgeSandboxHint": "Der Agent läuft in einem Docker-Container und sieht nur dieses Projekt.",
     "badgeDirectHint": "Der Agent läuft direkt auf deinem System mit deinen Benutzerrechten.",
-    "logTitle": "Ausgabe des Sandbox-Builds",
+    "logTitle": "Docker-Ausgabe",
     "logEmptyTitle": "Noch keine Sandbox-Ausgabe",
     "logEmptyText": "Wenn das Sandbox-Image gebaut wird, erscheint die Ausgabe hier.",
     "docker": {
@@ -528,6 +531,76 @@
         "windows": "Starte Docker Desktop neu und prüfe erneut. Details stehen in den Logs.",
         "linux": "Starte den Docker-Dienst neu und prüfe erneut."
       }
+    }
+  },
+  "docker": {
+    "title": "Docker",
+    "show": "Docker anzeigen",
+    "refresh": "Docker erneut prüfen",
+    "buildImage": "Image bauen …",
+    "build": "Bauen",
+    "buildTitle": "Image aus {{file}} bauen",
+    "tag": "Image-Name und Tag",
+    "tagInvalid": "Verwende Kleinbuchstaben, Ziffern und . _ - / plus optional :tag, z. B. meine-app:latest.",
+    "chooseDockerfile": "Welches Dockerfile?",
+    "chooseDockerfileText": "Das Image wird mit dem Ordner des Dockerfiles als Kontext gebaut.",
+    "noDockerfiles": "Kein Dockerfile in diesem Projekt gefunden.",
+    "dockerfiles": "Dockerfiles im Projekt",
+    "onlyProject": "Nur dieses Projekt",
+    "containers_one": "Container ({{count}})",
+    "containers_other": "Container ({{count}})",
+    "containersList": "Container",
+    "images_one": "Images ({{count}})",
+    "images_other": "Images ({{count}})",
+    "imagesList": "Images",
+    "noContainers": "Keine Container",
+    "noProjectContainers": "Kein Container gehört zu diesem Projekt (Docker-Compose-Ordner oder ein eingebundener Ordner darin).",
+    "noImages": "Keine Images.",
+    "usedBy_one": "von {{count}} Container verwendet",
+    "usedBy_other": "von {{count}} Containern verwendet",
+    "sandboxTag": "Agent-Sandbox",
+    "composeProject": "Docker-Compose-Projekt",
+    "openPort": "{{url}} im Browser öffnen",
+    "remove": "Entfernen",
+    "stopAndRemove": "Stoppen und entfernen",
+    "removeContainerTitle": "Container «{{name}}» entfernen?",
+    "removeRunningTitle": "Container «{{name}}» läuft. Stoppen und entfernen?",
+    "removeContainerMessage": "Der Container und seine Daten, die nicht in einem Volume liegen, werden gelöscht. Images und Volumes bleiben.",
+    "removeSandboxMessage": "Das ist ein Container von Kestrels Agent-Sandbox. Ein laufender Agent darin wird beendet. Die Anmeldung des Agenten (sein Volume) bleibt.",
+    "removeImageTitle": "Image «{{name}}» entfernen?",
+    "removeImageMessage": "Das Image wird aus Docker gelöscht. Du kannst es später neu bauen oder herunterladen.",
+    "cancelBuild": "Build abbrechen",
+    "cancelBuildTitle": "Build von «{{name}}» abbrechen?",
+    "cancelBuildMessage": "Der Build läuft noch. Wenn du den Tab schliesst, wird er abgebrochen.",
+    "building": "baut …",
+    "buildOk": "gebaut",
+    "buildFailed": "fehlgeschlagen",
+    "ended": "beendet",
+    "outputs": "Docker-Ausgabe",
+    "outputLabel": "Docker-Ausgabe (nur lesen)",
+    "outputEmptyTitle": "Noch keine Docker-Ausgabe",
+    "outputEmptyText": "Container-Logs und Image-Builds öffnen sich hier, je in einem eigenen Tab.",
+    "closeOutput": "{{name}} schliessen",
+    "action": {
+      "start": "Container starten",
+      "stop": "Container stoppen",
+      "restart": "Container neu starten",
+      "logs": "Logs anzeigen",
+      "startName": "{{name}} starten",
+      "stopName": "{{name}} stoppen",
+      "restartName": "{{name}} neu starten",
+      "logsName": "Logs von {{name}}",
+      "removeName": "{{name}} entfernen"
+    },
+    "state": {
+      "running": "läuft",
+      "paused": "pausiert",
+      "restarting": "startet neu",
+      "created": "erstellt",
+      "exited": "gestoppt",
+      "removing": "wird entfernt",
+      "dead": "defekt",
+      "unknown": "unbekannt"
     }
   }
 }

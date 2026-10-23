@@ -4,12 +4,13 @@ import type { BottomView } from '@kestrel/shared';
 import { EmptyState } from '../components/EmptyState';
 import { IconButton } from '../components/IconButton';
 import { Tabs } from '../components/Tabs';
+import { DockerOutput } from '../features/docker';
 import { TerminalView } from '../features/terminal';
 import { setPanelOpen } from '../stores/layout';
 import { LogsView } from './LogsView';
 import { useSettingsStore } from '../stores/settings';
 
-const viewIds: readonly BottomView[] = ['terminal', 'logs', 'problems'];
+const viewIds: readonly BottomView[] = ['terminal', 'logs', 'docker', 'problems'];
 
 export function BottomPanel() {
   const { t } = useTranslation();
@@ -39,6 +40,7 @@ export function BottomPanel() {
       >
         {layout.bottomView === 'terminal' && <TerminalView />}
         {layout.bottomView === 'logs' && <LogsView />}
+        {layout.bottomView === 'docker' && <DockerOutput />}
         {layout.bottomView === 'problems' && (
           <EmptyState
             icon={CircleAlert}

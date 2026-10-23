@@ -1,11 +1,13 @@
-import { Bot, Cpu, FolderClosed } from 'lucide-react';
+import { Bot, Container, Cpu, FolderClosed } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { StatusMessage } from '../components/StatusMessage';
 import { useSettingsStore } from '../stores/settings';
 import { useAgentStore } from '../stores/agent';
 import { useEditorStore } from '../stores/editor';
 import { useWorkspaceStore } from '../stores/workspace';
+import { showDockerView } from '../features/docker';
 import { SandboxBadge } from '../features/sandbox';
+import { runningContainers, useDockerStore } from '../stores/docker';
 import styles from './StatusBar.module.css';
 
 export function StatusBar() {
@@ -14,6 +16,7 @@ export function StatusBar() {
   const workspace = useWorkspaceStore((state) => state.info);
   const cursor = useEditorStore((state) => state.cursor);
   const agent = useAgentStore((state) => state.status);
+  const docker = useDockerStore((state) => state.overview);
   const agentText =
     agent.agentName && agent.state !== 'idle' && agent.state !== 'stopped'
       ? `${agent.agentName} · ${t(`status.agentState.${agent.state}`)}`
@@ -33,6 +36,12 @@ export function StatusBar() {
           <Cpu size={14} aria-hidden="true" />
           {t('status.modelNone')}
         </span>
+        {docker?.docker === 'available' && (
+          <button type="button" className={styles['button']} onClick={showDockerView}>
+            <Container size={14} aria-hidden="true" />
+            {t('status.containers', { count: runningContainers(docker) })}
+          </button>
+        )}
       </div>
       <div className={styles['group']}>
         {saveError && <StatusMessage kind="error">{t('errors.settingsSave')}</StatusMessage>}

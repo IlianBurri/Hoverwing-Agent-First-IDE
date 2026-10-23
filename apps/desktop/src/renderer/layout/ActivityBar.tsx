@@ -1,4 +1,4 @@
-import { Files, Monitor, Moon, Search, Sun } from 'lucide-react';
+import { Container, Files, Monitor, Moon, Search, Sun } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { SidebarView, ThemePreference } from '@kestrel/shared';
@@ -11,6 +11,7 @@ import styles from './ActivityBar.module.css';
 const views: readonly { id: SidebarView; icon: LucideIcon }[] = [
   { id: 'files', icon: Files },
   { id: 'search', icon: Search },
+  { id: 'docker', icon: Container },
 ];
 
 const themeIcons: Record<ThemePreference, LucideIcon> = {

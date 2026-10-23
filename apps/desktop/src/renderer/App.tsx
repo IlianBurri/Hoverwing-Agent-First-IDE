@@ -15,6 +15,8 @@ import { appendLog, applyEvent, setStatus as setAgentStatus } from './stores/age
 import { RulesDialog, registerPermissionCommands } from './features/permissions';
 import { refreshSandboxStatus, registerSandboxCommands } from './features/sandbox';
 import { appendSandboxLog, setSandboxStatus } from './stores/sandbox';
+import { refreshDocker, registerDockerCommands } from './features/docker';
+import { deliverStream, endStream } from './stores/docker';
 import { refreshCheckpoints } from './stores/checkpoints';
 import { refreshReview } from './stores/review';
 import { useWorkspaceStore } from './stores/workspace';
@@ -42,6 +44,24 @@ export function App() {
   useEffect(() => registerCheckpointCommands(), []);
   useEffect(() => registerAgentCommands(), []);
   useEffect(() => registerSandboxCommands(), []);
+  useEffect(() => registerDockerCommands(), []);
+  useEffect(() => {
+    const offs = [
+      window.kestrel.on('docker:changed', () => {
+        void refreshDocker();
+      }),
+      window.kestrel.on('docker:output', ({ streamId, data }) => {
+        deliverStream(streamId, data);
+      }),
+      window.kestrel.on('docker:streamEnded', ({ streamId, ok }) => {
+        endStream(streamId, ok);
+        void refreshDocker();
+      }),
+    ];
+    return () => {
+      for (const off of offs) off();
+    };
+  }, []);
   useEffect(() => {
     void refreshSandboxStatus();
     const offs = [
@@ -71,6 +91,8 @@ export function App() {
   useEffect(() => {
     void refreshCheckpoints();
     void refreshReview();
+    // Also feeds the container count in the status bar.
+    void refreshDocker();
   }, [workspaceRoot]);
   useEffect(
     () =>

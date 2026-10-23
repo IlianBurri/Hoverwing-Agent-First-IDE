@@ -159,7 +159,9 @@
       "working": "working …",
       "stopped": "stopped",
       "error": "error"
-    }
+    },
+    "containers_one": "{{count}} container running",
+    "containers_other": "{{count}} containers running"
   },
   "theme": {
     "label": "Color theme",
@@ -208,7 +210,8 @@
       "files": "Files",
       "editor": "Editor",
       "terminal": "Terminal",
-      "agent": "Agent"
+      "agent": "Agent",
+      "docker": "Docker"
     },
     "palette": "Open command palette",
     "showFiles": "Show files",
@@ -496,7 +499,7 @@
     "badgeDirect": "Directly on the system",
     "badgeSandboxHint": "The agent runs in a Docker container and only sees this project.",
     "badgeDirectHint": "The agent runs directly on your system with your user rights.",
-    "logTitle": "Sandbox build output",
+    "logTitle": "Docker output",
     "logEmptyTitle": "No sandbox output yet",
     "logEmptyText": "When the sandbox image is built, the output appears here.",
     "docker": {
@@ -528,6 +531,76 @@
         "windows": "Restart Docker Desktop and check again. Details are in the logs.",
         "linux": "Restart the Docker service and check again."
       }
+    }
+  },
+  "docker": {
+    "title": "Docker",
+    "show": "Show Docker",
+    "refresh": "Check Docker again",
+    "buildImage": "Build image …",
+    "build": "Build",
+    "buildTitle": "Build image from {{file}}",
+    "tag": "Image name and tag",
+    "tagInvalid": "Use lower-case letters, digits and . _ - / plus an optional :tag, e.g. my-app:latest.",
+    "chooseDockerfile": "Which Dockerfile?",
+    "chooseDockerfileText": "The image is built with the Dockerfile's folder as context.",
+    "noDockerfiles": "No Dockerfile found in this project.",
+    "dockerfiles": "Dockerfiles in the project",
+    "onlyProject": "Only this project",
+    "containers_one": "Containers ({{count}})",
+    "containers_other": "Containers ({{count}})",
+    "containersList": "Containers",
+    "images_one": "Images ({{count}})",
+    "images_other": "Images ({{count}})",
+    "imagesList": "Images",
+    "noContainers": "No containers",
+    "noProjectContainers": "No container belongs to this project (Docker Compose folder or a mounted folder inside it).",
+    "noImages": "No images.",
+    "usedBy_one": "used by {{count}} container",
+    "usedBy_other": "used by {{count}} containers",
+    "sandboxTag": "Agent sandbox",
+    "composeProject": "Docker Compose project",
+    "openPort": "Open {{url}} in the browser",
+    "remove": "Remove",
+    "stopAndRemove": "Stop and remove",
+    "removeContainerTitle": "Remove container “{{name}}”?",
+    "removeRunningTitle": "Container “{{name}}” is running. Stop and remove it?",
+    "removeContainerMessage": "The container and its data that is not in a volume are deleted. Images and volumes stay.",
+    "removeSandboxMessage": "This is a container of Kestrel's agent sandbox. A running agent in it stops. The agent's login (its volume) stays.",
+    "removeImageTitle": "Remove image “{{name}}”?",
+    "removeImageMessage": "The image is deleted from Docker. You can build or download it again later.",
+    "cancelBuild": "Cancel build",
+    "cancelBuildTitle": "Cancel the build of “{{name}}”?",
+    "cancelBuildMessage": "The build is still running. Closing the tab cancels it.",
+    "building": "building …",
+    "buildOk": "built",
+    "buildFailed": "failed",
+    "ended": "ended",
+    "outputs": "Docker output",
+    "outputLabel": "Docker output (read only)",
+    "outputEmptyTitle": "No Docker output yet",
+    "outputEmptyText": "Container logs and image builds open here, one tab each.",
+    "closeOutput": "Close {{name}}",
+    "action": {
+      "start": "Start container",
+      "stop": "Stop container",
+      "restart": "Restart container",
+      "logs": "Show logs",
+      "startName": "Start {{name}}",
+      "stopName": "Stop {{name}}",
+      "restartName": "Restart {{name}}",
+      "logsName": "Logs of {{name}}",
+      "removeName": "Remove {{name}}"
+    },
+    "state": {
+      "running": "running",
+      "paused": "paused",
+      "restarting": "restarting",
+      "created": "created",
+      "exited": "stopped",
+      "removing": "removing",
+      "dead": "dead",
+      "unknown": "unknown"
     }
   }
 }

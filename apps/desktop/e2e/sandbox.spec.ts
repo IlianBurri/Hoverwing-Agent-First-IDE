@@ -134,8 +134,8 @@ test.describe('in a Docker container', () => {
 
   test('shows the build output in the logs', async () => {
     await page.getByRole('tab', { name: 'Logs' }).click();
-    await page.getByRole('radio', { name: 'Sandbox' }).click();
-    await expect(page.getByLabel('Sandbox build output')).toContainText(
+    await page.getByRole('radio', { name: 'Docker' }).click();
+    await expect(page.getByLabel('Docker output', { exact: true })).toContainText(
       'covering 1 secret file(s) or folder(s).',
     );
   });

@@ -1,3 +1,4 @@
+import { DockerView } from '../features/docker';
 import { openFile } from '../features/editor';
 import { SearchView } from '../features/search';
 import { FilesView } from '../features/workspace';
@@ -8,7 +9,9 @@ export function Sidebar() {
   const view = useSettingsStore((state) => state.settings.layout.sidebarView);
   return (
     <section className="panel-fill" aria-labelledby="sidebar-title">
-      {view === 'files' ? <FilesView onOpenFile={(path) => void openFile(path)} /> : <SearchView />}
+      {view === 'files' && <FilesView onOpenFile={(path) => void openFile(path)} />}
+      {view === 'search' && <SearchView />}
+      {view === 'docker' && <DockerView />}
     </section>
   );
 }
