@@ -5,6 +5,8 @@ import { WebLinksAddon } from '@xterm/addon-web-links';
 import '@xterm/xterm/css/xterm.css';
 import { i18next } from '../../i18n';
 import { subscribeOutput, useTerminalStore } from '../../stores/terminal';
+import { openBrowser } from '../browser/actions';
+import { isLocalUrl } from './links';
 import { xtermTheme } from './xtermTheme';
 import styles from './TerminalView.module.css';
 
@@ -36,7 +38,9 @@ export function TerminalInstance({ id, visible }: { id: string; visible: boolean
     terminal.loadAddon(fit);
     terminal.loadAddon(
       new WebLinksAddon((_event, url) => {
-        void window.kestrel.invoke('app:openExternalUrl', { url });
+        // Local dev servers open in Kestrel's browser, everything else outside.
+        if (isLocalUrl(url)) void openBrowser(url);
+        else void window.kestrel.invoke('app:openExternalUrl', { url });
       }),
     );
 
