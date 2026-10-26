@@ -1,9 +1,15 @@
 name: Release
 
-# Builds the Windows installer (Kestrel-Setup-<version>.exe).
-# - Push a tag like v0.8.0: the installer is attached to a GitHub release.
-# - "Run workflow" in the Actions tab: the installer is kept as a build
-#   artifact (downloadable from the run page for 30 days).
+# Builds the installers for Windows (.exe), macOS (.dmg) and Linux (.AppImage).
+# - Push a tag like v0.8.1: all installers and the update feed (latest*.yml)
+#   are attached to a GitHub release; installed apps find the update there.
+# - "Run workflow" in the Actions tab: installers are kept as build artifacts
+#   (downloadable from the run page for 30 days).
+#
+# Code signing is optional. Add these repository secrets to sign:
+#   Windows: WIN_CSC_LINK (base64 .pfx), WIN_CSC_KEY_PASSWORD
+#   macOS:   MAC_CSC_LINK (base64 .p12), MAC_CSC_KEY_PASSWORD,
+#            APPLE_ID, APPLE_APP_SPECIFIC_PASSWORD, APPLE_TEAM_ID (notarization)
 on:
   push:
     tags: ['v*']
@@ -13,8 +19,29 @@ permissions:
   contents: write
 
 jobs:
-  windows:
-    runs-on: windows-latest
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            script: package:win
+            files: |
+              apps/desktop/release/*.exe
+              apps/desktop/release/*.exe.blockmap
+              apps/desktop/release/latest.yml
+          - os: macos-latest
+            script: package:mac
+            files: |
+              apps/desktop/release/*.dmg
+              apps/desktop/release/*.dmg.blockmap
+              apps/desktop/release/latest-mac.yml
+          - os: ubuntu-latest
+            script: package:linux
+            files: |
+              apps/desktop/release/*.AppImage
+              apps/desktop/release/latest-linux.yml
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -25,21 +52,55 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
       - name: Build the installer
-        run: pnpm --filter @kestrel/desktop package:win
+        run: pnpm --filter @kestrel/desktop ${{ matrix.script }}
+        env:
+          # Without a certificate electron-builder builds unsigned installers.
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+          CSC_LINK: ${{ runner.os == 'Windows' && secrets.WIN_CSC_LINK || secrets.MAC_CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ runner.os == 'Windows' && secrets.WIN_CSC_KEY_PASSWORD || secrets.MAC_CSC_KEY_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
       - name: Smoke test the packaged app
+        if: runner.os == 'Windows'
         run: pnpm --filter @kestrel/desktop exec playwright test e2e/packaged.spec.ts
       - uses: actions/upload-artifact@v4
         with:
-          name: Kestrel-Setup-windows
-          path: apps/desktop/release/Kestrel-Setup-*.exe
+          name: Kestrel-${{ runner.os }}
+          path: ${{ matrix.files }}
+          if-no-files-found: error
           retention-days: 30
-      - name: Attach the installer to the release
-        if: startsWith(github.ref, 'refs/tags/v')
-        shell: bash
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Attach the installers to the release
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
         run: |
-          gh release create "$GITHUB_REF_NAME" apps/desktop/release/Kestrel-Setup-*.exe \
+          ls -la dist
+          gh release create "$GITHUB_REF_NAME" dist/* \
             --title "Kestrel $GITHUB_REF_NAME" \
-            --notes "Windows installer. Not code-signed yet: Windows SmartScreen may warn about an unknown publisher (More info → Run anyway)." \
-            || gh release upload "$GITHUB_REF_NAME" apps/desktop/release/Kestrel-Setup-*.exe --clobber
+            --notes-file - <<'NOTES' || gh release upload "$GITHUB_REF_NAME" dist/* --clobber
+          ## Download
+
+          | System | File |
+          | --- | --- |
+          | Windows 10/11 (x64) | `Kestrel-Setup-<version>.exe` |
+          | macOS (Apple Silicon) | `Kestrel-<version>-arm64.dmg` |
+          | Linux (x64) | `Kestrel-<version>-x86_64.AppImage` |
+
+          The installers are not code-signed yet:
+          - **Windows:** SmartScreen may say “Windows protected your PC” → *More info* → *Run anyway*.
+          - **macOS:** right-click the app → *Open* the first time.
+          - **Linux:** `chmod +x Kestrel-*.AppImage`, then start it.
+
+          Installed apps (Windows, Linux) find new versions here and offer to update.
+          NOTES
