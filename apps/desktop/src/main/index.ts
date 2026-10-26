@@ -25,6 +25,14 @@ import { SecretStore } from './modules/secrets';
 import { BrowserManager, agentBrowser, createBrowserHandlers } from './modules/browser';
 import { McpHost, browserTools, writeBridge } from './modules/mcpHost';
 import { McpConfigStore, McpService, connectMcp, createMcpHandlers } from './modules/mcp';
+import {
+  ProviderConfigStore,
+  ProviderService,
+  createProviderHandlers,
+  openAiClient,
+} from './modules/providers';
+import { ChatService, ChatStore, createChatHandlers } from './modules/chat';
+import { CompletionService, createCompletionHandlers } from './modules/completion';
 import { childEnv } from './lib/env';
 import { CONTAINER_MCP_BRIDGE, SandboxService, createSandboxHandlers } from './modules/sandbox';
 import {
@@ -205,6 +213,8 @@ void app.whenReady().then(async () => {
       permissions.cancel(contents.id);
       void agents.release(contents.id);
       dockerPanel.release(contents.id);
+      chat.release(contents.id);
+      completion.release(contents.id);
     };
     contents.on('destroyed', release);
     contents.on('did-start-navigation', (details) => {
@@ -281,6 +291,27 @@ void app.whenReady().then(async () => {
   });
   app.on('will-quit', () => {
     void mcp.closeAll();
+  });
+  const providers = new ProviderService({
+    configs: new ProviderConfigStore(join(dataDir, 'providers.json')),
+    secrets,
+    createClient: openAiClient,
+    onChanged: () => {
+      broadcastEvent('providers:changed', {});
+    },
+  });
+  const chat = new ChatService({
+    providers,
+    store: new ChatStore(join(dataDir, 'chats')),
+    model: () => settings.get().chatModel,
+    emit: (ownerId, chatId, event) => {
+      const contents = webContents.fromId(ownerId);
+      if (contents) sendEvent(contents, 'chat:event', { chatId, event });
+    },
+  });
+  const completion = new CompletionService({
+    providers,
+    settings: () => settings.get().completion,
   });
   const dockerApi = createDockerApi({ socketPath: await findDockerSocket() });
   // Kestrel's MCP server for agents (browser tools), plus the stdio bridge.
@@ -446,6 +477,9 @@ void app.whenReady().then(async () => {
       ...createDockerHandlers(dockerPanel, workspaces),
       ...createBrowserHandlers(browser),
       ...createMcpHandlers(mcp, workspaces),
+      ...createProviderHandlers(providers),
+      ...createChatHandlers(chat),
+      ...createCompletionHandlers(completion),
       ...createSandboxHandlers(
         sandbox,
         terminals,

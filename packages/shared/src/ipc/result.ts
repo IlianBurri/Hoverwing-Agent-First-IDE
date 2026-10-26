@@ -24,7 +24,14 @@ export type IpcErrorCode =
   | 'docker_failed'
   | 'invalid_url'
   | 'mcp_not_approved'
-  | 'mcp_connect_failed';
+  | 'mcp_connect_failed'
+  | 'provider_unreachable'
+  | 'provider_auth'
+  | 'provider_rate_limited'
+  | 'provider_model_missing'
+  | 'provider_failed'
+  | 'model_not_set'
+  | 'secret_file';
 
 export interface IpcError {
   code: IpcErrorCode;

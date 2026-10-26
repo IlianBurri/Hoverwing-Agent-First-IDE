@@ -2,10 +2,13 @@ import type { z } from 'zod';
 import { agentChannels, agentEvents } from './channels/agent';
 import { appChannels } from './channels/app';
 import { browserChannels, browserEvents } from './channels/browser';
+import { chatChannels, chatEvents } from './channels/chat';
 import { checkpointChannels, checkpointEvents } from './channels/checkpoints';
+import { completionChannels } from './channels/completion';
 import { dockerChannels, dockerEvents } from './channels/docker';
 import { mcpChannels, mcpEvents } from './channels/mcp';
 import { permissionChannels, permissionEvents } from './channels/permissions';
+import { providerChannels, providerEvents } from './channels/providers';
 import { reviewChannels, reviewEvents } from './channels/review';
 import { sandboxChannels, sandboxEvents } from './channels/sandbox';
 import { searchChannels } from './channels/search';
@@ -31,10 +34,13 @@ export const ipcContract = {
   ...agentChannels,
   ...appChannels,
   ...browserChannels,
+  ...chatChannels,
   ...checkpointChannels,
+  ...completionChannels,
   ...dockerChannels,
   ...mcpChannels,
   ...permissionChannels,
+  ...providerChannels,
   ...reviewChannels,
   ...sandboxChannels,
   ...searchChannels,
@@ -47,10 +53,12 @@ export const ipcContract = {
 export const ipcEvents = {
   ...agentEvents,
   ...browserEvents,
+  ...chatEvents,
   ...checkpointEvents,
   ...dockerEvents,
   ...mcpEvents,
   ...permissionEvents,
+  ...providerEvents,
   ...reviewEvents,
   ...sandboxEvents,
   ...settingsEvents,
