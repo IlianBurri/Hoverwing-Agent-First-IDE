@@ -8,25 +8,36 @@ Phases 0 (foundation), 1 (layout, palette, workspace, Monaco, search, terminal),
 2 (permissions, agents via ACP, checkpoints, diff review), 3 (agent sandbox in
 Docker), 4 (Docker panel), 5 (integrated browser + agent browser tools), 6
 (MCP manager), 7 (model providers, simple chat, autocompletion) and 8 (setup
-assistant: hardware detection, model catalog, Ollama install) are done, and
-the Windows installer is built by `.github/workflows/release.yml`. Next:
-phase 9 (LSP and Git panel). Every phase: present a plan, wait for OK,
-implement in small commits, keep lint/typecheck/tests green, update this file.
+assistant: hardware detection, model catalog, Ollama install) are done, plus
+installers for Windows/macOS/Linux with auto-update. Next: phase 9 (LSP and
+Git panel). Every phase: present a plan, wait for OK, implement in small
+commits, keep lint/typecheck/tests green, update this file.
 
-Known issue (Windows, before phase 7): checkpoints fail because
-`modules/checkpoints/git.ts` sets `GIT_CONFIG_GLOBAL` to `os.devNull`
-(`\\.\nul`), which git on Windows rejects; the agent checkpoint E2E tests and
-`shadowRepo.test.ts` fail there. Some other unit tests (docker sockets, env
-PATH, workspace paths) are Linux/macOS-specific too.
+Windows: unit and E2E tests run on Windows too (PowerShell is the default
+shell, so terminal tests pick commands per platform; E2E uses 2 workers and a
+60 s timeout there). Checkpoints use an empty config file instead of
+`os.devNull` on Windows (`emptyGitConfig()`), which git rejects as `\\.\nul`.
+Programs are looked up with `lib/which.ts` (`findProgram`, PATHEXT-aware).
 
 ## Packaging (installable app)
 
-- `pnpm --filter @kestrel/desktop package:win` → `apps/desktop/release/Kestrel-Setup-<version>.exe`
-  (NSIS, not one-click: folder choice, desktop + start-menu shortcut, app data
-  kept on uninstall). Version = `apps/desktop/package.json` `version`.
-- Release: push a tag `v<version>` → the Release workflow builds on
-  windows-latest, runs `e2e/packaged.spec.ts` against `release/win-unpacked`
-  and attaches the installer to a GitHub release ("Run workflow" = artifact only).
+- `pnpm --filter @kestrel/desktop package:win|package:mac|package:linux` →
+  `apps/desktop/release/` (`Kestrel-Setup-<version>.exe`, `.dmg`, `.AppImage`).
+  NSIS is not one-click: folder choice, desktop + start-menu shortcut, app data
+  kept on uninstall. Version = `apps/desktop/package.json` `version`.
+- Release: push a tag `v<version>` → the Release workflow builds all three on
+  their runners (Windows also runs `e2e/packaged.spec.ts` against
+  `release/win-unpacked`) and attaches installers + `latest*.yml` to the GitHub
+  release ("Run workflow" = artifacts only). Signing is used when the
+  `WIN_CSC_*` / `MAC_CSC_*` / `APPLE_*` secrets exist.
+- Auto-update: `modules/updates` wraps electron-updater (`autoDownload` and
+  `autoInstallOnAppQuit` off: the user clicks in the status bar). Feed =
+  `publish` in `electron-builder.yml` (GitHub). Only in the packaged app and
+  while `settings.checkForUpdates`; macOS needs a signed build. A private repo
+  makes the check fail quietly (logged).
+- README screenshots: run `e2e/screenshots.spec.ts` with
+  `KESTREL_SCREENSHOTS=1` (after `pnpm build`); it uses
+  `e2e/fixtures/demo-agent.mjs` and a demo project and writes `docs/images/`.
 - `dependencies` of the desktop app = only what main loads at runtime (the
   rest is bundled by Vite and lives in `devDependencies`, keeping the
   installer small). Platform packages of ripgrep/watcher are listed in
@@ -36,8 +47,8 @@ PATH, workspace paths) are Linux/macOS-specific too.
   (`unpackedPath()` in `modules/search/search.ts`).
 - Icon: `apps/desktop/build/icon.png`, rendered from the mark by
   `npx electron scripts/make-icon.mjs`.
-- Open: code signing (SmartScreen warns "unknown publisher"), auto-update,
-  macOS/Linux release jobs.
+- Open: an actual code-signing certificate (until then SmartScreen warns
+  "unknown publisher" and macOS needs right-click → Open).
 
 ## Commands
 
@@ -287,7 +298,8 @@ diff 9, react-markdown 10 + remark-gfm 4, dockerode 5.0.1 (+ @types/dockerode
 `npx -y @google/gemini-cli@0.65.0 --experimental-acp` (the `@zed-industries/*`
 package names are deprecated). Checkpoints need system `git`.
 
-systeminformation 5.33.16, electron-builder 26.15 (checked 2026-10-26).
+systeminformation 5.33.16, electron-builder 26.15, electron-updater 6.8.10
+(checked 2026-10-26; 6.8.11+ were days old, so not taken yet).
 Ollama release v0.40.11 assets carry `digest: sha256:…` in the GitHub API.
 
 openai 7.43.0 (checked 2026-10-26; Node ≥ 22; reads `OPENAI_*` env defaults

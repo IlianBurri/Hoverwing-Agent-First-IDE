@@ -1,173 +1,230 @@
+<div align="center">
+
+<img src="apps/desktop/build/icon.png" alt="Kestrel logo" width="96" height="96" />
+
 # Kestrel
 
-Kestrel is an agent-first desktop IDE. It does not ship its own AI. You bring your
-own agent (e.g. Claude Code via the Agent Client Protocol), your own API key or a
-local model, and Kestrel makes working with it visible, safe and easy to undo.
+**The agent-first desktop IDE. Bring your own AI – keep control of your code.**
 
-> Status: **phase 8 done** – workspace, editor, search, terminal, agents via the
-> Agent Client Protocol with permissions, checkpoints and diff review, an
-> optional Docker sandbox for agents, a Docker panel, an integrated browser the
-> agent can inspect, an MCP manager, model providers with a built-in chat and
-> inline autocompletion, and a setup assistant for local models. See
-> [`SPEC.md`](SPEC.md) for the full specification and roadmap.
+Run coding agents like Claude Code or Gemini CLI, your own API key or a local model,
+in an editor that makes every agent action visible, reviewable and reversible.
 
-## Download (Windows)
+[![CI](https://github.com/IlianBurri/Kestrel-Agen-Harness-IDE/actions/workflows/ci.yml/badge.svg)](https://github.com/IlianBurri/Kestrel-Agen-Harness-IDE/actions/workflows/ci.yml)
+[![Release](https://github.com/IlianBurri/Kestrel-Agen-Harness-IDE/actions/workflows/release.yml/badge.svg)](https://github.com/IlianBurri/Kestrel-Agen-Harness-IDE/releases)
+![Platforms](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-3b5bdb)
+![Electron](https://img.shields.io/badge/Electron-45-47848f)
+![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-1. Open the repository on GitHub → **Releases** (right side) and pick the
-   newest version, e.g. `v0.8.0`.
-2. Download **`Kestrel-Setup-<version>.exe`** under "Assets" and run it.
-3. The installer is not code-signed yet, so Windows SmartScreen may say
-   “Windows protected your PC”: click **More info → Run anyway**.
-4. Choose the folder; Kestrel gets a desktop and a start-menu shortcut.
-   Uninstall via Windows Settings › Apps (your settings and keys stay).
+[**Download**](#download) · [Features](#features) · [Security](#security-by-default) ·
+[Development](#development) · [Roadmap](#roadmap)
 
-New release: bump `version` in `apps/desktop/package.json`, commit, then
-`git tag v<version> && git push origin v<version>`. The _Release_ workflow
-builds the installer, tests it and attaches it to the release. Without a tag,
-_Actions → Release → Run workflow_ builds it as a downloadable artifact.
-Build it locally with `pnpm --filter @kestrel/desktop package:win`
-(output in `apps/desktop/release/`).
+<br />
 
-## What works today
+<img src="docs/images/agent.png" alt="Kestrel with a coding agent: plan, tool calls, a change held for review and a permission request to run the tests" width="100%" />
 
-- **Workbench:** resizable panels (sidebar, editor, bottom panel, agent panel), custom
-  title bar, dark/light/system theme, German and English. Layout is remembered.
-- **Command palette** (`Ctrl/Cmd+K` or `Ctrl/Cmd+Shift+P`): every action, with
-  shortcuts that can be overridden in the settings file.
-- **Files:** open a folder, virtualized file tree (10,000+ files), create, rename (F2),
-  move (drag and drop), delete to the system trash (with confirmation). Changes made
-  outside Kestrel show up automatically.
-- **Editor:** Monaco with tabs, syntax highlighting, find/replace in the file, unsaved
-  markers, `Ctrl/Cmd+S`. If a file changes on disk while you have unsaved edits,
-  Kestrel asks instead of overwriting.
-- **Project search** (`Ctrl/Cmd+Shift+F`): ripgrep-powered, respects `.gitignore`,
-  case/word/regex options, include/exclude globs, replace with preview.
-- **Terminal** (`` Ctrl+` ``): several terminals with your default shell, started in
-  the project folder.
+</div>
 
-- **Agents** (ACP): start your own agent (templates for Claude Code and Gemini
-  CLI) in the project folder. Streaming answers, plan, tool calls, stop button,
-  resume earlier sessions. Log in inside the agent itself – Kestrel never
-  handles your credentials.
-- **Permissions:** every risky agent action asks first (allow once / always for
-  this project / deny). Secret files (`.env`, keys, `.ssh` …) are always blocked
-  for access through Kestrel. Every decision is logged (bottom panel → Logs).
-- **Checkpoints:** before every agent turn, the project state is saved in a
-  separate git repository in the app data folder (your own `.git` is never
-  touched). Jump back to any checkpoint, completely or per file.
-- **Diff review:** agent changes are listed for review; accept or reject per
-  file or per section. Rejected changes leave the file exactly as it was.
-- **Agent sandbox (Docker):** per agent, “Run in the Docker sandbox” starts the
-  agent in a container that sees only the project (secret files such as `.env`
-  are covered with an empty file, `.ssh`/`.aws`/`.gnupg` folders with an empty
-  tmpfs) and its own home volume – not your home folder or other files. The
-  container has a read-only root file system, no capabilities, memory/CPU
-  limits, and runs as your user on Linux. A badge always shows whether an agent
-  runs in the sandbox or directly on the system. Log in to the agent in a
-  sandbox terminal (Manage agents → “Log in in the sandbox terminal”); the login
-  stays in the agent's Docker volume and Kestrel never reads it.
-- **Integrated browser** (`Mod+Shift+O`): browser tabs next to your files,
-  address bar (`localhost:3000` works), back/forward/reload, DevTools. Pages run
-  in their own session (own cookies, no access to Kestrel, all permission
-  requests such as camera or location denied, only http/https). Docker ports
-  and `localhost` links in the terminal open here. Command “Clear browser data”.
-- **Browser tools for agents:** Kestrel gives every agent session its own MCP
-  server with `browser_list_tabs`, `browser_screenshot`, `browser_console`,
-  `browser_network_errors` and `browser_open`. Each read asks for permission
-  (per site, “always allow” possible); opening pages has its own permission.
-  Web content reaches the agent clearly marked as untrusted data. Works for
-  sandboxed agents too.
-- **MCP manager** (sidebar “MCP”): add MCP servers – local (command, arguments,
-  environment) or remote (URL, headers) – globally or for the project, or import
-  them from the project's `.mcp.json`. Test the connection, see the tools,
-  switch servers and single tools on/off and set a level per tool (allow / ask /
-  deny). Kestrel connects to the servers itself and passes the enabled tools to
-  the agent (as `<server>__<tool>`), so every call goes through the permission
-  system and the audit log, and results reach the agent marked as untrusted.
-  New local commands need a confirmation in a system dialog; secrets live in
-  the system keychain. Local servers run on your system, so they are not given
-  to sandboxed agents unless you allow it. OAuth logins are not supported yet.
-- **Models** (sidebar “Models”): add OpenAI-compatible providers – templates
-  for OpenRouter, Ollama and llama.cpp, or any endpoint. Each provider has a
-  model list: the first is used, the others are fallbacks when it hits a rate
-  limit or is unavailable. API keys live only in the system keychain (and are
-  removed when the address changes). Free models show a hint that prompts may
-  be used for training. “Test connection” lists the endpoint's models.
-- **Chat** (right panel → “Chat”): a simple chat with the chosen model,
-  streamed, with stop button and earlier chats. It has no access to your
-  files – attach the current file or selection with the paperclip (secret
-  files such as `.env` are refused).
-- **Autocompletion:** ghost-text suggestions while typing (`Tab` accepts),
-  from a model of your choice – ideally a small local one. Uses
-  fill-in-the-middle when the endpoint supports it, can be switched off per
-  language, and toggled from the status bar or the command palette. Never
-  sends secret files.
-- **Setup assistant** (first start; later Models › magic wand or the command
-  palette): detects GPU/VRAM, memory, processor, free disk and the possible
-  acceleration (CUDA, ROCm, Metal, Vulkan or CPU), recommends one model for
-  autocompletion and one for chat from an updatable JSON catalog, installs
-  Ollama from the official GitHub release (source, size and SHA-256 shown;
-  the checksum is verified before anything runs), downloads the models with
-  progress, runs an optional speed test (“fluid / usable / too slow”) and
-  sets everything up. Skippable at any time.
-- **Docker panel** (`Mod+Shift+D`): containers (state, ports, start/stop/
-  restart, live logs, remove with confirmation), images (size, remove) and the
-  project's Dockerfiles with “Build” (live output). Click a published port to
-  open `http://localhost:<port>` in the integrated browser. Filter “Only this project” shows Compose projects and containers
-  with a mounted folder inside the project. The status bar counts running
-  containers.
+## Why Kestrel?
 
-## Requirements
+Coding agents are powerful – and they work on your files, run commands and read your
+secrets if you let them. Kestrel is not another AI: it is the **cockpit around the
+AI you already use**.
 
-- Node.js ≥ 22.12 (see `.nvmrc`)
-- pnpm 10 (`corepack enable` picks the version pinned in `package.json`)
-- Git (for checkpoints)
-- Docker (optional, for the agent sandbox): Docker Desktop on macOS/Windows,
-  Docker Engine on Linux (your user in the `docker` group). Colima and Rancher
-  Desktop work too. The sandbox image is built from a Debian-based Node image
-  (`node:22-bookworm-slim` by default; a mirror can be set in Manage agents).
-- **Linux only:** a C/C++ toolchain and Python 3 (`build-essential`, `python3`) –
-  `node-pty` is compiled during install. macOS and Windows use prebuilt binaries.
-- Headless Linux (E2E tests): `xvfb-run`
+- 🛡️ **Nothing risky happens silently.** Writes, commands, browser and MCP access
+  ask first. Secret files (`.env`, keys, `.ssh`) are always blocked.
+- 🔍 **Every change is reviewable.** Accept or reject agent edits per file or per
+  hunk, and jump back to any checkpoint before an agent turn.
+- 📦 **Optional Docker sandbox.** Run an agent in a hardened container that only sees
+  your project.
+- 🔌 **Bring your own AI.** Agents via the Agent Client Protocol, any OpenAI-compatible
+  endpoint (OpenRouter …) or local models with Ollama and llama.cpp. No account, no
+  middleman, no telemetry.
 
-## Setup
+## Features
+
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>🤖 Agents with guard rails</h3>
+      Start Claude Code, Gemini CLI or any ACP agent in your project. See its plan,
+      tool calls and answers live; approve commands once or always for the project;
+      stop it at any time.
+    </td>
+    <td width="50%" valign="top">
+      <h3>🧾 Diff review &amp; checkpoints</h3>
+      Agent writes are held until you accept them – per file or per section. Before
+      every turn, Kestrel saves a checkpoint in a separate git repository (your own
+      <code>.git</code> stays untouched).
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><img src="docs/images/review.png" alt="Reviewing an agent change hunk by hunk" width="100%" /></td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>💬 Built-in chat</h3>
+      Ask a model of your choice – streamed answers, Markdown and code, earlier chats.
+      The chat has no file access: attach the current file or selection explicitly.
+      Rate-limited free models fall back to the next one automatically.
+    </td>
+    <td width="50%" valign="top">
+      <h3>✨ Inline autocompletion</h3>
+      Ghost-text suggestions from your own model – ideally a small local one.
+      Fill-in-the-middle when the endpoint supports it, debounced and cancelled while
+      you type, switchable per language. Secret files are never sent.
+    </td>
+  </tr>
+  <tr>
+    <td><img src="docs/images/chat.png" alt="Models view and built-in chat" width="100%" /></td>
+    <td><img src="docs/images/autocomplete.png" alt="Ghost-text autocompletion in the editor" width="100%" /></td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>🧭 Setup assistant</h3>
+      Detects your GPU, memory and acceleration (CUDA, ROCm, Metal, Vulkan, CPU),
+      recommends models from an updatable catalog, installs Ollama from the official
+      release with a verified SHA-256 checksum, downloads the models and measures their
+      speed.
+    </td>
+    <td width="50%" valign="top">
+      <h3>🧰 Everything around it</h3>
+      Monaco editor, ripgrep project search, terminals, a Docker panel, an integrated
+      browser the agent can inspect (content marked as untrusted), an MCP manager with
+      per-tool permissions, command palette, German and English, dark and light themes.
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><img src="docs/images/setup.png" alt="Setup assistant with hardware detection and model recommendation" width="100%" /></td>
+  </tr>
+</table>
+
+## Bring your own AI
+
+| You have …                         | Use it in Kestrel as                                                                                    |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| Claude Code, Gemini CLI, other ACP | **Agent** – templates included; log in inside the agent itself (Kestrel never touches your credentials) |
+| An OpenRouter / OpenAI-style key   | **Provider** for chat and autocompletion – keys live only in the system keychain                        |
+| A local model                      | **Ollama** or **llama.cpp** – the setup assistant installs and configures Ollama for you                |
+| MCP servers                        | **MCP manager** – Kestrel proxies their tools to agents, with a permission level per tool               |
+
+## Download
+
+Get the newest version from **[Releases](https://github.com/IlianBurri/Kestrel-Agen-Harness-IDE/releases)**:
+
+| System                | File                                | First start                                                          |
+| --------------------- | ----------------------------------- | -------------------------------------------------------------------- |
+| Windows 10/11 (x64)   | `Kestrel-Setup-<version>.exe`       | SmartScreen may warn (not code-signed yet): _More info → Run anyway_ |
+| macOS (Apple Silicon) | `Kestrel-<version>-arm64.dmg`       | Right-click the app → _Open_ the first time                          |
+| Linux (x64)           | `Kestrel-<version>-x86_64.AppImage` | `chmod +x Kestrel-*.AppImage`, then start it                         |
+
+The Windows installer lets you choose the folder and creates desktop and start-menu
+shortcuts. Installed apps on Windows and Linux check for new versions on start and
+offer the update in the status bar (macOS needs a signed build for that) – nothing
+is downloaded without your click (switch it off with
+_Turn off automatic update check_ in the command palette). Settings, keys and
+checkpoints survive updates and uninstalling.
+
+## Security by default
+
+- **Hardened Electron:** sandboxed renderer without Node.js, context isolation, a
+  strict Content-Security-Policy, blocked navigation and new windows.
+- **Narrow, typed IPC:** one channel per action, every request validated with zod in
+  the main process. Paths are always relative to the project and checked against
+  escapes (including symlinks).
+- **Central permission system** with allow / ask / deny rules per project and an
+  audit log. Rules live in the app data folder, where agents cannot edit them.
+- **Secrets stay secret:** API keys only in the OS keychain (`safeStorage`); a key is
+  dropped when its provider's address changes. Secret files are never shown to agents
+  or sent to models. Content from the web and MCP servers reaches agents marked as
+  untrusted data.
+- **Verified downloads:** installers only from official GitHub releases, checked
+  against the published SHA-256 before anything runs; app updates are verified by
+  electron-updater (SHA-512).
+- **No telemetry.** Kestrel does not sell or proxy AI usage.
+
+## Architecture
+
+```mermaid
+flowchart LR
+  subgraph Renderer["Renderer (React, sandboxed)"]
+    UI[Editor · Agent panel · Chat · Views]
+  end
+  subgraph Main["Main process (Node.js)"]
+    IPC[Typed IPC<br/>zod-validated]
+    Perm[Permission service<br/>+ audit log]
+    Agent[ACP client]
+    Prov[Model providers]
+    Host[Kestrel MCP host]
+    CP[Checkpoints<br/>shadow git]
+  end
+  UI -- invoke / events --> IPC
+  IPC --> Perm
+  IPC --> Prov
+  Agent <-- ACP --> Agents[(Claude Code · Gemini CLI<br/>direct or in Docker)]
+  Agent --> Perm
+  Agent --> CP
+  Host <-- MCP --> Agents
+  Host --> Perm
+  Prov --> Models[(OpenRouter · Ollama · llama.cpp)]
+```
+
+Kestrel is a pnpm monorepo: `apps/desktop` (Electron + React + TypeScript, built with
+electron-vite) and `packages/shared` (the IPC contract and schemas shared by all
+processes). See [`CLAUDE.md`](CLAUDE.md) for the architecture rules and
+[`SPEC.md`](SPEC.md) for the product specification.
+
+```
+apps/desktop/
+  src/main/modules/   agent, browser, chat, checkpoints, completion, docker, mcp,
+                      mcpHost, permissions, providers, review, sandbox, search,
+                      setup, settings, terminal, updates, workspace
+  src/preload/        the typed bridge (window.kestrel)
+  src/renderer/       layout, features, components, stores, design tokens, i18n
+  e2e/                Playwright tests against the built app
+packages/shared/      IPC contract (zod schemas per module) and domain schemas
+```
+
+## Development
+
+**Requirements:** Node.js ≥ 22.12, pnpm 10 (`corepack enable`), Git. Optional: Docker
+for the agent sandbox. On Linux, `node-pty` is compiled during install (needs
+`build-essential` and `python3`).
 
 ```bash
 pnpm install
 pnpm dev
 ```
 
-If Electron fails to download during `pnpm install` (flaky network), run it again
-or trigger the download manually:
+| Command                                        | What it does                                     |
+| ---------------------------------------------- | ------------------------------------------------ |
+| `pnpm dev`                                     | Start the app with hot reload                    |
+| `pnpm lint` / `pnpm typecheck`                 | ESLint (type-aware) / TypeScript in all packages |
+| `pnpm test`                                    | Unit tests (Vitest)                              |
+| `pnpm test:e2e`                                | Build, then E2E tests with Playwright + Electron |
+| `pnpm --filter @kestrel/desktop package:win`   | Windows installer in `apps/desktop/release/`     |
+| `pnpm --filter @kestrel/desktop package:mac`   | macOS disk image (on a Mac)                      |
+| `pnpm --filter @kestrel/desktop package:linux` | Linux AppImage                                   |
 
-```bash
-node node_modules/electron/install.js
-```
+<details>
+<summary>More: Docker tests, screenshots, releases</summary>
 
-## Commands
+- Headless Linux: `xvfb-run -a pnpm test:e2e`.
+- Tests against a real Docker daemon: `KESTREL_DOCKER_TESTS=1 pnpm test` and
+  `KESTREL_E2E_DOCKER=1 xvfb-run -a pnpm test:e2e` (optional
+  `KESTREL_SANDBOX_BASE_IMAGE=<mirror>`, `KESTREL_SANDBOX_PACKAGES=""`).
+- README screenshots are rendered from the real app with a demo project:
+  `cd apps/desktop && pnpm build && KESTREL_SCREENSHOTS=1 npx playwright test e2e/screenshots.spec.ts`.
+- **Release:** bump `version` in `apps/desktop/package.json`, commit, then
+  `git tag v<version> && git push origin v<version>`. The _Release_ workflow builds
+  Windows, macOS and Linux installers, smoke-tests the Windows build and publishes
+  them with the update feed. Code signing turns on when the certificate secrets
+  described in `.github/workflows/release.yml` are set.
 
-| Command          | What it does                                     |
-| ---------------- | ------------------------------------------------ |
-| `pnpm dev`       | Start the app with hot reload                    |
-| `pnpm build`     | Build main, preload and renderer into `out/`     |
-| `pnpm lint`      | ESLint (type-aware, `any` is an error)           |
-| `pnpm typecheck` | TypeScript in all packages                       |
-| `pnpm test`      | Unit tests (Vitest)                              |
-| `pnpm test:e2e`  | Build, then E2E tests with Playwright + Electron |
-| `pnpm format`    | Format everything with Prettier                  |
+</details>
 
-On a Linux machine without a display use `xvfb-run -a pnpm test:e2e`.
-
-Tests against a real Docker daemon are opt-in:
-
-```bash
-KESTREL_DOCKER_TESTS=1 pnpm test                  # sandbox integration test
-KESTREL_E2E_DOCKER=1 xvfb-run -a pnpm test:e2e    # agent in a real container
-# optional: KESTREL_SANDBOX_BASE_IMAGE / KESTREL_E2E_SANDBOX_BASE_IMAGE=<mirror>,
-#           KESTREL_SANDBOX_PACKAGES="" where apt cannot reach Debian
-```
-
-## Keyboard shortcuts
+<details>
+<summary>Keyboard shortcuts</summary>
 
 `Mod` is `Cmd` on macOS and `Ctrl` elsewhere.
 
@@ -177,6 +234,7 @@ KESTREL_E2E_DOCKER=1 xvfb-run -a pnpm test:e2e    # agent in a real container
 | `Mod+O`                          | Open folder                   |
 | `Mod+B` / `Mod+J`                | Toggle sidebar / bottom panel |
 | `Mod+Alt+B`                      | Toggle agent panel            |
+| `Mod+L`                          | Focus the agent input         |
 | `Mod+Shift+E` / `Mod+Shift+F`    | Files / project search        |
 | `Mod+S`, `Mod+Alt+S`             | Save, save all                |
 | `Mod+W`, `Ctrl+Tab`              | Close tab, next tab           |
@@ -184,51 +242,30 @@ KESTREL_E2E_DOCKER=1 xvfb-run -a pnpm test:e2e    # agent in a real container
 | `Mod+Shift+D`                    | Docker panel                  |
 | `Mod+Shift+O`                    | New browser tab               |
 
-Inside a terminal on Windows/Linux, `Ctrl+<letter>` goes to the shell (e.g. `Ctrl+C`,
-`Ctrl+R`); use `Ctrl+Shift+P` for the palette there. Copy with `Ctrl+Shift+C`.
+Inside a terminal on Windows/Linux, `Ctrl+<letter>` goes to the shell; use
+`Ctrl+Shift+P` for the palette there. Shortcuts can be changed in `settings.json` in
+the app data folder: `"keybindings": { "view.toggleSidebar": "Mod+Shift+B" }`.
 
-Shortcuts can be changed in `settings.json` in the app data folder:
-`"keybindings": { "view.toggleSidebar": "Mod+Shift+B" }` (empty string disables one).
+</details>
 
-## Project structure
+## Roadmap
 
-```
-apps/desktop/          Electron app
-  src/main/            Main process: windows, security, IPC, modules
-    modules/           app, settings, workspace, search, terminal, permissions,
-                       checkpoints, agent, review, docker, sandbox
-  src/preload/         Minimal typed bridge (window.kestrel)
-  src/renderer/        React UI
-    layout/            App shell, title/activity/status bar, panels
-    features/          commands, workspace, editor, search, terminal, agent,
-                       permissions, checkpoints, review, sandbox
-    components/        Reusable UI (dialogs, tabs, menus, buttons …)
-    stores/            Zustand stores
-    design/            Design tokens and themes
-  e2e/                 Playwright tests against the built app
-packages/shared/       Code shared by all processes (IPC contract, schemas)
-```
+| Phase | Content                                                             | Status |
+| ----- | ------------------------------------------------------------------- | ------ |
+| 0–1   | Foundation, workbench, command palette, workspace, Monaco, terminal | ✅     |
+| 2     | Permission system, agents via ACP, diff review, checkpoints         | ✅     |
+| 3–4   | Agent sandbox in Docker, Docker panel                               | ✅     |
+| 5–6   | Integrated browser with agent tools, MCP manager                    | ✅     |
+| 7     | Model providers, built-in chat, inline autocompletion               | ✅     |
+| 8     | Setup assistant, installers and auto-update                         | ✅     |
+| 9     | Language servers (go to definition, diagnostics) and a Git panel    | ⏳     |
 
-## Security model (short)
+## Trademarks
 
-- The renderer is sandboxed, context-isolated and has no Node.js access.
-- It talks to the main process through one typed `invoke` function. Every channel
-  is declared with zod schemas in `packages/shared/src/ipc/channels/` and every
-  request is validated in the main process.
-- File paths from the UI are always relative to the open folder; the main process
-  rejects anything outside it (including symlinks that point outside).
-- A strict Content-Security-Policy is applied (Monaco is bundled locally, no CDN);
-  navigation and new windows are blocked.
-- Sandboxed agents get only their own configured variables (and proxy
-  settings), never your environment. Note: like anything passed to Docker, these
-  values are visible to users who can run `docker inspect`. Secret files created
-  after the agent started are not covered until the next start.
-
-## Note on trademarks
-
-Kestrel is an independent project. It supports Claude Code via the Agent
-Client Protocol but is not affiliated with or endorsed by Anthropic.
+Kestrel is an independent project. It supports Claude Code via the Agent Client
+Protocol but is not affiliated with or endorsed by Anthropic. All product names
+belong to their owners.
 
 ## License
 
-[MIT](LICENSE)
+[MIT](LICENSE) © 2026 Kestrel contributors
