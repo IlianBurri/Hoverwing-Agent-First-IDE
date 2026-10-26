@@ -93,7 +93,7 @@ function formatNetwork(entries: NetworkError[]): string {
     .map((entry) => {
       const what =
         entry.status === null ? (entry.error ?? 'failed') : `HTTP ${String(entry.status)}`;
-      return `${what} ${entry.method ?? 'GET'} ${entry.url}`;
+      return `${what} ${entry.method ?? 'GET'} ${entry.url || '(address unknown)'}`;
     })
     .join('\n');
 }

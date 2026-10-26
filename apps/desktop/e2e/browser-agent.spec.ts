@@ -82,7 +82,7 @@ test.describe('agent tools over HTTP', () => {
       .click();
     await expect(conversation(page)).toContainText(`HTTP 404 GET ${site.url}/missing`);
     await expect(conversation(page)).toContainText(
-      /net::ERR_\w+ GET http:\/\/127\.0\.0\.1:9\/unreachable/,
+      `net::ERR_CONNECTION_REFUSED GET ${site.unreachable}`,
     );
     // Allowed for this origin from now on: no second question.
     await send(page, 'mcp browser_screenshot');

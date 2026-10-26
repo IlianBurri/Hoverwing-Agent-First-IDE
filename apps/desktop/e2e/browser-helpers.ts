@@ -3,7 +3,26 @@ import type { Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 
 /** A tiny local web app for browser tests. */
-export async function startTestSite(): Promise<{ url: string; close: () => Promise<void> }> {
+/** A local port nothing listens on (a server that is not running). */
+async function closedPort(): Promise<number> {
+  const probe = createServer();
+  await new Promise<void>((resolve) => {
+    probe.listen(0, '127.0.0.1', resolve);
+  });
+  const { port } = probe.address() as AddressInfo;
+  await new Promise((resolve) => {
+    probe.close(resolve);
+  });
+  return port;
+}
+
+export async function startTestSite(): Promise<{
+  url: string;
+  /** Address the page fetches without success (connection refused). */
+  unreachable: string;
+  close: () => Promise<void>;
+}> {
+  const unreachable = `http://127.0.0.1:${String(await closedPort())}/unreachable`;
   const server: Server = createServer((request, response) => {
     const path = new URL(request.url ?? '/', 'http://localhost').pathname;
     if (path === '/') {
@@ -15,7 +34,7 @@ export async function startTestSite(): Promise<{ url: string; close: () => Promi
           console.log('page loaded');
           console.error('Something broke on purpose');
           fetch('/missing');
-          fetch('http://127.0.0.1:9/unreachable').catch(() => {});
+          fetch('${unreachable}').catch(() => {});
           if (location.search.includes('popup')) window.open('/second');
         </script>`);
       return;
@@ -34,6 +53,7 @@ export async function startTestSite(): Promise<{ url: string; close: () => Promi
   const { port } = server.address() as AddressInfo;
   return {
     url: `http://localhost:${String(port)}`,
+    unreachable,
     close: () =>
       new Promise((resolve) => {
         server.close(() => {

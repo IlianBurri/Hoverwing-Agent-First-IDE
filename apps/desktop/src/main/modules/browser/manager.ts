@@ -8,6 +8,7 @@ import { PageCollector } from './collector';
 /** Persistent, so logins in your dev apps survive a restart. */
 export const BROWSER_PARTITION = 'persist:kestrel-browser';
 const ABORTED = -3;
+const RECORDING_WAIT_MS = 1000;
 
 interface Tab {
   id: string;
@@ -15,6 +16,8 @@ interface Tab {
   view: WebContentsView;
   collector: PageCollector;
   error: string | null;
+  /** Resolves once console/network recording runs (pages load after that). */
+  ready: Promise<void>;
 }
 
 export interface BrowserEvents {
@@ -111,14 +114,24 @@ export class BrowserManager {
       view,
       collector: new PageCollector(),
       error: null,
+      ready: Promise.resolve(),
     };
     this.tabs.set(tab.id, tab);
-    this.wire(tab, view.webContents);
-    if (target) void view.webContents.loadURL(target).catch(() => undefined);
+    tab.ready = this.wire(tab, view.webContents);
+    // An empty tab still loads about:blank, so its renderer exists and the
+    // recording (CDP) is ready before the first real page.
+    this.load(tab, target ?? 'about:blank');
     return this.stateOf(tab);
   }
 
-  private wire(tab: Tab, contents: WebContents): void {
+  /** Loads a page once recording is on, so its first requests are not missed. */
+  private load(tab: Tab, url: string): void {
+    // about:blank creates the renderer the recording waits for: load it now.
+    const ready = url === 'about:blank' ? Promise.resolve() : tab.ready;
+    void ready.then(() => tab.view.webContents.loadURL(url)).catch(() => undefined);
+  }
+
+  private wire(tab: Tab, contents: WebContents): Promise<void> {
     // Pages may only go to web addresses (no file:, no app internals).
     const guard = (event: { preventDefault(): void; url: string }) => {
       if (!isAllowedBrowserUrl(event.url)) event.preventDefault();
@@ -143,8 +156,17 @@ export class BrowserManager {
       update();
     });
     contents.on('did-stop-loading', update);
+    // A new page starts with empty logs. Cleared when the navigation starts,
+    // before any request of the new page (did-navigate may arrive later).
+    contents.on('did-start-navigation', (details) => {
+      if (details.isMainFrame && !details.isSameDocument) tab.collector.clear();
+    });
     contents.on('did-navigate', () => {
-      tab.collector.clear();
+      // The initial about:blank is not a page to go back to.
+      const history = contents.navigationHistory;
+      if (history.length() > 1 && history.getEntryAtIndex(0).url === 'about:blank') {
+        history.removeEntryAtIndex(0);
+      }
       update();
     });
     contents.on('did-navigate-in-page', update);
@@ -161,11 +183,19 @@ export class BrowserManager {
       contents.debugger.on('message', (_event, method, params) => {
         tab.collector.handle(method, params as Record<string, unknown>);
       });
-      for (const domain of ['Runtime.enable', 'Log.enable', 'Network.enable']) {
-        void contents.debugger.sendCommand(domain).catch(() => undefined);
-      }
+      const enabled = Promise.all(
+        ['Runtime.enable', 'Log.enable', 'Network.enable'].map((domain) =>
+          contents.debugger.sendCommand(domain).catch(() => undefined),
+        ),
+      ).then(() => undefined);
+      // A tab that never loaded may not answer until it does: wait at most briefly.
+      return Promise.race([
+        enabled,
+        new Promise<void>((resolve) => setTimeout(resolve, RECORDING_WAIT_MS)),
+      ]);
     } catch {
       // Another debugger is attached; the page still works, only logs are missing.
+      return Promise.resolve();
     }
   }
 
@@ -174,7 +204,7 @@ export class BrowserManager {
     const url = normalizeBrowserUrl(input);
     if (!url) throw new UserError('invalid_url', 'Only http and https addresses can be opened.');
     tab.error = null;
-    void tab.view.webContents.loadURL(url).catch(() => undefined);
+    this.load(tab, url);
   }
 
   back(ownerId: number, tabId: string): void {
