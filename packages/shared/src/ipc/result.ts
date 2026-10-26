@@ -22,7 +22,9 @@ export type IpcErrorCode =
   | 'sandbox_build_failed'
   | 'docker_conflict'
   | 'docker_failed'
-  | 'invalid_url';
+  | 'invalid_url'
+  | 'mcp_not_approved'
+  | 'mcp_connect_failed';
 
 export interface IpcError {
   code: IpcErrorCode;

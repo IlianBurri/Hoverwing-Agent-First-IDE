@@ -11,6 +11,10 @@ export const nativeTexts = {
     agentSandboxDetail:
       'Kestrel startet dieses Programm in der Docker-Sandbox. Es sieht nur deinen Projektordner (ohne Geheimdateien) und kann ihn ändern. Starte nur Agenten, denen du vertraust.\n\n{command}',
     agentStart: 'Starten',
+    mcpMessage: 'MCP-Server «{name}» erlauben?',
+    mcpDetail:
+      'Kestrel startet dieses Programm bei Bedarf auf deinem System, mit deinen Rechten. Erlaube nur Server, denen du vertraust.\n\n{command}',
+    mcpAllow: 'Erlauben',
   },
   en: {
     unsavedMessage: 'Discard unsaved changes?',
@@ -23,6 +27,10 @@ export const nativeTexts = {
     agentSandboxDetail:
       'Kestrel will start this program in the Docker sandbox. It only sees your project folder (without secret files) and can change it. Only start agents you trust.\n\n{command}',
     agentStart: 'Start',
+    mcpMessage: 'Allow MCP server “{name}”?',
+    mcpDetail:
+      'Kestrel will start this program on your system when needed, with your rights. Only allow servers you trust.\n\n{command}',
+    mcpAllow: 'Allow',
   },
 } as const;
 

@@ -8,9 +8,11 @@ import type { ToolDefinition } from './tools';
 const echo: ToolDefinition = {
   name: 'browser_console',
   description: 'test tool',
-  params: 'tab',
-  run: ({ tabId }) =>
-    Promise.resolve({ content: [{ type: 'text', text: `tab=${tabId ?? 'none'}` }] }),
+  inputSchema: { type: 'object', properties: { tabId: { type: 'string' } } },
+  run: (args) => {
+    const tabId = typeof args['tabId'] === 'string' ? args['tabId'] : 'none';
+    return Promise.resolve({ content: [{ type: 'text', text: `tab=${tabId}` }] });
+  },
 };
 
 let host: McpHost;

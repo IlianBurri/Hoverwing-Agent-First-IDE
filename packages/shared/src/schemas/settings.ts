@@ -10,7 +10,7 @@ export type Language = z.infer<typeof languageSchema>;
 /** Panel sizes of one resizable group, keyed by panel id, in percent. */
 export const panelLayoutSchema = z.record(z.string().max(50), z.number().min(0).max(100));
 
-export const sidebarViewSchema = z.enum(['files', 'search', 'docker']);
+export const sidebarViewSchema = z.enum(['files', 'search', 'docker', 'mcp']);
 export type SidebarView = z.infer<typeof sidebarViewSchema>;
 
 export const bottomViewSchema = z.enum(['terminal', 'logs', 'problems', 'docker']);

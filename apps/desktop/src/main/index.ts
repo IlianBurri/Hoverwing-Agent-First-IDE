@@ -24,6 +24,8 @@ import {
 import { SecretStore } from './modules/secrets';
 import { BrowserManager, agentBrowser, createBrowserHandlers } from './modules/browser';
 import { McpHost, browserTools, writeBridge } from './modules/mcpHost';
+import { McpConfigStore, McpService, connectMcp, createMcpHandlers } from './modules/mcp';
+import { childEnv } from './lib/env';
 import { CONTAINER_MCP_BRIDGE, SandboxService, createSandboxHandlers } from './modules/sandbox';
 import {
   DEFAULT_SANDBOX_PACKAGES,
@@ -149,24 +151,21 @@ void app.whenReady().then(async () => {
     },
   );
   const permissionsDir = join(app.getPath('userData'), 'permissions');
-  const permissions = new PermissionService(
-    new RuleStore(permissionsDir),
-    new AuditLog(permissionsDir),
-    {
-      request: (ownerId, request) => {
-        const contents = webContents.fromId(ownerId);
-        if (contents) sendEvent(contents, 'permissions:request', request);
-      },
-      resolved: (ownerId, id) => {
-        const contents = webContents.fromId(ownerId);
-        if (contents) sendEvent(contents, 'permissions:resolved', { id });
-      },
-      logged: (ownerId, entry) => {
-        const contents = webContents.fromId(ownerId);
-        if (contents) sendEvent(contents, 'permissions:logged', entry);
-      },
+  const ruleStore = new RuleStore(permissionsDir);
+  const permissions = new PermissionService(ruleStore, new AuditLog(permissionsDir), {
+    request: (ownerId, request) => {
+      const contents = webContents.fromId(ownerId);
+      if (contents) sendEvent(contents, 'permissions:request', request);
     },
-  );
+    resolved: (ownerId, id) => {
+      const contents = webContents.fromId(ownerId);
+      if (contents) sendEvent(contents, 'permissions:resolved', { id });
+    },
+    logged: (ownerId, entry) => {
+      const contents = webContents.fromId(ownerId);
+      if (contents) sendEvent(contents, 'permissions:logged', entry);
+    },
+  });
   const sendTo = (ownerId: number) => webContents.fromId(ownerId);
   const terminals = new TerminalManager(spawnNodePty, {
     onData: (ownerId, id, data) => {
@@ -231,6 +230,58 @@ void app.whenReady().then(async () => {
       }
     },
   );
+  /** A native question (main process), so a compromised renderer cannot answer it. */
+  const askNatively = async (
+    ownerId: number,
+    question: { message: string; detail: string; confirm: string },
+  ): Promise<boolean> => {
+    const contents = webContents.fromId(ownerId);
+    const window = contents ? BrowserWindow.fromWebContents(contents) : null;
+    const text = nativeTexts[dialogLanguage(settings.get())];
+    const options = {
+      type: 'question' as const,
+      message: question.message,
+      detail: question.detail,
+      buttons: [text.cancel, question.confirm],
+      defaultId: 0,
+      cancelId: 0,
+      noLink: true,
+    };
+    const result = window
+      ? await dialog.showMessageBox(window, options)
+      : await dialog.showMessageBox(options);
+    return result.response === 1;
+  };
+  const secrets = new SecretStore(join(dataDir, 'secrets.json'), safeStorage);
+  const mcp = new McpService({
+    configs: new McpConfigStore(join(dataDir, 'mcp')),
+    secrets,
+    rules: ruleStore,
+    connect: connectMcp,
+    confirmStart: (ownerId, config) => {
+      const text = nativeTexts[dialogLanguage(settings.get())];
+      const command =
+        config.transport.type === 'stdio'
+          ? [config.transport.command, ...config.transport.args].join(' ')
+          : config.transport.url;
+      return askNatively(ownerId, {
+        message: text.mcpMessage.replace('{name}', config.name),
+        detail: text.mcpDetail.replace('{command}', command),
+        confirm: text.mcpAllow,
+      });
+    },
+    baseEnv: () => childEnv(process.env),
+    homeDir: homedir(),
+    onChanged: () => {
+      broadcastEvent('mcp:changed', {});
+    },
+    onLog: (line) => {
+      broadcastEvent('mcp:log', { line, time: Date.now() });
+    },
+  });
+  app.on('will-quit', () => {
+    void mcp.closeAll();
+  });
   const dockerApi = createDockerApi({ socketPath: await findDockerSocket() });
   // Kestrel's MCP server for agents (browser tools), plus the stdio bridge.
   const mcpBridge = await writeBridge(join(dataDir, 'mcp')).catch(() => null);
@@ -289,33 +340,23 @@ void app.whenReady().then(async () => {
   const agents = new AgentService({
     configs: agentConfigs,
     sandbox,
-    secrets: new SecretStore(join(dataDir, 'secrets.json'), safeStorage),
+    secrets,
     sessions: new SessionHistory(join(dataDir, 'agent-sessions')),
     permissions,
     startTransport: spawnTransport,
     checkpoint: async (root, label, sessionId) =>
       (await checkpoints.create(root, label, 'turn', sessionId).catch(() => null))?.id ?? null,
     review,
-    confirmStart: async (ownerId, config) => {
-      const contents = webContents.fromId(ownerId);
-      const window = contents ? BrowserWindow.fromWebContents(contents) : null;
+    confirmStart: (ownerId, config) => {
       const text = nativeTexts[dialogLanguage(settings.get())];
-      const options = {
-        type: 'question' as const,
+      return askNatively(ownerId, {
         message: text.agentMessage.replace('{name}', config.name),
         detail: (config.sandbox.enabled ? text.agentSandboxDetail : text.agentDetail).replace(
           '{command}',
           [config.command, ...config.args].join(' '),
         ),
-        buttons: [text.cancel, text.agentStart],
-        defaultId: 0,
-        cancelId: 0,
-        noLink: true,
-      };
-      const result = window
-        ? await dialog.showMessageBox(window, options)
-        : await dialog.showMessageBox(options);
-      return result.response === 1;
+        confirm: text.agentStart,
+      });
     },
     events: {
       status: (ownerId, status) => {
@@ -339,7 +380,13 @@ void app.whenReady().then(async () => {
           const contents = webContents.fromId(ownerId);
           if (contents) sendEvent(contents, 'browser:opened', state);
         });
-        const endpoint = await mcpHost.register(() => browserTools(access, check), sandboxed);
+        const endpoint = await mcpHost.register(
+          async () => [
+            ...browserTools(access, check),
+            ...(await mcp.agentTools(workspaces.get(ownerId)?.root ?? null, sandboxed, check)),
+          ],
+          sandboxed,
+        );
         const url = sandboxed ? endpoint.containerUrl : endpoint.url;
         if (!url) throw new Error('Kestrel tools are not reachable from the sandbox.');
         const release = () => {
@@ -398,6 +445,7 @@ void app.whenReady().then(async () => {
       ...createReviewHandlers(review, workspaces),
       ...createDockerHandlers(dockerPanel, workspaces),
       ...createBrowserHandlers(browser),
+      ...createMcpHandlers(mcp, workspaces),
       ...createSandboxHandlers(
         sandbox,
         terminals,

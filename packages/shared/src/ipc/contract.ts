@@ -4,6 +4,7 @@ import { appChannels } from './channels/app';
 import { browserChannels, browserEvents } from './channels/browser';
 import { checkpointChannels, checkpointEvents } from './channels/checkpoints';
 import { dockerChannels, dockerEvents } from './channels/docker';
+import { mcpChannels, mcpEvents } from './channels/mcp';
 import { permissionChannels, permissionEvents } from './channels/permissions';
 import { reviewChannels, reviewEvents } from './channels/review';
 import { sandboxChannels, sandboxEvents } from './channels/sandbox';
@@ -32,6 +33,7 @@ export const ipcContract = {
   ...browserChannels,
   ...checkpointChannels,
   ...dockerChannels,
+  ...mcpChannels,
   ...permissionChannels,
   ...reviewChannels,
   ...sandboxChannels,
@@ -47,6 +49,7 @@ export const ipcEvents = {
   ...browserEvents,
   ...checkpointEvents,
   ...dockerEvents,
+  ...mcpEvents,
   ...permissionEvents,
   ...reviewEvents,
   ...sandboxEvents,

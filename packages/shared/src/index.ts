@@ -11,3 +11,4 @@ export * from './schemas/review';
 export * from './schemas/sandbox';
 export * from './schemas/docker';
 export * from './schemas/browser';
+export * from './schemas/mcp';

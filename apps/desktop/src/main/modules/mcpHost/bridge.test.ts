@@ -25,7 +25,7 @@ describe('stdio bridge', () => {
         {
           name: 'browser_list_tabs',
           description: 'test',
-          params: 'none',
+          inputSchema: { type: 'object', properties: {} },
           run: () => Promise.resolve({ content: [{ type: 'text', text: 'no tabs' }] }),
         },
       ],

@@ -5,11 +5,11 @@ import type { AddressInfo } from 'node:net';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import type { Transport } from '@modelcontextprotocol/sdk/shared/transport.js';
-import { z } from 'zod';
+import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 import type { ToolDefinition } from './tools';
 
 /** Creates the tools for one agent session (bound to its window and permissions). */
-export type ToolFactory = () => ToolDefinition[];
+export type ToolFactory = () => ToolDefinition[] | Promise<ToolDefinition[]>;
 
 interface Registration {
   token: Buffer;
@@ -58,36 +58,24 @@ function reply(response: ServerResponse, status: number, message: string): void 
 
 /** An MCP server for this session's tools, used for exactly one HTTP request. */
 function mcpServerFor(tools: ToolDefinition[], version: string): McpServer {
-  const server = new McpServer({ name: 'kestrel', version });
-  for (const tool of tools) {
-    const config = { description: tool.description };
-    if (tool.params === 'url') {
-      server.registerTool(
-        tool.name,
-        {
-          ...config,
-          inputSchema: {
-            url: z.string().max(8192).describe('http(s) address, e.g. localhost:3000'),
-          },
-        },
-        async ({ url }) => tool.run({ url }),
-      );
-    } else if (tool.params === 'tab') {
-      server.registerTool(
-        tool.name,
-        {
-          ...config,
-          inputSchema: {
-            tabId: z.string().max(20).optional().describe('Tab id from browser_list_tabs'),
-          },
-        },
-        async ({ tabId }) => tool.run(tabId === undefined ? {} : { tabId }),
-      );
-    } else {
-      server.registerTool(tool.name, config, async () => tool.run({}));
+  const mcp = new McpServer({ name: 'kestrel', version }, { capabilities: { tools: {} } });
+  // Low-level handlers: proxied tools bring their own JSON Schema (no zod).
+  const server = mcp.server;
+  server.setRequestHandler(ListToolsRequestSchema, () => ({
+    tools: tools.map((tool) => ({
+      name: tool.name,
+      description: tool.description,
+      inputSchema: tool.inputSchema,
+    })),
+  }));
+  server.setRequestHandler(CallToolRequestSchema, async (request) => {
+    const tool = tools.find((entry) => entry.name === request.params.name);
+    if (!tool) {
+      return { content: [{ type: 'text', text: 'Unknown or disabled tool.' }], isError: true };
     }
-  }
-  return server;
+    return tool.run(request.params.arguments ?? {});
+  });
+  return mcp;
 }
 
 /**
@@ -156,7 +144,14 @@ export class McpHost {
       reply(response, 400, 'Invalid request body.');
       return;
     }
-    const server = mcpServerFor(registration.tools(), this.version);
+    let tools: ToolDefinition[];
+    try {
+      tools = await registration.tools();
+    } catch {
+      reply(response, 500, 'Tools unavailable.');
+      return;
+    }
+    const server = mcpServerFor(tools, this.version);
     // No session id generator: stateless mode, one server per request.
     const transport = new StreamableHTTPServerTransport({ enableJsonResponse: true });
     response.on('close', () => {
