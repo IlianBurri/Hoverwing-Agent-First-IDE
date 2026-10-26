@@ -14,7 +14,8 @@
     "label": "Activities",
     "files": "Files",
     "search": "Search",
-    "docker": "Docker"
+    "docker": "Docker",
+    "mcp": "MCP"
   },
   "sidebar": {
     "files": {
@@ -194,7 +195,9 @@
       "sandbox_build_failed": "The sandbox image could not be built. Details are in the logs.",
       "docker_conflict": "Docker refused: it is still in use (e.g. an image used by a container).",
       "docker_failed": "The Docker action failed. Details are in Logs › Docker.",
-      "invalid_url": "Only web addresses (http or https) can be opened, e.g. localhost:3000 or example.com."
+      "invalid_url": "Only web addresses (http or https) can be opened, e.g. localhost:3000 or example.com.",
+      "mcp_not_approved": "The MCP server was not allowed.",
+      "mcp_connect_failed": "The MCP server could not be connected."
     }
   },
   "palette": {
