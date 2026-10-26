@@ -947,5 +947,19 @@
       "failed": "Failed",
       "cancelled": "Cancelled"
     }
+  },
+  "updates": {
+    "check": "Check for updates",
+    "upToDate": "Kestrel is up to date.",
+    "available": "Kestrel {{version}} is available. Click it in the status bar to download.",
+    "availableShort": "Update {{version}}",
+    "disabledHint": "Updates are checked in the installed app only (and can be switched off in the command palette).",
+    "failed": "Could not check for updates (offline, or the release feed is not public).",
+    "download": "Download update",
+    "downloading": "Downloading update {{percent}} %",
+    "install": "Restart and install update",
+    "restart": "Restart for {{version}}",
+    "turnOff": "Turn off automatic update check",
+    "turnOn": "Turn on automatic update check"
   }
 }

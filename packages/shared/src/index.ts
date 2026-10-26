@@ -16,3 +16,4 @@ export * from './schemas/providers';
 export * from './schemas/chat';
 export * from './schemas/completion';
 export * from './schemas/setup';
+export * from './schemas/updates';

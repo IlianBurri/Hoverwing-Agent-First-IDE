@@ -36,6 +36,8 @@ import {
 import { ChatService, ChatStore, createChatHandlers } from './modules/chat';
 import { CompletionService, createCompletionHandlers } from './modules/completion';
 import * as systemInformation from 'systeminformation';
+import electronUpdater from 'electron-updater';
+import { UpdateService, createUpdateHandlers } from './modules/updates';
 import {
   CatalogStore,
   DEFAULT_OLLAMA_URL,
@@ -329,6 +331,22 @@ void app.whenReady().then(async () => {
     providers,
     settings: () => settings.get().completion,
   });
+  const updates = new UpdateService({
+    // Only the installed app updates itself (dev builds have no release feed).
+    updater: app.isPackaged ? electronUpdater.autoUpdater : null,
+    currentVersion: app.getVersion(),
+    enabled: () => settings.get().checkForUpdates,
+    onStatus: (status) => {
+      broadcastEvent('updates:status', status);
+    },
+    log: (line) => {
+      console.warn('[updates]', line);
+    },
+  });
+  // One quiet check shortly after start; downloading needs a click.
+  setTimeout(() => {
+    void updates.check();
+  }, 10_000);
   const githubJson = async (url: string): Promise<unknown> => {
     const response = await fetch(url, {
       headers: { accept: 'application/vnd.github+json', 'user-agent': 'Kestrel' },
@@ -553,6 +571,7 @@ void app.whenReady().then(async () => {
       ...createChatHandlers(chat),
       ...createCompletionHandlers(completion),
       ...createSetupHandlers(setup),
+      ...createUpdateHandlers(updates),
       ...createSandboxHandlers(
         sandbox,
         terminals,

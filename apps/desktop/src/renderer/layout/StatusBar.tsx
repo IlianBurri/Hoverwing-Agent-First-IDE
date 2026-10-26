@@ -1,4 +1,13 @@
-import { Bot, Container, Cpu, FolderClosed, Sparkles, TriangleAlert } from 'lucide-react';
+import {
+  ArrowDownToLine,
+  Bot,
+  Container,
+  Cpu,
+  FolderClosed,
+  RotateCcw,
+  Sparkles,
+  TriangleAlert,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { StatusMessage } from '../components/StatusMessage';
 import { useSettingsStore } from '../stores/settings';
@@ -7,6 +16,8 @@ import { useEditorStore } from '../stores/editor';
 import { useWorkspaceStore } from '../stores/workspace';
 import { showDockerView } from '../features/docker';
 import { showModelsView, toggleCompletion } from '../features/providers';
+import { downloadUpdate, installUpdate } from '../features/updates';
+import { useUpdateStore } from '../stores/updates';
 import { useProvidersStore } from '../stores/providers';
 import { SandboxBadge } from '../features/sandbox';
 import { runningContainers, useDockerStore } from '../stores/docker';
@@ -22,6 +33,7 @@ export function StatusBar() {
   const chatModel = useSettingsStore((state) => state.settings.chatModel);
   const completion = useSettingsStore((state) => state.settings.completion);
   const completionError = useProvidersStore((state) => state.completionError);
+  const update = useUpdateStore((state) => state.status);
   const agentText =
     agent.agentName && agent.state !== 'idle' && agent.state !== 'stopped'
       ? `${agent.agentName} · ${t(`status.agentState.${agent.state}`)}`
@@ -74,6 +86,24 @@ export function StatusBar() {
         )}
       </div>
       <div className={styles['group']}>
+        {update?.state === 'available' && (
+          <button type="button" className={styles['button']} onClick={() => void downloadUpdate()}>
+            <ArrowDownToLine size={14} aria-hidden="true" />
+            {t('updates.availableShort', { version: update.version })}
+          </button>
+        )}
+        {update?.state === 'downloading' && (
+          <span className={styles['item']} role="status">
+            <ArrowDownToLine size={14} aria-hidden="true" />
+            {t('updates.downloading', { percent: update.percent ?? 0 })}
+          </span>
+        )}
+        {update?.state === 'ready' && (
+          <button type="button" className={styles['button']} onClick={() => void installUpdate()}>
+            <RotateCcw size={14} aria-hidden="true" />
+            {t('updates.restart', { version: update.version })}
+          </button>
+        )}
         {saveError && <StatusMessage kind="error">{t('errors.settingsSave')}</StatusMessage>}
         {cursor && (
           <>

@@ -947,5 +947,19 @@
       "failed": "Fehlgeschlagen",
       "cancelled": "Abgebrochen"
     }
+  },
+  "updates": {
+    "check": "Nach Updates suchen",
+    "upToDate": "Kestrel ist aktuell.",
+    "available": "Kestrel {{version}} ist verfügbar. Zum Herunterladen in der Statusleiste klicken.",
+    "availableShort": "Update {{version}}",
+    "disabledHint": "Updates werden nur in der installierten App gesucht (abschaltbar über die Befehlspalette).",
+    "failed": "Updates konnten nicht geprüft werden (offline, oder die Releases sind nicht öffentlich).",
+    "download": "Update herunterladen",
+    "downloading": "Lade Update {{percent}} %",
+    "install": "Neu starten und Update installieren",
+    "restart": "Neu starten für {{version}}",
+    "turnOff": "Automatische Update-Suche ausschalten",
+    "turnOn": "Automatische Update-Suche einschalten"
   }
 }

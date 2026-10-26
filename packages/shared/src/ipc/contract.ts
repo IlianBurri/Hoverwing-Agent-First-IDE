@@ -14,6 +14,7 @@ import { sandboxChannels, sandboxEvents } from './channels/sandbox';
 import { searchChannels } from './channels/search';
 import { setupChannels, setupEvents } from './channels/setup';
 import { settingsChannels, settingsEvents } from './channels/settings';
+import { updateChannels, updateEvents } from './channels/updates';
 import { terminalChannels, terminalEvents } from './channels/terminal';
 import { windowChannels } from './channels/window';
 import { workspaceChannels, workspaceEvents } from './channels/workspace';
@@ -48,6 +49,7 @@ export const ipcContract = {
   ...setupChannels,
   ...settingsChannels,
   ...terminalChannels,
+  ...updateChannels,
   ...windowChannels,
   ...workspaceChannels,
 } as const satisfies Record<string, { request: z.ZodType; response: z.ZodType }>;
@@ -66,6 +68,7 @@ export const ipcEvents = {
   ...settingsEvents,
   ...setupEvents,
   ...terminalEvents,
+  ...updateEvents,
   ...workspaceEvents,
 } as const satisfies Record<string, z.ZodType>;
 

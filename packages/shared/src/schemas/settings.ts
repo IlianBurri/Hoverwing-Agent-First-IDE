@@ -43,6 +43,8 @@ export const settingsSchema = z.object({
   completion: completionSettingsSchema,
   /** The setup assistant was finished or skipped (it opens on first start otherwise). */
   setupDone: z.boolean(),
+  /** Look for a new Kestrel version on start (installed app only). */
+  checkForUpdates: z.boolean(),
 });
 export type Settings = z.infer<typeof settingsSchema>;
 
@@ -64,6 +66,7 @@ export const defaultSettings: Settings = {
   chatModel: null,
   completion: defaultCompletionSettings,
   setupDone: false,
+  checkForUpdates: true,
 };
 
 /** Applies a patch; keys that are missing or undefined stay unchanged. */

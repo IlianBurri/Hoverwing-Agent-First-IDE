@@ -16,8 +16,13 @@ asarUnpack:
   - '**/node_modules/@vscode/ripgrep-*/**'
   - '**/node_modules/@parcel/watcher-*/**'
   - '**/node_modules/node-pty/**'
-# No auto-update server yet: releases are downloaded from GitHub by hand.
-publish: null
+# Update feed: the app reads latest.yml from the GitHub releases (the Release
+# workflow uploads it). Builds use --publish never; CI attaches the files.
+publish:
+  provider: github
+  owner: IlianBurri
+  repo: Kestrel-Agen-Harness-IDE
+  releaseType: release
 mac:
   category: public.app-category.developer-tools
   target: dmg

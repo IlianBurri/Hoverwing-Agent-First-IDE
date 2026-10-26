@@ -22,6 +22,8 @@ import { setBrowserState } from './stores/browser';
 import { McpServerDialog, refreshMcp, registerMcpCommands } from './features/mcp';
 import { ProviderDialog, refreshProviders, registerProviderCommands } from './features/providers';
 import { registerChatCommands } from './features/chat';
+import { loadUpdateStatus, registerUpdateCommands } from './features/updates';
+import { setUpdateStatus } from './stores/updates';
 import { SetupWizard, openSetup, registerSetupCommands } from './features/setup';
 import { applySetupProgress } from './stores/setup';
 import { applyChatEvent, useChatStore } from './stores/chat';
@@ -59,6 +61,11 @@ export function App() {
   useEffect(() => registerProviderCommands(), []);
   useEffect(() => registerChatCommands(), []);
   useEffect(() => registerSetupCommands(), []);
+  useEffect(() => registerUpdateCommands(), []);
+  useEffect(() => {
+    void loadUpdateStatus();
+    return window.kestrel.on('updates:status', setUpdateStatus);
+  }, []);
   useEffect(() => {
     // First start: the setup assistant opens once (it can be skipped).
     if (!useSettingsStore.getState().settings.setupDone) openSetup();
