@@ -1,12 +1,17 @@
-import { mkdtempSync } from 'node:fs';
+import { mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { _electron as electron } from '@playwright/test';
 import type { ElectronApplication } from '@playwright/test';
 
-/** A fresh user data directory, so tests never share or touch real settings. */
-export function createUserDataDir(): string {
-  return mkdtempSync(join(tmpdir(), 'kestrel-e2e-'));
+/**
+ * A fresh user data directory, so tests never share or touch real settings.
+ * The setup assistant is marked as done unless a test wants the first start.
+ */
+export function createUserDataDir({ firstStart = false } = {}): string {
+  const dir = mkdtempSync(join(tmpdir(), 'kestrel-e2e-'));
+  if (!firstStart) writeFileSync(join(dir, 'settings.json'), '{ "setupDone": true }\n');
+  return dir;
 }
 
 /** Launches the built app (out/) the same way a user would, in English. */

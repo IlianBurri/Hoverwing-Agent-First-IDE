@@ -11,6 +11,7 @@ import {
   Plus,
   RefreshCw,
   Trash2,
+  Wand,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { isFreeModel, isLocalEndpoint } from '@kestrel/shared';
@@ -229,7 +230,19 @@ export function ModelsView() {
       <PanelHeader
         id="sidebar-title"
         title={t('models.title')}
-        actions={<IconButton size="sm" icon={Plus} label={t('providers.add')} onClick={add} />}
+        actions={
+          <>
+            <IconButton
+              size="sm"
+              icon={Wand}
+              label={t('setup.open')}
+              onClick={() => {
+                openModal({ id: 'setup' });
+              }}
+            />
+            <IconButton size="sm" icon={Plus} label={t('providers.add')} onClick={add} />
+          </>
+        }
       />
       <div className={styles['root']}>
         {providers.length === 0 ? (

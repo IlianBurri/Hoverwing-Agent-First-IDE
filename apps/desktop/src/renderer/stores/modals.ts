@@ -10,6 +10,7 @@ export type ModalState =
   | { id: 'checkpointChanges'; checkpoint: Checkpoint }
   /** Add (provider: null) or edit a model provider. */
   | { id: 'provider'; provider: ProviderView | null }
+  | { id: 'setup' }
   | null;
 
 export const useModalStore = create<{ open: ModalState }>()(() => ({ open: null }));

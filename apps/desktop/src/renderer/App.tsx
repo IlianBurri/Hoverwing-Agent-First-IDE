@@ -22,6 +22,8 @@ import { setBrowserState } from './stores/browser';
 import { McpServerDialog, refreshMcp, registerMcpCommands } from './features/mcp';
 import { ProviderDialog, refreshProviders, registerProviderCommands } from './features/providers';
 import { registerChatCommands } from './features/chat';
+import { SetupWizard, openSetup, registerSetupCommands } from './features/setup';
+import { applySetupProgress } from './stores/setup';
 import { applyChatEvent, useChatStore } from './stores/chat';
 import { appendMcpLog } from './stores/mcp';
 import { refreshCheckpoints } from './stores/checkpoints';
@@ -36,7 +38,7 @@ import { deliverOutput, markExited } from './stores/terminal';
 import { hasDirtyFiles } from './stores/editor';
 import { AppShell } from './layout/AppShell';
 import { applyWorkspaceChanges } from './stores/workspace';
-import { subscribeToSettingsChanges } from './stores/settings';
+import { subscribeToSettingsChanges, useSettingsStore } from './stores/settings';
 
 export function App() {
   useApplyTheme();
@@ -56,6 +58,12 @@ export function App() {
   useEffect(() => registerMcpCommands(), []);
   useEffect(() => registerProviderCommands(), []);
   useEffect(() => registerChatCommands(), []);
+  useEffect(() => registerSetupCommands(), []);
+  useEffect(() => {
+    // First start: the setup assistant opens once (it can be skipped).
+    if (!useSettingsStore.getState().settings.setupDone) openSetup();
+    return window.kestrel.on('setup:progress', applySetupProgress);
+  }, []);
   useEffect(() => {
     void refreshProviders();
     const offs = [
@@ -214,6 +222,7 @@ export function App() {
       {modal?.id === 'agents' && <AgentsDialog />}
       {modal?.id === 'mcpServer' && <McpServerDialog server={modal.server} />}
       {modal?.id === 'provider' && <ProviderDialog provider={modal.provider} />}
+      {modal?.id === 'setup' && <SetupWizard />}
       {modal?.id === 'checkpointChanges' && (
         <ChangesModal key={modal.checkpoint.id} checkpoint={modal.checkpoint} />
       )}
