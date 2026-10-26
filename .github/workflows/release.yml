@@ -1,0 +1,45 @@
+name: Release
+
+# Builds the Windows installer (Kestrel-Setup-<version>.exe).
+# - Push a tag like v0.8.0: the installer is attached to a GitHub release.
+# - "Run workflow" in the Actions tab: the installer is kept as a build
+#   artifact (downloadable from the run page for 30 days).
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - name: Build the installer
+        run: pnpm --filter @kestrel/desktop package:win
+      - name: Smoke test the packaged app
+        run: pnpm --filter @kestrel/desktop exec playwright test e2e/packaged.spec.ts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Kestrel-Setup-windows
+          path: apps/desktop/release/Kestrel-Setup-*.exe
+          retention-days: 30
+      - name: Attach the installer to the release
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" apps/desktop/release/Kestrel-Setup-*.exe \
+            --title "Kestrel $GITHUB_REF_NAME" \
+            --notes "Windows installer. Not code-signed yet: Windows SmartScreen may warn about an unknown publisher (More info → Run anyway)." \
+            || gh release upload "$GITHUB_REF_NAME" apps/desktop/release/Kestrel-Setup-*.exe --clobber

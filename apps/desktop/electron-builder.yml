@@ -1,5 +1,6 @@
 appId: dev.kestrel.app
 productName: Kestrel
+copyright: Copyright © 2026 Kestrel contributors
 directories:
   output: release
   buildResources: build
@@ -7,16 +8,38 @@ files:
   - out/**
   - package.json
 asar: true
+# node-pty and @parcel/watcher ship prebuilt N-API binaries (ABI-stable):
+# nothing needs to be compiled (and no C++ toolchain is required).
+npmRebuild: false
 # Native binaries cannot run from inside the asar archive.
 asarUnpack:
   - '**/node_modules/@vscode/ripgrep-*/**'
   - '**/node_modules/@parcel/watcher-*/**'
   - '**/node_modules/node-pty/**'
+# No auto-update server yet: releases are downloaded from GitHub by hand.
+publish: null
 mac:
   category: public.app-category.developer-tools
   target: dmg
+  artifactName: Kestrel-${version}-${arch}.${ext}
 win:
-  target: nsis
+  target:
+    - target: nsis
+      arch: [x64]
+  # Not code-signed yet: Windows SmartScreen shows "unknown publisher".
+  signAndEditExecutable: true
+nsis:
+  # A normal installer (not one-click): choose the folder, get shortcuts.
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: always
+  createStartMenuShortcut: true
+  shortcutName: Kestrel
+  artifactName: Kestrel-Setup-${version}.${ext}
+  # Keep settings, keys and checkpoints when uninstalling.
+  deleteAppDataOnUninstall: false
 linux:
   target: AppImage
   category: Development
+  artifactName: Kestrel-${version}-${arch}.${ext}

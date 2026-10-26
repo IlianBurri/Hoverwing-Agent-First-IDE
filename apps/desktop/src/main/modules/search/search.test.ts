@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { replaceInFiles } from './replace';
-import { SearchRunner } from './search';
+import { SearchRunner, unpackedPath } from './search';
 
 let root: string;
 const options = {
@@ -82,5 +82,19 @@ describe('replaceInFiles', () => {
   it('reports files outside the workspace as failed', async () => {
     const result = await replaceInFiles(root, options, 'x', ['../outside.ts']);
     expect(result.failed).toEqual(['../outside.ts']);
+  });
+});
+
+describe('unpackedPath', () => {
+  it('points into app.asar.unpacked in the installed app', () => {
+    expect(unpackedPath('C:\\Kestrel\\resources\\app.asar\\node_modules\\rg.exe')).toBe(
+      'C:\\Kestrel\\resources\\app.asar.unpacked\\node_modules\\rg.exe',
+    );
+    expect(unpackedPath('/opt/Kestrel/resources/app.asar/node_modules/rg')).toBe(
+      '/opt/Kestrel/resources/app.asar.unpacked/node_modules/rg',
+    );
+    expect(unpackedPath('/home/me/kestrel/node_modules/rg')).toBe(
+      '/home/me/kestrel/node_modules/rg',
+    );
   });
 });

@@ -10,13 +10,21 @@ export const MAX_MATCHES = 2000;
 const TIMEOUT_MS = 30_000;
 
 /**
+ * In the installed app, ripgrep lives in app.asar.unpacked: programs cannot
+ * be started from inside the asar archive.
+ */
+export function unpackedPath(path: string): string {
+  return path.replace(/app\.asar([\\/])/, 'app.asar.unpacked$1');
+}
+
+/**
  * Runs ripgrep in the workspace. One search per owner (window) at a time:
  * starting a new one, or calling `cancel`, stops the previous process.
  */
 export class SearchRunner {
   private readonly running = new Map<number, ChildProcess>();
 
-  constructor(private readonly binary: string = rgPath) {}
+  constructor(private readonly binary: string = unpackedPath(rgPath)) {}
 
   cancel(ownerId: number): void {
     this.running.get(ownerId)?.kill();
