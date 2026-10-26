@@ -17,6 +17,8 @@ import { refreshSandboxStatus, registerSandboxCommands } from './features/sandbo
 import { appendSandboxLog, setSandboxStatus } from './stores/sandbox';
 import { refreshDocker, registerDockerCommands } from './features/docker';
 import { deliverStream, endStream } from './stores/docker';
+import { openBrowser, registerBrowserCommands } from './features/browser';
+import { setBrowserState } from './stores/browser';
 import { refreshCheckpoints } from './stores/checkpoints';
 import { refreshReview } from './stores/review';
 import { useWorkspaceStore } from './stores/workspace';
@@ -45,6 +47,18 @@ export function App() {
   useEffect(() => registerAgentCommands(), []);
   useEffect(() => registerSandboxCommands(), []);
   useEffect(() => registerDockerCommands(), []);
+  useEffect(() => registerBrowserCommands(), []);
+  useEffect(() => {
+    const offs = [
+      window.kestrel.on('browser:state', setBrowserState),
+      window.kestrel.on('browser:openTab', ({ url }) => {
+        void openBrowser(url);
+      }),
+    ];
+    return () => {
+      for (const off of offs) off();
+    };
+  }, []);
   useEffect(() => {
     const offs = [
       window.kestrel.on('docker:changed', () => {

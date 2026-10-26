@@ -24,6 +24,7 @@ import { IconButton } from '../../components/IconButton';
 import { PanelHeader } from '../../layout/PanelHeader';
 import { useDockerStore } from '../../stores/docker';
 import { useWorkspaceStore } from '../../stores/workspace';
+import { openBrowser } from '../browser';
 import { DockerHelp } from '../sandbox';
 import {
   buildImage,
@@ -87,7 +88,7 @@ function ContainerRow({ container }: { container: ContainerSummary }) {
               type="button"
               className={styles['port']}
               title={t('docker.openPort', { url })}
-              onClick={() => void window.kestrel.invoke('app:openExternalUrl', { url })}
+              onClick={() => void openBrowser(url)}
             >
               {text}
               <ExternalLink size={12} aria-hidden="true" />

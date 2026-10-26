@@ -193,7 +193,8 @@
       "sandbox_unavailable": "Docker is not available. Start Docker (or Docker Desktop) and try again.",
       "sandbox_build_failed": "The sandbox image could not be built. Details are in the logs.",
       "docker_conflict": "Docker refused: it is still in use (e.g. an image used by a container).",
-      "docker_failed": "The Docker action failed. Details are in Logs › Docker."
+      "docker_failed": "The Docker action failed. Details are in Logs › Docker.",
+      "invalid_url": "Only web addresses (http or https) can be opened, e.g. localhost:3000 or example.com."
     }
   },
   "palette": {
@@ -211,7 +212,8 @@
       "editor": "Editor",
       "terminal": "Terminal",
       "agent": "Agent",
-      "docker": "Docker"
+      "docker": "Docker",
+      "browser": "Browser"
     },
     "palette": "Open command palette",
     "showFiles": "Show files",
@@ -560,7 +562,7 @@
     "usedBy_other": "used by {{count}} containers",
     "sandboxTag": "Agent sandbox",
     "composeProject": "Docker Compose project",
-    "openPort": "Open {{url}} in the browser",
+    "openPort": "Open {{url}} in the integrated browser",
     "remove": "Remove",
     "stopAndRemove": "Stop and remove",
     "removeContainerTitle": "Remove container “{{name}}”?",
@@ -602,5 +604,24 @@
       "dead": "dead",
       "unknown": "unknown"
     }
+  },
+  "browser": {
+    "open": "Open browser",
+    "newTab": "New tab",
+    "navigate": "Open address",
+    "back": "Back",
+    "forward": "Forward",
+    "reload": "Reload",
+    "stop": "Stop loading",
+    "address": "Address",
+    "addressPlaceholder": "Enter an address, e.g. localhost:3000",
+    "devTools": "Open developer tools",
+    "page": "Web page",
+    "emptyHint": "Enter an address above. Pages run separately from Kestrel, with their own cookies.",
+    "loadFailed": "The page could not be loaded ({{error}}).",
+    "clearData": "Clear browser data",
+    "clearDataTitle": "Clear browser data?",
+    "clearDataMessage": "Cookies, logins, storage and cache of the integrated browser are deleted. Open pages stay open.",
+    "dataCleared": "Browser data cleared."
   }
 }

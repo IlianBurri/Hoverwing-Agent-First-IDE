@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IconButton } from '../IconButton';
 import styles from './Modal.module.css';
+import { useOverlay } from '../../stores/overlays';
 
 interface ModalProps {
   title: string;
@@ -17,6 +18,7 @@ interface ModalProps {
 export function Modal({ title, onClose, children, size = 'md' }: ModalProps) {
   const { t } = useTranslation();
   const ref = useRef<HTMLDialogElement>(null);
+  useOverlay();
 
   useEffect(() => {
     const dialog = ref.current;

@@ -1,8 +1,9 @@
-import { FileDiff, X } from 'lucide-react';
+import { FileDiff, Globe, X } from 'lucide-react';
 import { useRef } from 'react';
 import type { KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { baseName } from '@kestrel/shared';
+import { browserTitle, useBrowserStore } from '../../stores/browser';
 import { useEditorStore } from '../../stores/editor';
 import { iconForEntry } from '../workspace/fileIcon';
 import { activate, closeFile } from './actions';
@@ -13,6 +14,7 @@ export function EditorTabs() {
   const { t } = useTranslation();
   const files = useEditorStore((state) => state.files);
   const active = useEditorStore((state) => state.active);
+  const browserTabs = useBrowserStore((state) => state.tabs);
   const listRef = useRef<HTMLDivElement>(null);
 
   function onKeyDown(event: KeyboardEvent) {
@@ -47,16 +49,21 @@ export function EditorTabs() {
     >
       {files.map((file) => {
         const isReview = file.kind === 'review' && file.reviewPath !== undefined;
-        const name = isReview
-          ? t('review.tabName', { name: baseName(file.reviewPath ?? '') })
-          : baseName(file.path);
+        const isBrowser = file.kind === 'browser';
+        const name = isBrowser
+          ? browserTitle(browserTabs[file.browserTabId ?? ''], t('browser.newTab'))
+          : isReview
+            ? t('review.tabName', { name: baseName(file.reviewPath ?? '') })
+            : baseName(file.path);
         const selected = file.path === active;
-        const Icon = isReview
-          ? FileDiff
-          : iconForEntry(
-              { name, path: file.path, kind: 'file', symlink: false, heavy: false },
-              false,
-            );
+        const Icon = isBrowser
+          ? Globe
+          : isReview
+            ? FileDiff
+            : iconForEntry(
+                { name, path: file.path, kind: 'file', symlink: false, heavy: false },
+                false,
+              );
         const state = file.dirty ? t('editor.unsaved') : undefined;
         return (
           <div

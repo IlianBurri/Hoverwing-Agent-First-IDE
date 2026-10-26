@@ -10,6 +10,7 @@ import {
   useEditorStore,
 } from '../../stores/editor';
 import type { OpenFile } from '../../stores/editor';
+import { closeBrowserTab } from '../browser/actions';
 
 const t = i18next.t.bind(i18next);
 
@@ -74,6 +75,8 @@ export async function openFile(
 }
 
 function forgetFile(path: string): void {
+  const file = getFile(path);
+  if (file?.browserTabId) closeBrowserTab(file.browserTabId);
   useEditorStore.setState((state) => ({
     files: state.files.filter((file) => file.path !== path),
     active: state.active === path ? neighbourAfterClose(state.files, path) : state.active,

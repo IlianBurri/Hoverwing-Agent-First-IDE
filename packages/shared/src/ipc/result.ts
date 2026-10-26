@@ -21,7 +21,8 @@ export type IpcErrorCode =
   | 'sandbox_unavailable'
   | 'sandbox_build_failed'
   | 'docker_conflict'
-  | 'docker_failed';
+  | 'docker_failed'
+  | 'invalid_url';
 
 export interface IpcError {
   code: IpcErrorCode;

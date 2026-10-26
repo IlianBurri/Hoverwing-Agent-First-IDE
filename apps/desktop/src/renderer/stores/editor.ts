@@ -5,9 +5,11 @@ export type ExternalState = 'none' | 'changed' | 'deleted';
 export interface OpenFile {
   path: string;
   /** What the editor shows: text in Monaco, an agent change to review, or a notice. */
-  kind: 'text' | 'binary' | 'tooLarge' | 'review';
+  kind: 'text' | 'binary' | 'tooLarge' | 'review' | 'browser';
   /** For review tabs: the project file whose change is reviewed. */
   reviewPath?: string;
+  /** For browser tabs: the tab id in the main process. */
+  browserTabId?: string;
   size?: number;
   dirty: boolean;
   /** Modification time of the version on disk we last read or wrote. */

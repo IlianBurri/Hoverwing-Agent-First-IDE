@@ -5,6 +5,7 @@ import { isCommandEnabled, runCommand, useCommandStore } from './registry';
 import type { Command } from './registry';
 import { useKeybindingLabel } from './useKeybindingLabel';
 import styles from './CommandPalette.module.css';
+import { useOverlay } from '../../stores/overlays';
 
 function PaletteItem({ command, onRun }: { command: Command; onRun: (id: string) => void }) {
   const shortcut = useKeybindingLabel(command.id);
@@ -35,6 +36,7 @@ export function CommandPalette() {
   const { t } = useTranslation();
   const open = useCommandStore((state) => state.paletteOpen);
   const setOpen = useCommandStore((state) => state.setPaletteOpen);
+  useOverlay(open);
   const commands = useCommandStore((state) => state.commands);
   const recentIds = useCommandStore((state) => state.recent);
 

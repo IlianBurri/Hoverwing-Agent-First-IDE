@@ -10,6 +10,7 @@ import type {
 } from '../../stores/dialogs';
 import { Button } from '../Button';
 import styles from './Dialog.module.css';
+import { useOverlay } from '../../stores/overlays';
 
 /**
  * Renders the current prompt/confirm dialog with the native <dialog>
@@ -25,6 +26,7 @@ export function DialogHost() {
 
 function ModalDialog({ request }: { request: DialogRequest }) {
   const ref = useRef<HTMLDialogElement>(null);
+  useOverlay();
   const settled = useRef(false);
 
   function finish(value: string | boolean | null) {

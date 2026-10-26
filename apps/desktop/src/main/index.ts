@@ -22,6 +22,7 @@ import {
   spawnTransport,
 } from './modules/agent';
 import { SecretStore } from './modules/secrets';
+import { BrowserManager, createBrowserHandlers } from './modules/browser';
 import { SandboxService, createSandboxHandlers } from './modules/sandbox';
 import {
   DEFAULT_SANDBOX_PACKAGES,
@@ -176,9 +177,28 @@ void app.whenReady().then(async () => {
       if (contents) sendEvent(contents, 'terminal:exit', { id, exitCode });
     },
   });
+  const browser = new BrowserManager(
+    (ownerId) => {
+      const contents = webContents.fromId(ownerId);
+      return contents ? BrowserWindow.fromWebContents(contents) : null;
+    },
+    {
+      state: (ownerId, state) => {
+        const contents = webContents.fromId(ownerId);
+        if (contents) sendEvent(contents, 'browser:state', state);
+      },
+      openTab: (ownerId, url) => {
+        const contents = webContents.fromId(ownerId);
+        if (contents) sendEvent(contents, 'browser:openTab', { url });
+      },
+    },
+  );
   app.on('web-contents-created', (_event, contents) => {
     // A closed or reloaded window releases its workspace, watcher and search.
     const release = () => {
+      // Browser pages are web contents too, but own no window state.
+      if (browser.isBrowserContents(contents.id)) return;
+      browser.release(contents.id);
       void workspaces.close(contents.id);
       search.cancel(contents.id);
       terminals.killAll(contents.id);
@@ -317,6 +337,7 @@ void app.whenReady().then(async () => {
       ...createAgentHandlers(agents, workspaces),
       ...createReviewHandlers(review, workspaces),
       ...createDockerHandlers(dockerPanel, workspaces),
+      ...createBrowserHandlers(browser),
       ...createSandboxHandlers(
         sandbox,
         terminals,

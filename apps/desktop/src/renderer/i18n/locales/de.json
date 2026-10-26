@@ -193,7 +193,8 @@
       "sandbox_unavailable": "Docker ist nicht verfügbar. Starte Docker (oder Docker Desktop) und versuche es erneut.",
       "sandbox_build_failed": "Das Sandbox-Image konnte nicht gebaut werden. Details stehen in den Logs.",
       "docker_conflict": "Docker hat abgelehnt: wird noch verwendet (z. B. ein Image, das ein Container nutzt).",
-      "docker_failed": "Die Docker-Aktion ist fehlgeschlagen. Details stehen unter Logs › Docker."
+      "docker_failed": "Die Docker-Aktion ist fehlgeschlagen. Details stehen unter Logs › Docker.",
+      "invalid_url": "Nur Web-Adressen (http oder https) können geöffnet werden, z. B. localhost:3000 oder example.com."
     }
   },
   "palette": {
@@ -211,7 +212,8 @@
       "editor": "Editor",
       "terminal": "Terminal",
       "agent": "Agent",
-      "docker": "Docker"
+      "docker": "Docker",
+      "browser": "Browser"
     },
     "palette": "Befehlspalette öffnen",
     "showFiles": "Dateien anzeigen",
@@ -560,7 +562,7 @@
     "usedBy_other": "von {{count}} Containern verwendet",
     "sandboxTag": "Agent-Sandbox",
     "composeProject": "Docker-Compose-Projekt",
-    "openPort": "{{url}} im Browser öffnen",
+    "openPort": "{{url}} im integrierten Browser öffnen",
     "remove": "Entfernen",
     "stopAndRemove": "Stoppen und entfernen",
     "removeContainerTitle": "Container «{{name}}» entfernen?",
@@ -602,5 +604,24 @@
       "dead": "defekt",
       "unknown": "unbekannt"
     }
+  },
+  "browser": {
+    "open": "Browser öffnen",
+    "newTab": "Neuer Tab",
+    "navigate": "Adresse öffnen",
+    "back": "Zurück",
+    "forward": "Vor",
+    "reload": "Neu laden",
+    "stop": "Laden stoppen",
+    "address": "Adresse",
+    "addressPlaceholder": "Adresse eingeben, z. B. localhost:3000",
+    "devTools": "Entwicklertools öffnen",
+    "page": "Webseite",
+    "emptyHint": "Gib oben eine Adresse ein. Seiten laufen getrennt von Kestrel, mit eigenen Cookies.",
+    "loadFailed": "Die Seite konnte nicht geladen werden ({{error}}).",
+    "clearData": "Browserdaten löschen",
+    "clearDataTitle": "Browserdaten löschen?",
+    "clearDataMessage": "Cookies, Anmeldungen, Speicher und Cache des integrierten Browsers werden gelöscht. Offene Seiten bleiben offen.",
+    "dataCleared": "Browserdaten gelöscht."
   }
 }

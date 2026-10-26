@@ -85,23 +85,11 @@ test.describe('with Docker', () => {
     );
   });
 
-  test('opens a published port in the browser', async () => {
-    await app.evaluate(({ shell }) => {
-      const opened: string[] = [];
-      Object.assign(globalThis, { openedUrls: opened });
-      Object.assign(shell, {
-        openExternal: (url: string) => {
-          opened.push(url);
-          return Promise.resolve();
-        },
-      });
-    });
+  test('opens a published port in the integrated browser', async () => {
     await row().getByRole('button', { name: '18080 → 8080' }).click();
-    await expect
-      .poll(() =>
-        app.evaluate(() => (globalThis as unknown as { openedUrls: string[] }).openedUrls),
-      )
-      .toEqual(['http://localhost:18080']);
+    await expect(page.getByRole('textbox', { name: 'Address' })).toHaveValue(
+      'http://localhost:18080/',
+    );
   });
 
   test('follows the logs of a container', async () => {

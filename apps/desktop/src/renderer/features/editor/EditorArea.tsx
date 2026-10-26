@@ -6,6 +6,7 @@ import { useEditorStore } from '../../stores/editor';
 import { EditorTabs } from './EditorTabs';
 import { ExternalChangeBanner } from './ExternalChangeBanner';
 import { ReviewView } from '../review/ReviewView';
+import { BrowserView } from '../browser/BrowserView';
 import { Kbd } from '../../components/Kbd';
 import { KestrelMark } from '../../components/KestrelMark';
 import { Button } from '../../components/Button';
@@ -89,6 +90,9 @@ export function EditorArea() {
           </Suspense>
         )}
         {file?.kind === 'review' && file.reviewPath && <ReviewView path={file.reviewPath} />}
+        {file?.kind === 'browser' && file.browserTabId && (
+          <BrowserView key={file.browserTabId} tabId={file.browserTabId} />
+        )}
         {file && (file.kind === 'binary' || file.kind === 'tooLarge') && (
           <EmptyState
             icon={FileWarning}

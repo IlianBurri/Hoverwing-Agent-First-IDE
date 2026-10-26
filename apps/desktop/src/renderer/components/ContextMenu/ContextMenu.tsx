@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { KeyboardEvent } from 'react';
 import type { LucideIcon } from 'lucide-react';
 import styles from './ContextMenu.module.css';
+import { useOverlay } from '../../stores/overlays';
 
 export interface MenuItem {
   id: string;
@@ -28,6 +29,7 @@ interface ContextMenuProps {
  */
 export function ContextMenu({ label, x, y, entries, onClose }: ContextMenuProps) {
   const ref = useRef<HTMLDivElement>(null);
+  useOverlay();
   const [position, setPosition] = useState({ x, y });
   // Captured during the first render, before the menu takes focus.
   const [returnFocus] = useState(() => document.activeElement as HTMLElement | null);
