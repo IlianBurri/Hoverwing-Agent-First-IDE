@@ -15,7 +15,8 @@
     "files": "Files",
     "search": "Search",
     "docker": "Docker",
-    "mcp": "MCP"
+    "mcp": "MCP",
+    "models": "Models"
   },
   "sidebar": {
     "files": {
@@ -162,7 +163,11 @@
       "error": "error"
     },
     "containers_one": "{{count}} container running",
-    "containers_other": "{{count}} containers running"
+    "containers_other": "{{count}} containers running",
+    "modelHint": "Chat model – click to manage models",
+    "completionOn": "Autocompletion",
+    "completionOff": "Autocompletion off",
+    "completionError": "Autocompletion: {{reason}}"
   },
   "theme": {
     "label": "Color theme",
@@ -197,7 +202,14 @@
       "docker_failed": "The Docker action failed. Details are in Logs › Docker.",
       "invalid_url": "Only web addresses (http or https) can be opened, e.g. localhost:3000 or example.com.",
       "mcp_not_approved": "The MCP server was not allowed.",
-      "mcp_connect_failed": "The MCP server could not be connected."
+      "mcp_connect_failed": "The MCP server could not be connected.",
+      "provider_unreachable": "The model provider is not reachable. Is the address right and the server running?",
+      "provider_auth": "The provider refused the API key (or the account has no credit).",
+      "provider_rate_limited": "The provider’s rate limit is reached. Try again later or use another model.",
+      "provider_model_missing": "The model or endpoint was not found at this provider.",
+      "provider_failed": "The model provider reported an error.",
+      "model_not_set": "Choose a model for the chat first (sidebar › Models).",
+      "secret_file": "Secret files (e.g. .env or keys) are never sent to a model."
     }
   },
   "palette": {
@@ -217,7 +229,9 @@
       "agent": "Agent",
       "docker": "Docker",
       "browser": "Browser",
-      "mcp": "MCP"
+      "mcp": "MCP",
+      "models": "Models",
+      "chat": "Chat"
     },
     "palette": "Open command palette",
     "showFiles": "Show files",
@@ -710,5 +724,118 @@
     "logTitle": "MCP server output",
     "logEmptyTitle": "No MCP output yet",
     "logEmptyText": "Messages of local MCP servers and connection errors appear here."
+  },
+  "models": {
+    "title": "Models",
+    "show": "Show models",
+    "emptyTitle": "No model provider yet",
+    "emptyText": "Add an OpenAI-compatible endpoint: OpenRouter with your API key, or a local model with Ollama or llama.cpp. It powers the chat and autocompletion.",
+    "byoNote": "Kestrel does not sell or proxy AI usage: requests go directly from this computer to the provider you configure.",
+    "retryAfter_one": "Try again in {{count}} second.",
+    "retryAfter_other": "Try again in {{count}} seconds.",
+    "error": {
+      "unreachable": "The provider is not reachable.",
+      "auth": "The API key was refused (or the account has no credit).",
+      "rateLimited": "Rate limit reached.",
+      "modelMissing": "Model not found.",
+      "badRequest": "The provider rejected the request.",
+      "server": "The provider has a problem (server error).",
+      "cancelled": "Cancelled.",
+      "unknown": "The request failed."
+    }
+  },
+  "providers": {
+    "title": "Providers",
+    "add": "Add model provider",
+    "addTitle": "Add model provider",
+    "editTitle": "Edit {{name}}",
+    "template": "Template",
+    "custom": "Other",
+    "name": "Name",
+    "idTaken": "A provider with the id “{{id}}” exists already. Choose another name.",
+    "baseUrl": "Address",
+    "baseUrlHint": "OpenAI-compatible endpoint, usually ending in /v1.",
+    "models": "Models",
+    "modelsHint": "One model per line. The first one is used; the others are fallbacks when it is rate-limited or unavailable.",
+    "apiKey": "API key",
+    "keyStored": "Stored in the system keychain",
+    "keyNotNeeded": "Not needed for local servers",
+    "keyNotSet": "Not set",
+    "clearKey": "Remove key",
+    "keyDropped": "The address changed: the stored key will be removed. Enter it again if it belongs to the new address.",
+    "keyHint": "Stored only in the system keychain – never in project files or logs, and never shown to the window again.",
+    "localNote": "Runs on this computer: your code and prompts stay local.",
+    "remoteNote": "Prompts and attached code are sent to this provider.",
+    "freeNote": "Free models: the provider may use your prompts for training. Do not send confidential code.",
+    "freeShort": "Free model: prompts may be used for training.",
+    "save": "Save",
+    "saved": "{{name}} saved.",
+    "deleteTitle": "Delete {{name}}?",
+    "deleteMessage": "The provider and its stored API key are removed.",
+    "delete": "Delete",
+    "testName": "Test connection to {{name}}",
+    "editName": "Edit {{name}}",
+    "deleteName": "Delete {{name}}",
+    "local": "local",
+    "remote": "remote",
+    "keySet": "key stored",
+    "keyMissing": "no key",
+    "fallbacks": "then {{models}}",
+    "testing": "Connecting …",
+    "connected_one": "Connected · {{count}} model offered",
+    "connected_other": "Connected · {{count}} models offered",
+    "modelNotListed": "a configured model is not in the list",
+    "noModel": "No model"
+  },
+  "completion": {
+    "title": "Autocompletion",
+    "enabled": "Suggest code while typing",
+    "model": "Model",
+    "modelHint": "Small local models (e.g. a 1.5B coder model with Ollama) feel the most fluid.",
+    "fim": "Fill-in-the-middle",
+    "fimMode": {
+      "auto": "Auto",
+      "on": "On",
+      "off": "Off"
+    },
+    "fimHint": "Auto uses the code after the cursor if the endpoint supports it, else a chat prompt.",
+    "disabledLanguages": "No suggestions in (language ids)",
+    "toggle": "Toggle autocompletion",
+    "chooseModelFirst": "Choose an autocompletion model first (sidebar › Models).",
+    "turnedOn": "Autocompletion is on.",
+    "turnedOff": "Autocompletion is off."
+  },
+  "chat": {
+    "title": "Chat",
+    "show": "Show chat",
+    "new": "New chat",
+    "history": "Earlier chats",
+    "noHistory": "No earlier chats",
+    "model": "Chat model",
+    "modelHint": "Used by the chat in the right panel. Fallbacks come from the provider’s model list.",
+    "chooseModel": "Choose a model …",
+    "manageModels": "Manage models",
+    "modeLabel": "Panel content",
+    "modeAgent": "Agent",
+    "modeChat": "Chat",
+    "conversation": "Conversation with the model",
+    "emptyText": "Ask a question. Attach the current file or selection with the paperclip.",
+    "thinking": "Waiting for the answer …",
+    "fallback": "{{from}}: {{reason}} Trying {{to}}.",
+    "stopped": "Stopped.",
+    "send": "Send",
+    "stop": "Stop answer",
+    "open": "Open chat",
+    "inputLabel": "Message to the model",
+    "inputPlaceholder": "Ask the model …",
+    "attach": "Attach current file or selection",
+    "removeAttachment": "Remove attachment",
+    "attachNoFile": "Open a file in the editor first.",
+    "attachSecret": "Secret files (e.g. .env or keys) are never sent to a model.",
+    "attachTooLarge": "The file is too large to attach. Select the relevant part instead.",
+    "attachedLines": "{{path}}, lines {{start}}–{{end}}",
+    "noProviderTitle": "No model connected",
+    "noProviderText": "The chat talks to a model of your choice: OpenRouter, a local model with Ollama or llama.cpp, or any OpenAI-compatible endpoint.",
+    "privacyNote": "The chat has no access to your files: it only sees what you write and attach."
   }
 }

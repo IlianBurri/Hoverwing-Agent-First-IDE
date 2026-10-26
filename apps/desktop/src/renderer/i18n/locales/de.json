@@ -15,7 +15,8 @@
     "files": "Dateien",
     "search": "Suche",
     "docker": "Docker",
-    "mcp": "MCP"
+    "mcp": "MCP",
+    "models": "Modelle"
   },
   "sidebar": {
     "files": {
@@ -162,7 +163,11 @@
       "error": "Fehler"
     },
     "containers_one": "{{count}} Container läuft",
-    "containers_other": "{{count}} Container laufen"
+    "containers_other": "{{count}} Container laufen",
+    "modelHint": "Chat-Modell – klicken, um Modelle zu verwalten",
+    "completionOn": "Autovervollständigung",
+    "completionOff": "Autovervollständigung aus",
+    "completionError": "Autovervollständigung: {{reason}}"
   },
   "theme": {
     "label": "Farbschema",
@@ -197,7 +202,14 @@
       "docker_failed": "Die Docker-Aktion ist fehlgeschlagen. Details stehen unter Logs › Docker.",
       "invalid_url": "Nur Web-Adressen (http oder https) können geöffnet werden, z. B. localhost:3000 oder example.com.",
       "mcp_not_approved": "Der MCP-Server wurde nicht erlaubt.",
-      "mcp_connect_failed": "Der MCP-Server konnte nicht verbunden werden."
+      "mcp_connect_failed": "Der MCP-Server konnte nicht verbunden werden.",
+      "provider_unreachable": "Der Modell-Anbieter ist nicht erreichbar. Stimmt die Adresse und läuft der Server?",
+      "provider_auth": "Der Anbieter hat den API-Key abgelehnt (oder das Konto hat kein Guthaben).",
+      "provider_rate_limited": "Das Rate-Limit des Anbieters ist erreicht. Versuche es später oder nimm ein anderes Modell.",
+      "provider_model_missing": "Das Modell oder der Endpoint wurde bei diesem Anbieter nicht gefunden.",
+      "provider_failed": "Der Modell-Anbieter hat einen Fehler gemeldet.",
+      "model_not_set": "Wähle zuerst ein Modell für den Chat (Seitenleiste › Modelle).",
+      "secret_file": "Geheime Dateien (z. B. .env oder Schlüssel) werden nie an ein Modell geschickt."
     }
   },
   "palette": {
@@ -217,7 +229,9 @@
       "agent": "Agent",
       "docker": "Docker",
       "browser": "Browser",
-      "mcp": "MCP"
+      "mcp": "MCP",
+      "models": "Modelle",
+      "chat": "Chat"
     },
     "palette": "Befehlspalette öffnen",
     "showFiles": "Dateien anzeigen",
@@ -710,5 +724,118 @@
     "logTitle": "Ausgabe der MCP-Server",
     "logEmptyTitle": "Noch keine MCP-Ausgabe",
     "logEmptyText": "Meldungen lokaler MCP-Server und Verbindungsfehler erscheinen hier."
+  },
+  "models": {
+    "title": "Modelle",
+    "show": "Modelle anzeigen",
+    "emptyTitle": "Noch kein Modell-Anbieter",
+    "emptyText": "Füge einen OpenAI-kompatiblen Endpoint hinzu: OpenRouter mit deinem API-Key oder ein lokales Modell mit Ollama oder llama.cpp. Er treibt Chat und Autovervollständigung an.",
+    "byoNote": "Kestrel verkauft oder vermittelt keine KI-Nutzung: Anfragen gehen direkt von diesem Computer an den Anbieter, den du einträgst.",
+    "retryAfter_one": "Versuche es in {{count}} Sekunde erneut.",
+    "retryAfter_other": "Versuche es in {{count}} Sekunden erneut.",
+    "error": {
+      "unreachable": "Der Anbieter ist nicht erreichbar.",
+      "auth": "Der API-Key wurde abgelehnt (oder das Konto hat kein Guthaben).",
+      "rateLimited": "Rate-Limit erreicht.",
+      "modelMissing": "Modell nicht gefunden.",
+      "badRequest": "Der Anbieter hat die Anfrage abgelehnt.",
+      "server": "Der Anbieter hat ein Problem (Serverfehler).",
+      "cancelled": "Abgebrochen.",
+      "unknown": "Die Anfrage ist fehlgeschlagen."
+    }
+  },
+  "providers": {
+    "title": "Anbieter",
+    "add": "Modell-Anbieter hinzufügen",
+    "addTitle": "Modell-Anbieter hinzufügen",
+    "editTitle": "{{name}} bearbeiten",
+    "template": "Vorlage",
+    "custom": "Andere",
+    "name": "Name",
+    "idTaken": "Es gibt schon einen Anbieter mit der ID «{{id}}». Wähle einen anderen Namen.",
+    "baseUrl": "Adresse",
+    "baseUrlHint": "OpenAI-kompatibler Endpoint, meist mit /v1 am Ende.",
+    "models": "Modelle",
+    "modelsHint": "Ein Modell pro Zeile. Das erste wird verwendet, die weiteren sind Fallbacks, wenn es ein Rate-Limit hat oder nicht verfügbar ist.",
+    "apiKey": "API-Key",
+    "keyStored": "Im System-Schlüsselbund gespeichert",
+    "keyNotNeeded": "Für lokale Server nicht nötig",
+    "keyNotSet": "Nicht gesetzt",
+    "clearKey": "Key entfernen",
+    "keyDropped": "Die Adresse hat sich geändert: Der gespeicherte Key wird entfernt. Gib ihn neu ein, wenn er zur neuen Adresse gehört.",
+    "keyHint": "Wird nur im System-Schlüsselbund gespeichert – nie in Projektdateien oder Logs und nie wieder an das Fenster geschickt.",
+    "localNote": "Läuft auf diesem Computer: Code und Prompts bleiben lokal.",
+    "remoteNote": "Prompts und angehängter Code werden an diesen Anbieter geschickt.",
+    "freeNote": "Gratis-Modelle: Der Anbieter darf deine Prompts eventuell fürs Training nutzen. Schicke keinen vertraulichen Code.",
+    "freeShort": "Gratis-Modell: Prompts können fürs Training genutzt werden.",
+    "save": "Speichern",
+    "saved": "{{name}} gespeichert.",
+    "deleteTitle": "{{name}} löschen?",
+    "deleteMessage": "Der Anbieter und sein gespeicherter API-Key werden entfernt.",
+    "delete": "Löschen",
+    "testName": "Verbindung zu {{name}} testen",
+    "editName": "{{name}} bearbeiten",
+    "deleteName": "{{name}} löschen",
+    "local": "lokal",
+    "remote": "entfernt",
+    "keySet": "Key gespeichert",
+    "keyMissing": "kein Key",
+    "fallbacks": "danach {{models}}",
+    "testing": "Verbinde …",
+    "connected_one": "Verbunden · {{count}} Modell verfügbar",
+    "connected_other": "Verbunden · {{count}} Modelle verfügbar",
+    "modelNotListed": "ein eingetragenes Modell fehlt in der Liste",
+    "noModel": "Kein Modell"
+  },
+  "completion": {
+    "title": "Autovervollständigung",
+    "enabled": "Beim Tippen Code vorschlagen",
+    "model": "Modell",
+    "modelHint": "Kleine lokale Modelle (z. B. ein 1.5B-Coder-Modell mit Ollama) fühlen sich am flüssigsten an.",
+    "fim": "Fill-in-the-Middle",
+    "fimMode": {
+      "auto": "Auto",
+      "on": "An",
+      "off": "Aus"
+    },
+    "fimHint": "Auto nutzt den Code nach dem Cursor, wenn der Endpoint das kann, sonst einen Chat-Prompt.",
+    "disabledLanguages": "Keine Vorschläge in (Sprach-IDs)",
+    "toggle": "Autovervollständigung ein/aus",
+    "chooseModelFirst": "Wähle zuerst ein Modell für die Autovervollständigung (Seitenleiste › Modelle).",
+    "turnedOn": "Autovervollständigung ist an.",
+    "turnedOff": "Autovervollständigung ist aus."
+  },
+  "chat": {
+    "title": "Chat",
+    "show": "Chat anzeigen",
+    "new": "Neuer Chat",
+    "history": "Frühere Chats",
+    "noHistory": "Keine früheren Chats",
+    "model": "Chat-Modell",
+    "modelHint": "Wird vom Chat im rechten Panel genutzt. Fallbacks kommen aus der Modellliste des Anbieters.",
+    "chooseModel": "Modell wählen …",
+    "manageModels": "Modelle verwalten",
+    "modeLabel": "Inhalt des Panels",
+    "modeAgent": "Agent",
+    "modeChat": "Chat",
+    "conversation": "Gespräch mit dem Modell",
+    "emptyText": "Stell eine Frage. Mit der Büroklammer hängst du die aktuelle Datei oder Auswahl an.",
+    "thinking": "Warte auf die Antwort …",
+    "fallback": "{{from}}: {{reason}} Versuche {{to}}.",
+    "stopped": "Angehalten.",
+    "send": "Senden",
+    "stop": "Antwort stoppen",
+    "open": "Chat öffnen",
+    "inputLabel": "Nachricht an das Modell",
+    "inputPlaceholder": "Frag das Modell …",
+    "attach": "Aktuelle Datei oder Auswahl anhängen",
+    "removeAttachment": "Anhang entfernen",
+    "attachNoFile": "Öffne zuerst eine Datei im Editor.",
+    "attachSecret": "Geheime Dateien (z. B. .env oder Schlüssel) werden nie an ein Modell geschickt.",
+    "attachTooLarge": "Die Datei ist zu gross zum Anhängen. Markiere stattdessen den relevanten Teil.",
+    "attachedLines": "{{path}}, Zeilen {{start}}–{{end}}",
+    "noProviderTitle": "Kein Modell verbunden",
+    "noProviderText": "Der Chat spricht mit einem Modell deiner Wahl: OpenRouter, ein lokales Modell mit Ollama oder llama.cpp oder ein beliebiger OpenAI-kompatibler Endpoint.",
+    "privacyNote": "Der Chat hat keinen Zugriff auf deine Dateien: Er sieht nur, was du schreibst und anhängst."
   }
 }

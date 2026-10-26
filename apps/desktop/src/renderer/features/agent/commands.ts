@@ -1,6 +1,7 @@
 import { CheckCheck, MessageSquare, Undo2, Play, Power, Settings2, Square } from 'lucide-react';
 import { i18next } from '../../i18n';
 import { useAgentStore } from '../../stores/agent';
+import { useChatStore } from '../../stores/chat';
 import { setPanelOpen } from '../../stores/layout';
 import { openModal } from '../../stores/modals';
 import { useWorkspaceStore } from '../../stores/workspace';
@@ -32,6 +33,7 @@ export function registerAgentCommands(): () => void {
       when: hasWorkspace,
       run: () => {
         setPanelOpen('agent', true);
+        useChatStore.setState({ mode: 'agent' });
         window.setTimeout(focusAgentInput, 0);
       },
     },

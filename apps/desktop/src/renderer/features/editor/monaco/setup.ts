@@ -10,6 +10,7 @@ import HtmlWorker from 'monaco-editor/language/html/html.worker?worker';
 import JsonWorker from 'monaco-editor/language/json/json.worker?worker';
 import TsWorker from 'monaco-editor/language/typescript/ts.worker?worker';
 import { toHexColor } from './colors';
+import { inlineCompletionProvider } from './inlineCompletion';
 
 self.MonacoEnvironment = {
   getWorker(_workerId: string, label: string): Worker {
@@ -42,6 +43,9 @@ for (const defaults of [
 ]) {
   defaults.setDiagnosticsOptions({ noSemanticValidation: true, noSyntaxValidation: false });
 }
+
+// Ghost text from the user's autocompletion model, for every language.
+monaco.languages.registerInlineCompletionsProvider('*', inlineCompletionProvider);
 
 export const THEME_DARK = 'kestrel-dark';
 export const THEME_LIGHT = 'kestrel-light';

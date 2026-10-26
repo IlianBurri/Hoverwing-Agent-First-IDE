@@ -1,0 +1,94 @@
+.root {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.bar {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3) 0;
+}
+
+.bar select {
+  flex: 1;
+}
+
+.note {
+  flex-shrink: 0;
+  padding: var(--space-2) var(--space-3) 0;
+}
+
+.input {
+  flex-shrink: 0;
+  margin: 0 var(--space-3) var(--space-1);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--bg);
+}
+
+.input:focus-within {
+  border-color: var(--accent);
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-1) 0 var(--space-3);
+}
+
+.textarea {
+  display: block;
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  resize: none;
+}
+
+.textarea:focus-visible {
+  outline: none;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-1) var(--space-1);
+}
+
+.hint {
+  flex: 1;
+  color: var(--text-muted);
+  font-size: var(--font-size-2xs);
+}
+
+.send:not(:disabled) {
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.send:not(:disabled):hover {
+  background: var(--accent-hover);
+  color: var(--accent-contrast);
+}
+
+.stop {
+  background: var(--error);
+  color: var(--accent-contrast);
+}
+
+.privacy {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0 var(--space-3) var(--space-2);
+  color: var(--text-muted);
+  font-size: var(--font-size-2xs);
+}

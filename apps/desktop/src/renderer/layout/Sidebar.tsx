@@ -1,5 +1,6 @@
 import { DockerView } from '../features/docker';
 import { McpView } from '../features/mcp';
+import { ModelsView } from '../features/providers';
 import { openFile } from '../features/editor';
 import { SearchView } from '../features/search';
 import { FilesView } from '../features/workspace';
@@ -14,6 +15,7 @@ export function Sidebar() {
       {view === 'search' && <SearchView />}
       {view === 'docker' && <DockerView />}
       {view === 'mcp' && <McpView />}
+      {view === 'models' && <ModelsView />}
     </section>
   );
 }

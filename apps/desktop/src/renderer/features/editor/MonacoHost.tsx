@@ -3,6 +3,7 @@ import type { editor } from 'monaco-editor';
 import { useEditorStore } from '../../stores/editor';
 import { getModel, getViewState, saveViewState } from './monaco/models';
 import { applyMonacoTheme, monaco } from './monaco/setup';
+import { setSnapshotSource } from './snapshot';
 import styles from './MonacoHost.module.css';
 
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -34,6 +35,8 @@ export default function MonacoHost({ path }: { path: string }) {
       fixedOverflowWidgets: true,
       padding: { top: 8 },
       accessibilitySupport: 'auto',
+      // Ghost text from the autocompletion model (if switched on).
+      inlineSuggest: { enabled: true },
     });
     editorRef.current = instance;
 
@@ -52,8 +55,25 @@ export default function MonacoHost({ path }: { path: string }) {
     };
     const cursorListener = instance.onDidChangeCursorPosition(reportCursor);
     const modelListener = instance.onDidChangeModel(reportCursor);
+    setSnapshotSource(() => {
+      const model = instance.getModel();
+      const path = shownPath.current;
+      if (!model || !path) return null;
+      const selection = instance.getSelection();
+      const language = model.getLanguageId();
+      if (!selection || selection.isEmpty()) {
+        return { path, language, text: model.getValue(), lines: null };
+      }
+      return {
+        path,
+        language,
+        text: model.getValueInRange(selection),
+        lines: { start: selection.startLineNumber, end: selection.endLineNumber },
+      };
+    });
 
     return () => {
+      setSnapshotSource(null);
       if (shownPath.current) saveViewState(shownPath.current, instance.saveViewState());
       cursorListener.dispose();
       modelListener.dispose();

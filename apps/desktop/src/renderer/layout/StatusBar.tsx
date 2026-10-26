@@ -1,4 +1,4 @@
-import { Bot, Container, Cpu, FolderClosed } from 'lucide-react';
+import { Bot, Container, Cpu, FolderClosed, Sparkles, TriangleAlert } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { StatusMessage } from '../components/StatusMessage';
 import { useSettingsStore } from '../stores/settings';
@@ -6,6 +6,8 @@ import { useAgentStore } from '../stores/agent';
 import { useEditorStore } from '../stores/editor';
 import { useWorkspaceStore } from '../stores/workspace';
 import { showDockerView } from '../features/docker';
+import { showModelsView, toggleCompletion } from '../features/providers';
+import { useProvidersStore } from '../stores/providers';
 import { SandboxBadge } from '../features/sandbox';
 import { runningContainers, useDockerStore } from '../stores/docker';
 import styles from './StatusBar.module.css';
@@ -17,6 +19,9 @@ export function StatusBar() {
   const cursor = useEditorStore((state) => state.cursor);
   const agent = useAgentStore((state) => state.status);
   const docker = useDockerStore((state) => state.overview);
+  const chatModel = useSettingsStore((state) => state.settings.chatModel);
+  const completion = useSettingsStore((state) => state.settings.completion);
+  const completionError = useProvidersStore((state) => state.completionError);
   const agentText =
     agent.agentName && agent.state !== 'idle' && agent.state !== 'stopped'
       ? `${agent.agentName} · ${t(`status.agentState.${agent.state}`)}`
@@ -32,10 +37,35 @@ export function StatusBar() {
         {agent.agentName && (agent.state === 'ready' || agent.state === 'working') && (
           <SandboxBadge sandboxed={agent.sandboxed} compact />
         )}
-        <span className={styles['item']}>
+        <button
+          type="button"
+          className={styles['button']}
+          title={t('status.modelHint')}
+          onClick={showModelsView}
+        >
           <Cpu size={14} aria-hidden="true" />
-          {t('status.modelNone')}
-        </span>
+          {chatModel ? chatModel.model : t('status.modelNone')}
+        </button>
+        {completion.model && (
+          <button
+            type="button"
+            className={styles['button']}
+            aria-pressed={completion.enabled}
+            title={t('completion.toggle')}
+            onClick={() => void toggleCompletion()}
+          >
+            {completion.enabled && completionError ? (
+              <TriangleAlert size={14} aria-hidden="true" className={styles['warning']} />
+            ) : (
+              <Sparkles size={14} aria-hidden="true" />
+            )}
+            {completion.enabled
+              ? completionError
+                ? t('status.completionError', { reason: t(`models.error.${completionError}`) })
+                : t('status.completionOn')
+              : t('status.completionOff')}
+          </button>
+        )}
         {docker?.docker === 'available' && (
           <button type="button" className={styles['button']} onClick={showDockerView}>
             <Container size={14} aria-hidden="true" />

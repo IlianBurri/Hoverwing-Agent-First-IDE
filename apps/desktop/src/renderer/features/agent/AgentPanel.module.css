@@ -27,3 +27,9 @@
   flex-shrink: 0;
   padding: var(--space-2) var(--space-3) 0;
 }
+
+.mode {
+  display: flex;
+  flex-shrink: 0;
+  padding: var(--space-2) var(--space-3) 0;
+}

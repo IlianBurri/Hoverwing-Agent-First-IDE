@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { Checkpoint, McpServerView } from '@kestrel/shared';
+import type { Checkpoint, McpServerView, ProviderView } from '@kestrel/shared';
 
 /** The app-level modal that is open (one at a time), with its data. */
 export type ModalState =
@@ -8,6 +8,8 @@ export type ModalState =
   /** Add (server: null) or edit an MCP server. */
   | { id: 'mcpServer'; server: McpServerView | null }
   | { id: 'checkpointChanges'; checkpoint: Checkpoint }
+  /** Add (provider: null) or edit a model provider. */
+  | { id: 'provider'; provider: ProviderView | null }
   | null;
 
 export const useModalStore = create<{ open: ModalState }>()(() => ({ open: null }));

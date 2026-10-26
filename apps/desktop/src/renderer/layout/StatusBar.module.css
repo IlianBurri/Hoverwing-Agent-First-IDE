@@ -44,3 +44,7 @@
 .button:hover {
   color: var(--text);
 }
+
+.warning {
+  color: var(--warning);
+}

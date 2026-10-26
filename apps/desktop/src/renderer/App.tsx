@@ -20,6 +20,9 @@ import { deliverStream, endStream } from './stores/docker';
 import { openBrowser, registerBrowserCommands, showBrowserTab } from './features/browser';
 import { setBrowserState } from './stores/browser';
 import { McpServerDialog, refreshMcp, registerMcpCommands } from './features/mcp';
+import { ProviderDialog, refreshProviders, registerProviderCommands } from './features/providers';
+import { registerChatCommands } from './features/chat';
+import { applyChatEvent, useChatStore } from './stores/chat';
 import { appendMcpLog } from './stores/mcp';
 import { refreshCheckpoints } from './stores/checkpoints';
 import { refreshReview } from './stores/review';
@@ -51,6 +54,22 @@ export function App() {
   useEffect(() => registerDockerCommands(), []);
   useEffect(() => registerBrowserCommands(), []);
   useEffect(() => registerMcpCommands(), []);
+  useEffect(() => registerProviderCommands(), []);
+  useEffect(() => registerChatCommands(), []);
+  useEffect(() => {
+    void refreshProviders();
+    const offs = [
+      window.kestrel.on('providers:changed', () => {
+        void refreshProviders();
+      }),
+      window.kestrel.on('chat:event', ({ chatId, event }) => {
+        applyChatEvent(chatId, event);
+      }),
+    ];
+    return () => {
+      for (const off of offs) off();
+    };
+  }, []);
   useEffect(() => {
     const offs = [
       window.kestrel.on('mcp:changed', () => {
@@ -144,6 +163,7 @@ export function App() {
         addPending(request);
         // Questions must never go unnoticed: show the agent panel.
         setPanelOpen('agent', true);
+        useChatStore.setState({ mode: 'agent' });
       }),
       window.kestrel.on('permissions:resolved', ({ id }) => {
         removePending(id);
@@ -193,6 +213,7 @@ export function App() {
       {modal?.id === 'permissionRules' && <RulesDialog />}
       {modal?.id === 'agents' && <AgentsDialog />}
       {modal?.id === 'mcpServer' && <McpServerDialog server={modal.server} />}
+      {modal?.id === 'provider' && <ProviderDialog provider={modal.provider} />}
       {modal?.id === 'checkpointChanges' && (
         <ChangesModal key={modal.checkpoint.id} checkpoint={modal.checkpoint} />
       )}
