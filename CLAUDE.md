@@ -10,6 +10,15 @@ Docker) and 4 (Docker panel) are done. Next: phase 5 (integrated browser incl.
 agent access; switch "open port" from the system browser to it). Every phase: present a plan, wait for OK, implement in
 small commits, keep lint/typecheck/tests green, update this file.
 
+## User wishes for later
+
+- **Installable desktop app:** the user wants to run Kestrel as a real app
+  (Windows `.exe` installer, desktop/start-menu shortcut; later macOS/Linux
+  too) instead of `pnpm dev`. `electron-builder.yml` exists (NSIS target) but
+  packaging is not tested yet: icons, app id, native modules (`node-pty`,
+  ripgrep, watcher unpacked from asar), code signing, auto-update. Plan this
+  as its own step after the current phase (or when the user asks).
+
 ## Commands
 
 ```bash
