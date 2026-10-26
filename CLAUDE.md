@@ -6,8 +6,8 @@ Guidance for working on Kestrel. Read `SPEC.md` for the product spec and phases.
 
 Phases 0 (foundation), 1 (layout, palette, workspace, Monaco, search, terminal),
 2 (permissions, agents via ACP, checkpoints, diff review), 3 (agent sandbox in
-Docker) and 4 (Docker panel) are done. Next: phase 5 (integrated browser incl.
-agent access; switch "open port" from the system browser to it). Every phase: present a plan, wait for OK, implement in
+Docker), 4 (Docker panel) and 5 (integrated browser + agent browser tools) are
+done. Next: phase 6 (MCP manager; reuse `modules/mcpHost` patterns). Every phase: present a plan, wait for OK, implement in
 small commits, keep lint/typecheck/tests green, update this file.
 
 ## User wishes for later
@@ -126,6 +126,28 @@ so use `KESTREL_SANDBOX_BASE_IMAGE` / `KESTREL_E2E_SANDBOX_BASE_IMAGE` =
   honoured. Docker's error text goes to Logs › Docker (`sandbox:log`), the UI
   gets `docker_conflict` / `docker_failed`. Agents have no access to it. Use
   `fakeDockerApi()` (`modules/docker/testing.ts`) in unit tests.
+- **Browser:** `modules/browser`. `BrowserManager` keeps one `WebContentsView`
+  per browser tab inside its window (renderer sends bounds via
+  `browser:setBounds`; `null` hides it). The view is native and sits above the
+  HTML, so every overlay (Modal, ContextMenu, dialogs, palette) calls
+  `useOverlay()` (`stores/overlays.ts`) and the page hides while any is open.
+  Session `persist:kestrel-browser`: no preload, sandbox, all permission
+  requests denied, navigation/redirects limited to http(s)
+  (`isAllowedBrowserUrl`), popups become `browser:openTab`. `PageCollector`
+  gathers console + network errors via `webContents.debugger` (CDP). Browser
+  web contents are skipped by the per-window release in `index.ts`.
+- **Agent tools (MCP host):** `modules/mcpHost`. `McpHost` serves Kestrel's MCP
+  server "kestrel" (`@modelcontextprotocol/sdk`, streamable HTTP, stateless
+  JSON mode, a new `McpServer` per request) on 127.0.0.1 with a per-session
+  bearer token; `AgentRuntime` passes it in `session/new` (`deps.mcp`), as
+  `http` if the agent supports it, else via the stdio bridge script
+  (`bridge.ts`, written to userData/mcp; run with Electron as Node, or in the
+  container from `/opt/kestrel/…`). Sandboxed agents use
+  `host.docker.internal` (`extraHosts` host-gateway; on Linux McpHost also
+  listens on the Docker bridge gateway). Tools (`tools.ts`) check
+  `browser` (read, target = origin) or `browser.control` (open) and wrap web
+  content with `untrusted()`. The SDK's transport types need a documented
+  `as unknown as Transport` cast (exactOptionalPropertyTypes).
 - **Commands:** every user action is a `Command` registered by its feature
   (`register<Feature>Commands`), with an i18n title, optional default keybinding(s)
   (`Mod+…`, overridable via `settings.keybindings`) and a `when` condition. One
@@ -161,7 +183,9 @@ so use `KESTREL_SANDBOX_BASE_IMAGE` / `KESTREL_E2E_SANDBOX_BASE_IMAGE` =
   scripted ACP agent `e2e/fixtures/mock-agent.mjs` (configured with
   `configureMockAgent`); prompts like `hello`, `edit <path> <text>`,
   `direct <path> <text>`, `twohunks <path>`, `secret`, `run <cmd>`, `slow`,
-  `peek <path>`, `whoami` trigger fixed behaviour. Sandbox E2E bundles the mock
+  `peek <path>`, `whoami`, `mcp <tool> [arg]` (calls Kestrel's MCP server;
+  `MOCK_MCP_STDIO=1` uses the stdio bridge) trigger fixed behaviour. Browser
+  tests use `startTestSite()` (`e2e/browser-helpers.ts`). Sandbox E2E bundles the mock
   agent into the project (`bundleMockAgent`, via Vite) because the container
   only sees the project. A failing test restarts the worker (and the app),
   so later tests in the file fail as follow-ups – fix the first failure first.
@@ -183,7 +207,8 @@ monaco-editor 0.57 (imports via `monaco-editor/<path>`, TS API under
 `onRequest`, `connect(stream)`, `ndJsonStream`; no request timeout option),
 diff 9, react-markdown 10 + remark-gfm 4, dockerode 5.0.1 (+ @types/dockerode
 4.0.2; `buildImage` takes `{ context, src }`, build errors arrive as JSON lines,
-`docker.modem.demuxStream` splits stdout/stderr). Agent templates: Claude Code via
+`docker.modem.demuxStream` splits stdout/stderr), @modelcontextprotocol/sdk
+1.32.1 (imports via `@modelcontextprotocol/sdk/server/mcp.js` etc.). Agent templates: Claude Code via
 `npx -y @agentclientprotocol/claude-agent-acp@0.94.0`, Gemini CLI via
 `npx -y @google/gemini-cli@0.65.0 --experimental-acp` (the `@zed-industries/*`
 package names are deprecated). Checkpoints need system `git`.
