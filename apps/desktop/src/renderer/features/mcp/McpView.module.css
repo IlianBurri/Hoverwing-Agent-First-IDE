@@ -1,0 +1,155 @@
+.root {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-height: 0;
+  padding: 0 var(--space-2) var(--space-3);
+  overflow: auto;
+}
+
+.heading {
+  margin: 0 0 var(--space-1);
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.list,
+.toolList,
+.builtIn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.server {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2) var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--surface-raised);
+}
+
+.head,
+.meta,
+.toolHead,
+.bulk {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+}
+
+.name {
+  overflow: hidden;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.actions {
+  display: flex;
+  margin-left: auto;
+}
+
+.state,
+.kind,
+.warning,
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--font-size-xs);
+}
+
+.meta {
+  color: var(--text-muted);
+}
+
+.connected {
+  color: var(--success);
+}
+
+.connecting {
+  color: var(--info);
+}
+
+.error {
+  margin: 0;
+  color: var(--error);
+  font-size: var(--font-size-xs);
+}
+
+.state.error {
+  font-size: var(--font-size-xs);
+}
+
+.idle {
+  color: var(--text-muted);
+}
+
+.warning {
+  color: var(--warning);
+}
+
+.tag {
+  padding: 0 var(--space-1);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+}
+
+.tools {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-left: var(--space-5);
+}
+
+.tool {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.toolHead {
+  justify-content: space-between;
+}
+
+.toolName {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.toolName code {
+  overflow: hidden;
+  font-size: var(--font-size-xs);
+  text-overflow: ellipsis;
+}
+
+.description,
+.hint {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.description {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.builtIn code {
+  font-size: var(--font-size-xs);
+}

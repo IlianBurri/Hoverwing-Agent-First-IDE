@@ -9,7 +9,7 @@
 //   slow                   -> waits until cancelled
 //   peek <path>            -> reads a file itself and reports its content (sandbox tests)
 //   whoami                 -> reports HOME and whether it runs in the sandbox
-//   mcp <tool> [arg]       -> calls a tool of Kestrel's MCP server and reports the result
+//   mcp <tool> [arg|json]  -> calls a tool of Kestrel's MCP server and reports the result
 //                             (HTTP; with MOCK_MCP_STDIO=1 via the stdio bridge)
 import { spawn } from 'node:child_process';
 import { readFile, writeFile } from 'node:fs/promises';
@@ -198,7 +198,9 @@ const app = agent({ name: 'mock-agent' })
       if (!server) {
         await say(client, sessionId, 'No Kestrel MCP server.');
       } else {
-        const args = path === 'browser_open' ? { url: rest[0] } : {};
+        const raw = rest.join(' ');
+        const args =
+          path === 'browser_open' ? { url: rest[0] } : raw.startsWith('{') ? JSON.parse(raw) : {};
         try {
           const result = await callTool(server, path, args);
           const parts = result.content.map((item) =>

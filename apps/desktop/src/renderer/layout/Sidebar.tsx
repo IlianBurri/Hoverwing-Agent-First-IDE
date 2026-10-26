@@ -1,4 +1,5 @@
 import { DockerView } from '../features/docker';
+import { McpView } from '../features/mcp';
 import { openFile } from '../features/editor';
 import { SearchView } from '../features/search';
 import { FilesView } from '../features/workspace';
@@ -12,6 +13,7 @@ export function Sidebar() {
       {view === 'files' && <FilesView onOpenFile={(path) => void openFile(path)} />}
       {view === 'search' && <SearchView />}
       {view === 'docker' && <DockerView />}
+      {view === 'mcp' && <McpView />}
     </section>
   );
 }

@@ -6,8 +6,9 @@ Guidance for working on Kestrel. Read `SPEC.md` for the product spec and phases.
 
 Phases 0 (foundation), 1 (layout, palette, workspace, Monaco, search, terminal),
 2 (permissions, agents via ACP, checkpoints, diff review), 3 (agent sandbox in
-Docker), 4 (Docker panel) and 5 (integrated browser + agent browser tools) are
-done. Next: phase 6 (MCP manager; reuse `modules/mcpHost` patterns). Every phase: present a plan, wait for OK, implement in
+Docker), 4 (Docker panel), 5 (integrated browser + agent browser tools) and 6
+(MCP manager) are done. Next: phase 7 (model providers, simple chat,
+autocompletion) – or the installable app, see "User wishes for later". Every phase: present a plan, wait for OK, implement in
 small commits, keep lint/typecheck/tests green, update this file.
 
 ## User wishes for later
@@ -148,6 +149,19 @@ so use `KESTREL_SANDBOX_BASE_IMAGE` / `KESTREL_E2E_SANDBOX_BASE_IMAGE` =
   `browser` (read, target = origin) or `browser.control` (open) and wrap web
   content with `untrusted()`. The SDK's transport types need a documented
   `as unknown as Transport` cast (exactOptionalPropertyTypes).
+- **MCP manager:** `modules/mcp`. `McpConfigStore` (userData/mcp: servers.json,
+  projects/<key>.json, approved.json) – never in the project. New stdio command
+  lines need the native confirm (`serverFingerprint`), checked again before
+  connecting. Secrets (env/headers) in `SecretStore` under
+  `mcp:<scope-key>/<id>:<name>`. `McpService` connects via `connectMcp` (SDK
+  Client; stdio or streamable HTTP; errors mapped to plain words, stderr to
+  `mcp:log`), pools connections, and builds proxied `ToolDefinition`s for
+  `McpHost` (`<id>__<tool>`, only enabled servers/tools; local servers only for
+  sandboxed agents with `sandboxAccess`). Each call: `check('mcp.tool',
+'<id>/<tool>')`; tool levels are plain permission rules (allow/deny, "ask" =
+  no rule). Results wrapped with `externalData()`. Import parses `.mcp.json`
+  (`importFile.ts`, nothing executed). The browser loads pages only after CDP
+  recording is enabled (`tab.ready`, max 1 s) so first requests are captured.
 - **Commands:** every user action is a `Command` registered by its feature
   (`register<Feature>Commands`), with an i18n title, optional default keybinding(s)
   (`Mod+…`, overridable via `settings.keybindings`) and a `when` condition. One
@@ -184,7 +198,10 @@ so use `KESTREL_SANDBOX_BASE_IMAGE` / `KESTREL_E2E_SANDBOX_BASE_IMAGE` =
   `configureMockAgent`); prompts like `hello`, `edit <path> <text>`,
   `direct <path> <text>`, `twohunks <path>`, `secret`, `run <cmd>`, `slow`,
   `peek <path>`, `whoami`, `mcp <tool> [arg]` (calls Kestrel's MCP server;
-  `MOCK_MCP_STDIO=1` uses the stdio bridge) trigger fixed behaviour. Browser
+  `MOCK_MCP_STDIO=1` uses the stdio bridge; a JSON argument is passed as tool
+  arguments) trigger fixed behaviour. `e2e/fixtures/test-mcp-server.mjs` is a
+  test MCP server (stdio, or `--http` with a bearer token) with `echo`,
+  `injection`, `fail`, `whoami`. Browser
   tests use `startTestSite()` (`e2e/browser-helpers.ts`). Sandbox E2E bundles the mock
   agent into the project (`bundleMockAgent`, via Vite) because the container
   only sees the project. A failing test restarts the worker (and the app),

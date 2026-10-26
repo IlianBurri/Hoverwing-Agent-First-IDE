@@ -3,10 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { SegmentedControl } from '../components/SegmentedControl';
 import { AgentLog } from '../features/agent';
 import { PermissionLog } from '../features/permissions';
+import { McpLog } from '../features/mcp';
 import { SandboxLog } from '../features/sandbox';
 import styles from './LogsView.module.css';
 
-type LogKind = 'permissions' | 'agent' | 'sandbox';
+type LogKind = 'permissions' | 'agent' | 'sandbox' | 'mcp';
 
 /** Bottom panel "Logs": permission decisions, agent diagnostics, sandbox builds. */
 export function LogsView() {
@@ -21,6 +22,7 @@ export function LogsView() {
             { value: 'permissions', label: t('logs.permissions') },
             { value: 'agent', label: t('logs.agent') },
             { value: 'sandbox', label: t('logs.sandbox') },
+            { value: 'mcp', label: t('logs.mcp') },
           ]}
           value={kind}
           onChange={setKind}
@@ -30,6 +32,7 @@ export function LogsView() {
         {kind === 'permissions' && <PermissionLog />}
         {kind === 'agent' && <AgentLog />}
         {kind === 'sandbox' && <SandboxLog />}
+        {kind === 'mcp' && <McpLog />}
       </div>
     </div>
   );

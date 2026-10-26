@@ -4,10 +4,10 @@ Kestrel is an agent-first desktop IDE. It does not ship its own AI. You bring yo
 own agent (e.g. Claude Code via the Agent Client Protocol), your own API key or a
 local model, and Kestrel makes working with it visible, safe and easy to undo.
 
-> Status: **phase 5 done** – workspace, editor, search, terminal, agents via the
+> Status: **phase 6 done** – workspace, editor, search, terminal, agents via the
 > Agent Client Protocol with permissions, checkpoints and diff review, an
-> optional Docker sandbox for agents, a Docker panel, and an integrated
-> browser the agent can inspect. See [`SPEC.md`](SPEC.md) for the full
+> optional Docker sandbox for agents, a Docker panel, an integrated browser the
+> agent can inspect, and an MCP manager. See [`SPEC.md`](SPEC.md) for the full
 > specification and roadmap.
 
 ## What works today
@@ -59,6 +59,16 @@ local model, and Kestrel makes working with it visible, safe and easy to undo.
   (per site, “always allow” possible); opening pages has its own permission.
   Web content reaches the agent clearly marked as untrusted data. Works for
   sandboxed agents too.
+- **MCP manager** (sidebar “MCP”): add MCP servers – local (command, arguments,
+  environment) or remote (URL, headers) – globally or for the project, or import
+  them from the project's `.mcp.json`. Test the connection, see the tools,
+  switch servers and single tools on/off and set a level per tool (allow / ask /
+  deny). Kestrel connects to the servers itself and passes the enabled tools to
+  the agent (as `<server>__<tool>`), so every call goes through the permission
+  system and the audit log, and results reach the agent marked as untrusted.
+  New local commands need a confirmation in a system dialog; secrets live in
+  the system keychain. Local servers run on your system, so they are not given
+  to sandboxed agents unless you allow it. OAuth logins are not supported yet.
 - **Docker panel** (`Mod+Shift+D`): containers (state, ports, start/stop/
   restart, live logs, remove with confirmation), images (size, remove) and the
   project's Dockerfiles with “Build” (live output). Click a published port to

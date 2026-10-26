@@ -19,6 +19,8 @@ import { refreshDocker, registerDockerCommands } from './features/docker';
 import { deliverStream, endStream } from './stores/docker';
 import { openBrowser, registerBrowserCommands, showBrowserTab } from './features/browser';
 import { setBrowserState } from './stores/browser';
+import { McpServerDialog, refreshMcp, registerMcpCommands } from './features/mcp';
+import { appendMcpLog } from './stores/mcp';
 import { refreshCheckpoints } from './stores/checkpoints';
 import { refreshReview } from './stores/review';
 import { useWorkspaceStore } from './stores/workspace';
@@ -48,6 +50,18 @@ export function App() {
   useEffect(() => registerSandboxCommands(), []);
   useEffect(() => registerDockerCommands(), []);
   useEffect(() => registerBrowserCommands(), []);
+  useEffect(() => registerMcpCommands(), []);
+  useEffect(() => {
+    const offs = [
+      window.kestrel.on('mcp:changed', () => {
+        void refreshMcp();
+      }),
+      window.kestrel.on('mcp:log', appendMcpLog),
+    ];
+    return () => {
+      for (const off of offs) off();
+    };
+  }, []);
   useEffect(() => {
     const offs = [
       window.kestrel.on('browser:state', setBrowserState),
@@ -178,6 +192,7 @@ export function App() {
       <CommandPalette />
       {modal?.id === 'permissionRules' && <RulesDialog />}
       {modal?.id === 'agents' && <AgentsDialog />}
+      {modal?.id === 'mcpServer' && <McpServerDialog server={modal.server} />}
       {modal?.id === 'checkpointChanges' && (
         <ChangesModal key={modal.checkpoint.id} checkpoint={modal.checkpoint} />
       )}
