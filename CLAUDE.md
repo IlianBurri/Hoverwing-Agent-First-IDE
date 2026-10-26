@@ -6,10 +6,18 @@ Guidance for working on Kestrel. Read `SPEC.md` for the product spec and phases.
 
 Phases 0 (foundation), 1 (layout, palette, workspace, Monaco, search, terminal),
 2 (permissions, agents via ACP, checkpoints, diff review), 3 (agent sandbox in
-Docker), 4 (Docker panel), 5 (integrated browser + agent browser tools) and 6
-(MCP manager) are done. Next: phase 7 (model providers, simple chat,
-autocompletion) – or the installable app, see "User wishes for later". Every phase: present a plan, wait for OK, implement in
-small commits, keep lint/typecheck/tests green, update this file.
+Docker), 4 (Docker panel), 5 (integrated browser + agent browser tools), 6
+(MCP manager) and 7 (model providers, simple chat, autocompletion) are done.
+Next: phase 8 (setup assistant: hardware detection, local install) – or the
+installable app, see "User wishes for later". Every phase: present a plan,
+wait for OK, implement in small commits, keep lint/typecheck/tests green,
+update this file.
+
+Known issue (Windows, before phase 7): checkpoints fail because
+`modules/checkpoints/git.ts` sets `GIT_CONFIG_GLOBAL` to `os.devNull`
+(`\\.\nul`), which git on Windows rejects; the agent checkpoint E2E tests and
+`shadowRepo.test.ts` fail there. Some other unit tests (docker sockets, env
+PATH, workspace paths) are Linux/macOS-specific too.
 
 ## User wishes for later
 
@@ -162,6 +170,30 @@ so use `KESTREL_SANDBOX_BASE_IMAGE` / `KESTREL_E2E_SANDBOX_BASE_IMAGE` =
   no rule). Results wrapped with `externalData()`. Import parses `.mcp.json`
   (`importFile.ts`, nothing executed). The browser loads pages only after CDP
   recording is enabled (`tab.ready`, max 1 s) so first requests are captured.
+- **Model providers:** `modules/providers`. All model traffic runs in main
+  (the renderer's CSP stays `connect-src 'self'`). `ProviderConfigStore`
+  (userData/providers.json); API keys in `SecretStore` under `provider:<id>`,
+  removed when the provider's `baseUrl` changes (a key never goes to another
+  address). `ModelClient` (injectable; `openAiClient` wraps the `openai` SDK
+  with explicit `organization/project/adminAPIKey/webhookSecret: null` and
+  `maxRetries: 0`, so no `OPENAI_*` env variable leaks in). `withFallback`
+  tries the provider's other models on rate limit / missing model / 5xx;
+  `classifyModelError` turns errors into `ModelErrorKind`s (no provider text
+  reaches the UI). Use `fakeModelClient()` / `httpError()`
+  (`providers/testing.ts`) in unit tests.
+- **Chat:** `modules/chat`. No tools, no file access: the model sees only the
+  conversation and files the user attached (`<attached-file>` blocks, marked
+  as data; secret paths refused in main and renderer). One stream per window
+  (`chat:event`), chats in userData/chats. The renderer picks the id of a new
+  chat so events can never arrive before it knows it. Settings
+  `chatModel` = provider + model.
+- **Completion:** `modules/completion` + `features/editor/monaco/inlineCompletion.ts`
+  (Monaco inline completions, 250 ms debounce, cancel → `completion:cancel`).
+  Main runs only the newest request per window, 10 s timeout; FIM via
+  `/completions` with `suffix`, `fim: 'auto'` falls back to a chat prompt
+  and remembers endpoints without FIM. Never for secret files or
+  `disabledLanguages`. Features needing editor content without importing
+  Monaco use `features/editor/snapshot.ts`.
 - **Commands:** every user action is a `Command` registered by its feature
   (`register<Feature>Commands`), with an i18n title, optional default keybinding(s)
   (`Mod+…`, overridable via `settings.keybindings`) and a `when` condition. One
@@ -201,7 +233,9 @@ so use `KESTREL_SANDBOX_BASE_IMAGE` / `KESTREL_E2E_SANDBOX_BASE_IMAGE` =
   `MOCK_MCP_STDIO=1` uses the stdio bridge; a JSON argument is passed as tool
   arguments) trigger fixed behaviour. `e2e/fixtures/test-mcp-server.mjs` is a
   test MCP server (stdio, or `--http` with a bearer token) with `echo`,
-  `injection`, `fail`, `whoami`. Browser
+  `injection`, `fail`, `whoami`. Model tests use `startFakeOpenAi()`
+  (`e2e/fake-openai.ts`: `busy-model` always 429, streamed `Echo: …` chat,
+  `slow` for stopping, FIM answers `42`). Browser
   tests use `startTestSite()` (`e2e/browser-helpers.ts`). Sandbox E2E bundles the mock
   agent into the project (`bundleMockAgent`, via Vite) because the container
   only sees the project. A failing test restarts the worker (and the app),
@@ -229,3 +263,7 @@ diff 9, react-markdown 10 + remark-gfm 4, dockerode 5.0.1 (+ @types/dockerode
 `npx -y @agentclientprotocol/claude-agent-acp@0.94.0`, Gemini CLI via
 `npx -y @google/gemini-cli@0.65.0 --experimental-acp` (the `@zed-industries/*`
 package names are deprecated). Checkpoints need system `git`.
+
+openai 7.43.0 (checked 2026-10-26; Node ≥ 22; reads `OPENAI_*` env defaults
+unless options are passed explicitly; `max_tokens` is marked deprecated but
+kept on purpose for Ollama/llama.cpp compatibility).

@@ -4,11 +4,12 @@ Kestrel is an agent-first desktop IDE. It does not ship its own AI. You bring yo
 own agent (e.g. Claude Code via the Agent Client Protocol), your own API key or a
 local model, and Kestrel makes working with it visible, safe and easy to undo.
 
-> Status: **phase 6 done** – workspace, editor, search, terminal, agents via the
+> Status: **phase 7 done** – workspace, editor, search, terminal, agents via the
 > Agent Client Protocol with permissions, checkpoints and diff review, an
 > optional Docker sandbox for agents, a Docker panel, an integrated browser the
-> agent can inspect, and an MCP manager. See [`SPEC.md`](SPEC.md) for the full
-> specification and roadmap.
+> agent can inspect, an MCP manager, model providers with a built-in chat and
+> inline autocompletion. See [`SPEC.md`](SPEC.md) for the full specification
+> and roadmap.
 
 ## What works today
 
@@ -69,6 +70,21 @@ local model, and Kestrel makes working with it visible, safe and easy to undo.
   New local commands need a confirmation in a system dialog; secrets live in
   the system keychain. Local servers run on your system, so they are not given
   to sandboxed agents unless you allow it. OAuth logins are not supported yet.
+- **Models** (sidebar “Models”): add OpenAI-compatible providers – templates
+  for OpenRouter, Ollama and llama.cpp, or any endpoint. Each provider has a
+  model list: the first is used, the others are fallbacks when it hits a rate
+  limit or is unavailable. API keys live only in the system keychain (and are
+  removed when the address changes). Free models show a hint that prompts may
+  be used for training. “Test connection” lists the endpoint's models.
+- **Chat** (right panel → “Chat”): a simple chat with the chosen model,
+  streamed, with stop button and earlier chats. It has no access to your
+  files – attach the current file or selection with the paperclip (secret
+  files such as `.env` are refused).
+- **Autocompletion:** ghost-text suggestions while typing (`Tab` accepts),
+  from a model of your choice – ideally a small local one. Uses
+  fill-in-the-middle when the endpoint supports it, can be switched off per
+  language, and toggled from the status bar or the command palette. Never
+  sends secret files.
 - **Docker panel** (`Mod+Shift+D`): containers (state, ports, start/stop/
   restart, live logs, remove with confirmation), images (size, remove) and the
   project's Dockerfiles with “Build” (live output). Click a published port to
