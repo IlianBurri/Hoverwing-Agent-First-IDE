@@ -15,6 +15,10 @@ export const nativeTexts = {
     mcpDetail:
       'Kestrel startet dieses Programm bei Bedarf auf deinem System, mit deinen Rechten. Erlaube nur Server, denen du vertraust.\n\n{command}',
     mcpAllow: 'Erlauben',
+    installMessage: 'Ollama-Installationsprogramm starten?',
+    installDetail:
+      'Die Datei wurde von der offiziellen Quelle geladen und ihre SHA-256-Prüfsumme stimmt.\n\nQuelle: {source}\nDatei: {file}\nSHA-256: {sha256}',
+    installStart: 'Installieren',
   },
   en: {
     unsavedMessage: 'Discard unsaved changes?',
@@ -31,6 +35,10 @@ export const nativeTexts = {
     mcpDetail:
       'Kestrel will start this program on your system when needed, with your rights. Only allow servers you trust.\n\n{command}',
     mcpAllow: 'Allow',
+    installMessage: 'Start the Ollama installer?',
+    installDetail:
+      'The file was downloaded from the official source and its SHA-256 checksum matches.\n\nSource: {source}\nFile: {file}\nSHA-256: {sha256}',
+    installStart: 'Install',
   },
 } as const;
 

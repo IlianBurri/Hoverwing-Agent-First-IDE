@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "checked": "2026-10-26",
+  "updateUrl": "https://raw.githubusercontent.com/IlianBurri/Kestrel-Agen-Harness-IDE/HEAD/apps/desktop/src/main/modules/setup/catalog.default.json",
+  "models": [
+    {
+      "id": "qwen2.5-coder:0.5b",
+      "name": "Qwen2.5 Coder 0.5B",
+      "purpose": "completion",
+      "sizeBytes": 398000000,
+      "memoryBytes": 1000000000,
+      "fim": true,
+      "license": "Apache-2.0"
+    },
+    {
+      "id": "qwen2.5-coder:1.5b",
+      "name": "Qwen2.5 Coder 1.5B",
+      "purpose": "completion",
+      "sizeBytes": 986000000,
+      "memoryBytes": 2000000000,
+      "fim": true,
+      "license": "Apache-2.0"
+    },
+    {
+      "id": "qwen2.5-coder:3b",
+      "name": "Qwen2.5 Coder 3B",
+      "purpose": "completion",
+      "sizeBytes": 1900000000,
+      "memoryBytes": 3500000000,
+      "fim": true,
+      "license": "Qwen Research"
+    },
+    {
+      "id": "qwen2.5-coder:7b",
+      "name": "Qwen2.5 Coder 7B",
+      "purpose": "chat",
+      "sizeBytes": 4700000000,
+      "memoryBytes": 7000000000,
+      "fim": true,
+      "license": "Apache-2.0"
+    },
+    {
+      "id": "qwen2.5-coder:14b",
+      "name": "Qwen2.5 Coder 14B",
+      "purpose": "chat",
+      "sizeBytes": 9000000000,
+      "memoryBytes": 12000000000,
+      "fim": true,
+      "license": "Apache-2.0"
+    },
+    {
+      "id": "gpt-oss:20b",
+      "name": "gpt-oss 20B",
+      "purpose": "chat",
+      "sizeBytes": 14000000000,
+      "memoryBytes": 16000000000,
+      "fim": false,
+      "license": "Apache-2.0"
+    },
+    {
+      "id": "qwen3-coder:30b",
+      "name": "Qwen3 Coder 30B (MoE)",
+      "purpose": "chat",
+      "sizeBytes": 19000000000,
+      "memoryBytes": 22000000000,
+      "fim": false,
+      "license": "Apache-2.0"
+    }
+  ]
+}

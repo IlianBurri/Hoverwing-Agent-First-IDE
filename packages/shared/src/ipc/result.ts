@@ -31,7 +31,10 @@ export type IpcErrorCode =
   | 'provider_model_missing'
   | 'provider_failed'
   | 'model_not_set'
-  | 'secret_file';
+  | 'secret_file'
+  | 'download_failed'
+  | 'download_corrupt'
+  | 'ollama_unavailable';
 
 export interface IpcError {
   code: IpcErrorCode;

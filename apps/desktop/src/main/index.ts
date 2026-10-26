@@ -10,8 +10,10 @@ import {
   nativeTheme,
   safeStorage,
   session,
+  shell,
   webContents,
 } from 'electron';
+import { spawn } from 'node:child_process';
 import type { Settings } from '@kestrel/shared';
 import { createAppHandlers } from './modules/app/handlers';
 import {
@@ -33,6 +35,19 @@ import {
 } from './modules/providers';
 import { ChatService, ChatStore, createChatHandlers } from './modules/chat';
 import { CompletionService, createCompletionHandlers } from './modules/completion';
+import * as systemInformation from 'systeminformation';
+import {
+  CatalogStore,
+  DEFAULT_OLLAMA_URL,
+  SetupService,
+  createSetupHandlers,
+  detectHardware,
+  downloadVerified,
+  isOllamaInstalled,
+  ollamaApi,
+  ollamaInstallPlan,
+  pathExists,
+} from './modules/setup';
 import { childEnv } from './lib/env';
 import { CONTAINER_MCP_BRIDGE, SandboxService, createSandboxHandlers } from './modules/sandbox';
 import {
@@ -215,6 +230,7 @@ void app.whenReady().then(async () => {
       dockerPanel.release(contents.id);
       chat.release(contents.id);
       completion.release(contents.id);
+      setup.release(contents.id);
     };
     contents.on('destroyed', release);
     contents.on('did-start-navigation', (details) => {
@@ -312,6 +328,62 @@ void app.whenReady().then(async () => {
   const completion = new CompletionService({
     providers,
     settings: () => settings.get().completion,
+  });
+  const githubJson = async (url: string): Promise<unknown> => {
+    const response = await fetch(url, {
+      headers: { accept: 'application/vnd.github+json', 'user-agent': 'Kestrel' },
+      signal: AbortSignal.timeout(15_000),
+    });
+    if (!response.ok) throw new Error(`HTTP ${String(response.status)}`);
+    return response.json();
+  };
+  const setup = new SetupService({
+    detectHardware: () =>
+      detectHardware({
+        si: systemInformation,
+        platform: process.platform,
+        arch: process.arch,
+        env: process.env,
+        homeDir: homedir(),
+        exists: pathExists,
+      }),
+    catalog: new CatalogStore(dataDir, async (url) => {
+      const response = await fetch(url, { signal: AbortSignal.timeout(15_000) });
+      if (!response.ok) throw new Error(`HTTP ${String(response.status)}`);
+      return response.text();
+    }),
+    // E2E tests point this at a fake Ollama server.
+    ollama: ollamaApi(process.env['KESTREL_OLLAMA_URL'] ?? DEFAULT_OLLAMA_URL),
+    isOllamaInstalled: () => isOllamaInstalled(process.platform, process.env, pathExists),
+    installPlan: () => ollamaInstallPlan(process.platform, githubJson),
+    download: (plan, destination, onProgress, signal) =>
+      downloadVerified(plan, destination, onProgress, signal),
+    launchInstaller: async (ownerId, plan, file) => {
+      const text = nativeTexts[dialogLanguage(settings.get())];
+      const confirmed = await askNatively(ownerId, {
+        message: text.installMessage,
+        detail: text.installDetail
+          .replace('{source}', plan.source)
+          .replace('{file}', plan.fileName)
+          .replace('{sha256}', plan.sha256),
+        confirm: text.installStart,
+      });
+      if (!confirmed) return false;
+      if (process.platform === 'win32') {
+        spawn(file, [], { detached: true, stdio: 'ignore' }).unref();
+      } else {
+        // macOS: the disk image opens in Finder; the user drags Ollama to Applications.
+        await shell.openPath(file);
+      }
+      return true;
+    },
+    providers,
+    settings,
+    downloadsDir: join(dataDir, 'downloads'),
+    progress: (ownerId, progress) => {
+      const contents = webContents.fromId(ownerId);
+      if (contents) sendEvent(contents, 'setup:progress', progress);
+    },
   });
   const dockerApi = createDockerApi({ socketPath: await findDockerSocket() });
   // Kestrel's MCP server for agents (browser tools), plus the stdio bridge.
@@ -480,6 +552,7 @@ void app.whenReady().then(async () => {
       ...createProviderHandlers(providers),
       ...createChatHandlers(chat),
       ...createCompletionHandlers(completion),
+      ...createSetupHandlers(setup),
       ...createSandboxHandlers(
         sandbox,
         terminals,

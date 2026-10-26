@@ -41,6 +41,8 @@ export const settingsSchema = z.object({
   /** Provider and model of the built-in chat (null = none chosen). */
   chatModel: modelRefSchema.nullable(),
   completion: completionSettingsSchema,
+  /** The setup assistant was finished or skipped (it opens on first start otherwise). */
+  setupDone: z.boolean(),
 });
 export type Settings = z.infer<typeof settingsSchema>;
 
@@ -61,6 +63,7 @@ export const defaultSettings: Settings = {
   sandboxBaseImage: DEFAULT_SANDBOX_BASE_IMAGE,
   chatModel: null,
   completion: defaultCompletionSettings,
+  setupDone: false,
 };
 
 /** Applies a patch; keys that are missing or undefined stay unchanged. */
