@@ -17,7 +17,7 @@ in an editor that makes every agent action visible, reviewable and reversible.
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 [**Download**](#download) · [Features](#features) · [Security](#security-by-default) ·
-[Development](#development) · [Roadmap](#roadmap)
+[Development](#development) · [Roadmap](#roadmap) · [Privacy](PRIVACY.md)
 
 <br />
 
@@ -112,18 +112,39 @@ AI you already use**.
 
 Get the newest version from **[Releases](https://github.com/IlianBurri/Kestrel-Agen-Harness-IDE/releases)**:
 
-| System                | File                                | First start                                                          |
-| --------------------- | ----------------------------------- | -------------------------------------------------------------------- |
-| Windows 10/11 (x64)   | `Kestrel-Setup-<version>.exe`       | SmartScreen may warn (not code-signed yet): _More info → Run anyway_ |
-| macOS (Apple Silicon) | `Kestrel-<version>-arm64.dmg`       | Right-click the app → _Open_ the first time                          |
-| Linux (x64)           | `Kestrel-<version>-x86_64.AppImage` | `chmod +x Kestrel-*.AppImage`, then start it                         |
+| System                | File                                | First start                                                                         |
+| --------------------- | ----------------------------------- | ----------------------------------------------------------------------------------- |
+| Windows 10/11 (x64)   | `Kestrel-Setup-<version>.exe`       | SmartScreen may warn (not code-signed yet): _More info → Run anyway_                |
+| macOS (Apple Silicon) | `Kestrel-<version>-arm64.dmg`       | Not notarized: open once, then _System Settings → Privacy & Security → Open Anyway_ |
+| Linux (x64)           | `Kestrel-<version>-x86_64.AppImage` | `chmod +x Kestrel-*.AppImage`, then start it                                        |
 
 The Windows installer lets you choose the folder and creates desktop and start-menu
 shortcuts. Installed apps on Windows and Linux check for new versions on start and
 offer the update in the status bar (macOS needs a signed build for that) – nothing
 is downloaded without your click (switch it off with
 _Turn off automatic update check_ in the command palette). Settings, keys and
-checkpoints survive updates and uninstalling.
+checkpoints survive updates and uninstalling. What the app connects to, and when,
+is listed in [PRIVACY.md](PRIVACY.md).
+
+### Code signing policy
+
+Windows releases are going to be signed through the
+[SignPath Foundation](https://signpath.org) with free code signing provided by
+[SignPath.io](https://about.signpath.io) (application in progress; until then the
+installers are unsigned).
+
+- Only binaries built by GitHub Actions from this repository
+  ([Release workflow](.github/workflows/release.yml)) are signed. Upstream
+  binaries (Electron's libraries, ripgrep, node-pty) are included as published by
+  their projects.
+- Every release signing request is approved by hand.
+- **Committers and reviewers:** [IlianBurri](https://github.com/IlianBurri)
+  (changes from other contributors are reviewed before they are merged)
+- **Approvers:** [IlianBurri](https://github.com/IlianBurri)
+- **Privacy:** this program will not transfer any information to other networked
+  systems unless specifically requested by the user or the person installing or
+  operating it. The only exception is the update check on start, which can be
+  turned off. Details in [PRIVACY.md](PRIVACY.md).
 
 ## Security by default
 
@@ -218,8 +239,8 @@ pnpm dev
 - **Release:** bump `version` in `apps/desktop/package.json`, commit, then
   `git tag v<version> && git push origin v<version>`. The _Release_ workflow builds
   Windows, macOS and Linux installers, smoke-tests the Windows build and publishes
-  them with the update feed. Code signing turns on when the certificate secrets
-  described in `.github/workflows/release.yml` are set.
+  them with the update feed. Code signing: see
+  [docs/code-signing.md](docs/code-signing.md).
 
 </details>
 

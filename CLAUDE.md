@@ -28,8 +28,16 @@ Programs are looked up with `lib/which.ts` (`findProgram`, PATHEXT-aware).
 - Release: push a tag `v<version>` → the Release workflow builds all three on
   their runners (Windows also runs `e2e/packaged.spec.ts` against
   `release/win-unpacked`) and attaches installers + `latest*.yml` to the GitHub
-  release ("Run workflow" = artifacts only). Signing is used when the
-  `WIN_CSC_*` / `MAC_CSC_*` / `APPLE_*` secrets exist.
+  release ("Run workflow" = artifacts only). macOS signing is used when the
+  `MAC_CSC_*` / `APPLE_*` secrets exist.
+- Windows signing (`docs/code-signing.md`): SignPath Foundation (free for
+  OSS) once the variable `SIGNPATH_ORGANIZATION_ID` + secret
+  `SIGNPATH_API_TOKEN` exist: sign `win-unpacked/Kestrel.exe` → NSIS via
+  `--prepackaged` (leaves the exe untouched) → sign installer →
+  `scripts/update-win-feed.mjs` recomputes sha512/size/blockmap in
+  `latest.yml`. Artifact configs in `.signpath/`. Otherwise `WIN_CSC_*`.
+  The README "Code signing policy" section and `PRIVACY.md` are SignPath
+  requirements: update them when roles or network connections change.
 - Auto-update: `modules/updates` wraps electron-updater (`autoDownload` and
   `autoInstallOnAppQuit` off: the user clicks in the status bar). Feed =
   `publish` in `electron-builder.yml` (GitHub). Only in the packaged app and
@@ -47,8 +55,9 @@ Programs are looked up with `lib/which.ts` (`findProgram`, PATHEXT-aware).
   (`unpackedPath()` in `modules/search/search.ts`).
 - Icon: `apps/desktop/build/icon.png`, rendered from the mark by
   `npx electron scripts/make-icon.mjs`.
-- Open: an actual code-signing certificate (until then SmartScreen warns
-  "unknown publisher" and macOS needs right-click → Open).
+- Open: SignPath application (until then SmartScreen warns "unknown
+  publisher"); macOS notarization needs the paid Apple Developer Program
+  (until then: _System Settings → Privacy & Security → Open Anyway_).
 
 ## Commands
 
