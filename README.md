@@ -4,12 +4,29 @@ Kestrel is an agent-first desktop IDE. It does not ship its own AI. You bring yo
 own agent (e.g. Claude Code via the Agent Client Protocol), your own API key or a
 local model, and Kestrel makes working with it visible, safe and easy to undo.
 
-> Status: **phase 7 done** – workspace, editor, search, terminal, agents via the
+> Status: **phase 8 done** – workspace, editor, search, terminal, agents via the
 > Agent Client Protocol with permissions, checkpoints and diff review, an
 > optional Docker sandbox for agents, a Docker panel, an integrated browser the
 > agent can inspect, an MCP manager, model providers with a built-in chat and
-> inline autocompletion. See [`SPEC.md`](SPEC.md) for the full specification
-> and roadmap.
+> inline autocompletion, and a setup assistant for local models. See
+> [`SPEC.md`](SPEC.md) for the full specification and roadmap.
+
+## Download (Windows)
+
+1. Open the repository on GitHub → **Releases** (right side) and pick the
+   newest version, e.g. `v0.8.0`.
+2. Download **`Kestrel-Setup-<version>.exe`** under "Assets" and run it.
+3. The installer is not code-signed yet, so Windows SmartScreen may say
+   “Windows protected your PC”: click **More info → Run anyway**.
+4. Choose the folder; Kestrel gets a desktop and a start-menu shortcut.
+   Uninstall via Windows Settings › Apps (your settings and keys stay).
+
+New release: bump `version` in `apps/desktop/package.json`, commit, then
+`git tag v<version> && git push origin v<version>`. The _Release_ workflow
+builds the installer, tests it and attaches it to the release. Without a tag,
+_Actions → Release → Run workflow_ builds it as a downloadable artifact.
+Build it locally with `pnpm --filter @kestrel/desktop package:win`
+(output in `apps/desktop/release/`).
 
 ## What works today
 
@@ -85,6 +102,14 @@ local model, and Kestrel makes working with it visible, safe and easy to undo.
   fill-in-the-middle when the endpoint supports it, can be switched off per
   language, and toggled from the status bar or the command palette. Never
   sends secret files.
+- **Setup assistant** (first start; later Models › magic wand or the command
+  palette): detects GPU/VRAM, memory, processor, free disk and the possible
+  acceleration (CUDA, ROCm, Metal, Vulkan or CPU), recommends one model for
+  autocompletion and one for chat from an updatable JSON catalog, installs
+  Ollama from the official GitHub release (source, size and SHA-256 shown;
+  the checksum is verified before anything runs), downloads the models with
+  progress, runs an optional speed test (“fluid / usable / too slow”) and
+  sets everything up. Skippable at any time.
 - **Docker panel** (`Mod+Shift+D`): containers (state, ports, start/stop/
   restart, live logs, remove with confirmation), images (size, remove) and the
   project's Dockerfiles with “Build” (live output). Click a published port to

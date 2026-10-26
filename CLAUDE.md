@@ -7,11 +7,11 @@ Guidance for working on Kestrel. Read `SPEC.md` for the product spec and phases.
 Phases 0 (foundation), 1 (layout, palette, workspace, Monaco, search, terminal),
 2 (permissions, agents via ACP, checkpoints, diff review), 3 (agent sandbox in
 Docker), 4 (Docker panel), 5 (integrated browser + agent browser tools), 6
-(MCP manager) and 7 (model providers, simple chat, autocompletion) are done.
-Next: phase 8 (setup assistant: hardware detection, local install) – or the
-installable app, see "User wishes for later". Every phase: present a plan,
-wait for OK, implement in small commits, keep lint/typecheck/tests green,
-update this file.
+(MCP manager), 7 (model providers, simple chat, autocompletion) and 8 (setup
+assistant: hardware detection, model catalog, Ollama install) are done, and
+the Windows installer is built by `.github/workflows/release.yml`. Next:
+phase 9 (LSP and Git panel). Every phase: present a plan, wait for OK,
+implement in small commits, keep lint/typecheck/tests green, update this file.
 
 Known issue (Windows, before phase 7): checkpoints fail because
 `modules/checkpoints/git.ts` sets `GIT_CONFIG_GLOBAL` to `os.devNull`
@@ -19,14 +19,25 @@ Known issue (Windows, before phase 7): checkpoints fail because
 `shadowRepo.test.ts` fail there. Some other unit tests (docker sockets, env
 PATH, workspace paths) are Linux/macOS-specific too.
 
-## User wishes for later
+## Packaging (installable app)
 
-- **Installable desktop app:** the user wants to run Kestrel as a real app
-  (Windows `.exe` installer, desktop/start-menu shortcut; later macOS/Linux
-  too) instead of `pnpm dev`. `electron-builder.yml` exists (NSIS target) but
-  packaging is not tested yet: icons, app id, native modules (`node-pty`,
-  ripgrep, watcher unpacked from asar), code signing, auto-update. Plan this
-  as its own step after the current phase (or when the user asks).
+- `pnpm --filter @kestrel/desktop package:win` → `apps/desktop/release/Kestrel-Setup-<version>.exe`
+  (NSIS, not one-click: folder choice, desktop + start-menu shortcut, app data
+  kept on uninstall). Version = `apps/desktop/package.json` `version`.
+- Release: push a tag `v<version>` → the Release workflow builds on
+  windows-latest, runs `e2e/packaged.spec.ts` against `release/win-unpacked`
+  and attaches the installer to a GitHub release ("Run workflow" = artifact only).
+- `dependencies` of the desktop app = only what main loads at runtime (the
+  rest is bundled by Vite and lives in `devDependencies`, keeping the
+  installer small). Platform packages of ripgrep/watcher are listed in
+  `optionalDependencies`, otherwise electron-builder leaves them out and the
+  app crashes on start. `npmRebuild: false` (N-API prebuilds, no toolchain).
+- Binaries started from main must use `app.asar.unpacked` paths
+  (`unpackedPath()` in `modules/search/search.ts`).
+- Icon: `apps/desktop/build/icon.png`, rendered from the mark by
+  `npx electron scripts/make-icon.mjs`.
+- Open: code signing (SmartScreen warns "unknown publisher"), auto-update,
+  macOS/Linux release jobs.
 
 ## Commands
 
@@ -194,6 +205,17 @@ so use `KESTREL_SANDBOX_BASE_IMAGE` / `KESTREL_E2E_SANDBOX_BASE_IMAGE` =
   and remembers endpoints without FIM. Never for secret files or
   `disabledLanguages`. Features needing editor content without importing
   Monaco use `features/editor/snapshot.ts`.
+- **Setup assistant:** `modules/setup` + `features/setup`. Hardware via
+  `systeminformation` behind the `SystemInfo` interface (detected once per
+  start, ~6 s on Windows); backend guess in `detectBackend`. Model catalog =
+  JSON (`catalog.default.json`, newer downloaded version in userData wins);
+  `recommendModels`/`rateSpeed` are pure (shared). Ollama via its own API
+  (`ollamaApi`, URL from `KESTREL_OLLAMA_URL` for tests). Installer: latest
+  official GitHub release, SHA-256 from the asset `digest`, only
+  allowlisted hosts (`DOWNLOAD_HOSTS`), deleted on mismatch, started only
+  after a native confirm; no automatic install on Linux. The assistant opens
+  while `settings.setupDone` is false; E2E `createUserDataDir()` writes
+  `setupDone: true` unless `{ firstStart: true }`.
 - **Commands:** every user action is a `Command` registered by its feature
   (`register<Feature>Commands`), with an i18n title, optional default keybinding(s)
   (`Mod+…`, overridable via `settings.keybindings`) and a `when` condition. One
@@ -233,7 +255,8 @@ so use `KESTREL_SANDBOX_BASE_IMAGE` / `KESTREL_E2E_SANDBOX_BASE_IMAGE` =
   `MOCK_MCP_STDIO=1` uses the stdio bridge; a JSON argument is passed as tool
   arguments) trigger fixed behaviour. `e2e/fixtures/test-mcp-server.mjs` is a
   test MCP server (stdio, or `--http` with a bearer token) with `echo`,
-  `injection`, `fail`, `whoami`. Model tests use `startFakeOpenAi()`
+  `injection`, `fail`, `whoami`. Setup tests use `startFakeOllama()`
+  (`e2e/fake-ollama.ts`). Model tests use `startFakeOpenAi()`
   (`e2e/fake-openai.ts`: `busy-model` always 429, streamed `Echo: …` chat,
   `slow` for stopping, FIM answers `42`). Browser
   tests use `startTestSite()` (`e2e/browser-helpers.ts`). Sandbox E2E bundles the mock
@@ -263,6 +286,9 @@ diff 9, react-markdown 10 + remark-gfm 4, dockerode 5.0.1 (+ @types/dockerode
 `npx -y @agentclientprotocol/claude-agent-acp@0.94.0`, Gemini CLI via
 `npx -y @google/gemini-cli@0.65.0 --experimental-acp` (the `@zed-industries/*`
 package names are deprecated). Checkpoints need system `git`.
+
+systeminformation 5.33.16, electron-builder 26.15 (checked 2026-10-26).
+Ollama release v0.40.11 assets carry `digest: sha256:…` in the GitHub API.
 
 openai 7.43.0 (checked 2026-10-26; Node ≥ 22; reads `OPENAI_*` env defaults
 unless options are passed explicitly; `max_tokens` is marked deprecated but
