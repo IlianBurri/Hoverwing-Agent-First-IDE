@@ -1,3 +1,4 @@
+import type { BrowserState } from '@kestrel/shared';
 import { i18next } from '../../i18n';
 import { notifyError } from '../../lib/errors';
 import { browserTabPath, forgetBrowserTab, setBrowserState } from '../../stores/browser';
@@ -14,9 +15,17 @@ export async function openBrowser(url?: string): Promise<void> {
     notifyError(t('browser.open'), result.error);
     return;
   }
-  const state = result.data;
+  showBrowserTab(result.data);
+}
+
+/** Adds an editor tab for a browser tab that exists in main (and shows it). */
+export function showBrowserTab(state: BrowserState): void {
   setBrowserState(state);
   const path = browserTabPath(state.tabId);
+  if (useEditorStore.getState().files.some((file) => file.path === path)) {
+    useEditorStore.setState({ active: path });
+    return;
+  }
   useEditorStore.setState((editor) => ({
     files: [
       ...editor.files,

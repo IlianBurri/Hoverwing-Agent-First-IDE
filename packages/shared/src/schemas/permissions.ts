@@ -8,7 +8,10 @@ export const permissionKindSchema = z.enum([
   'file.delete',
   'command.run',
   'network',
+  /** Read a browser tab (screenshot, console, network errors). */
   'browser',
+  /** Open pages in the integrated browser. */
+  'browser.control',
   'mcp.tool',
   'docker',
 ]);

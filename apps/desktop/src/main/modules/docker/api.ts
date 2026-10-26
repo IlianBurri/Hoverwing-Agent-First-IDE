@@ -22,6 +22,8 @@ export interface ContainerSpec {
   memoryMb: number;
   cpus: number;
   pidsLimit: number;
+  /** Extra /etc/hosts entries, e.g. "host.docker.internal:host-gateway". */
+  extraHosts: string[];
 }
 
 /** A started container with its standard streams attached. */
@@ -108,6 +110,8 @@ export interface DockerApi {
     onData: (data: string) => void,
     onEnd: () => void,
   ): Promise<StopStream>;
+  /** Gateway address of Docker's default bridge network (null if unknown). */
+  bridgeGateway(): Promise<string | null>;
   /** Creates, attaches and starts a container that removes itself when it ends. */
   run(spec: ContainerSpec): Promise<AttachedContainer>;
 }

@@ -12,7 +12,7 @@ import type { PermissionService } from '../permissions';
 import type { SecretStore } from '../secrets';
 import type { AgentConfigStore } from './configs';
 import { AgentRuntime } from './runtime';
-import type { RuntimeDeps } from './runtime';
+import type { RuntimeDeps, SessionMcp } from './runtime';
 import type { SessionHistory } from './sessions';
 import type { AgentTransport, StartTransport } from './transport';
 
@@ -40,6 +40,8 @@ export interface AgentServiceDeps {
     log(ownerId: number, line: string): void;
   };
   clientVersion: string;
+  /** Kestrel's MCP tools (browser) for agents of a window. */
+  mcp?: (ownerId: number) => SessionMcp;
 }
 
 const secretKey = (agentId: string, name: string) => `agent:${agentId}:${name}`;
@@ -74,6 +76,7 @@ export class AgentService {
           },
         },
         clientVersion: this.deps.clientVersion,
+        ...(this.deps.mcp ? { mcp: this.deps.mcp(ownerId) } : {}),
       });
       this.runtimes.set(ownerId, runtime);
     }

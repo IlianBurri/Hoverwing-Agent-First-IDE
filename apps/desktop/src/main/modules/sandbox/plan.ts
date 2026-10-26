@@ -8,6 +8,10 @@ const NPM_CACHE = '/cache/npm';
 /** Where the project is mounted on Windows (other systems keep the host path). */
 const WINDOWS_WORKSPACE = '/workspace';
 const PIDS_LIMIT = 1024;
+/** Where Kestrel's MCP bridge script is mounted (read-only) in agent containers. */
+export const CONTAINER_MCP_BRIDGE = '/opt/kestrel/kestrel-mcp-bridge.mjs';
+/** Lets containers reach Kestrel's MCP endpoint on the host (Linux needs it explicitly). */
+const HOST_GATEWAY = 'host.docker.internal:host-gateway';
 
 /** Proxy settings are passed on, so agents work behind corporate proxies. */
 const PASSED_VARIABLES = [
@@ -51,6 +55,8 @@ export interface AgentContainerInput {
   limits: Pick<AgentSandbox, 'memoryMb' | 'cpus'>;
   /** Labels that identify this Kestrel installation (orphan cleanup). */
   labels: Readonly<Record<string, string>>;
+  /** Host path of the MCP bridge script, mounted read-only (null: none). */
+  mcpBridge: string | null;
 }
 
 export interface AgentContainerPlan {
@@ -122,6 +128,16 @@ export function agentContainerPlan(input: AgentContainerInput): AgentContainerPl
       sizeMb: 1,
       mode: 0o700,
     })),
+    ...(input.mcpBridge
+      ? [
+          {
+            type: 'bind',
+            source: input.mcpBridge,
+            target: CONTAINER_MCP_BRIDGE,
+            readOnly: true,
+          } satisfies ContainerMount,
+        ]
+      : []),
   ];
   return {
     agentRoot,
@@ -142,6 +158,7 @@ export function agentContainerPlan(input: AgentContainerInput): AgentContainerPl
       memoryMb: input.limits.memoryMb,
       cpus: input.limits.cpus,
       pidsLimit: PIDS_LIMIT,
+      extraHosts: [HOST_GATEWAY],
     },
   };
 }
@@ -175,5 +192,6 @@ export function loginContainerSpec(input: {
     memoryMb: 2048,
     cpus: 1,
     pidsLimit: PIDS_LIMIT,
+    extraHosts: [],
   };
 }

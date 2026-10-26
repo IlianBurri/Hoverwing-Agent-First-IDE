@@ -19,6 +19,7 @@ export function fakeDockerApi(overrides: Partial<DockerApi> = {}): DockerApi {
     removeImage: missing('removeImage'),
     watchEvents: () => Promise.resolve(() => undefined),
     followLogs: missing('followLogs'),
+    bridgeGateway: () => Promise.resolve(null),
     run: missing('run'),
     ...overrides,
   };

@@ -18,6 +18,7 @@ export const kindIcons: Record<PermissionKind, LucideIcon> = {
   'command.run': SquareTerminal,
   network: Globe,
   browser: AppWindow,
+  'browser.control': Globe,
   'mcp.tool': Plug,
   docker: Container,
 };
@@ -32,6 +33,7 @@ export function kindKey(
   | 'commandRun'
   | 'network'
   | 'browser'
+  | 'browserControl'
   | 'mcpTool'
   | 'docker' {
   const keys = {
@@ -41,6 +43,7 @@ export function kindKey(
     'command.run': 'commandRun',
     network: 'network',
     browser: 'browser',
+    'browser.control': 'browserControl',
     'mcp.tool': 'mcpTool',
     docker: 'docker',
   } as const;

@@ -22,8 +22,9 @@ import {
   spawnTransport,
 } from './modules/agent';
 import { SecretStore } from './modules/secrets';
-import { BrowserManager, createBrowserHandlers } from './modules/browser';
-import { SandboxService, createSandboxHandlers } from './modules/sandbox';
+import { BrowserManager, agentBrowser, createBrowserHandlers } from './modules/browser';
+import { McpHost, browserTools, writeBridge } from './modules/mcpHost';
+import { CONTAINER_MCP_BRIDGE, SandboxService, createSandboxHandlers } from './modules/sandbox';
 import {
   DEFAULT_SANDBOX_PACKAGES,
   DockerPanelService,
@@ -231,6 +232,18 @@ void app.whenReady().then(async () => {
     },
   );
   const dockerApi = createDockerApi({ socketPath: await findDockerSocket() });
+  // Kestrel's MCP server for agents (browser tools), plus the stdio bridge.
+  const mcpBridge = await writeBridge(join(dataDir, 'mcp')).catch(() => null);
+  const mcpHost = new McpHost(app.getVersion(), async () => {
+    // Docker Desktop forwards host.docker.internal to the host's loopback;
+    // on Linux, containers reach the host via the bridge gateway address.
+    if (process.platform !== 'linux') return { listen: '127.0.0.1', url: 'host.docker.internal' };
+    const gateway = await dockerApi.bridgeGateway();
+    return gateway ? { listen: gateway, url: 'host.docker.internal' } : null;
+  });
+  app.on('will-quit', () => {
+    void mcpHost.close();
+  });
   const sandbox = new SandboxService({
     docker: dockerApi,
     dataDir: join(dataDir, 'sandbox'),
@@ -251,6 +264,7 @@ void app.whenReady().then(async () => {
     onStatus: (status) => {
       broadcastEvent('sandbox:status', status);
     },
+    mcpBridge: () => mcpBridge,
   });
   void sandbox.removeOrphans().catch(() => undefined);
   const dockerPanel = new DockerPanelService({
@@ -318,6 +332,52 @@ void app.whenReady().then(async () => {
       },
     },
     clientVersion: app.getVersion(),
+    mcp:
+      (ownerId) =>
+      async ({ sandboxed, http, check }) => {
+        const access = agentBrowser(browser, ownerId, (state) => {
+          const contents = webContents.fromId(ownerId);
+          if (contents) sendEvent(contents, 'browser:opened', state);
+        });
+        const endpoint = await mcpHost.register(() => browserTools(access, check), sandboxed);
+        const url = sandboxed ? endpoint.containerUrl : endpoint.url;
+        if (!url) throw new Error('Kestrel tools are not reachable from the sandbox.');
+        const release = () => {
+          mcpHost.revoke(endpoint.id);
+        };
+        if (http) {
+          return {
+            release,
+            servers: [
+              {
+                type: 'http' as const,
+                name: 'kestrel',
+                url,
+                headers: [{ name: 'Authorization', value: `Bearer ${endpoint.token}` }],
+              },
+            ],
+          };
+        }
+        if (!mcpBridge) throw new Error('The MCP bridge script is missing.');
+        const env = [
+          { name: 'KESTREL_MCP_URL', value: url },
+          { name: 'KESTREL_MCP_TOKEN', value: endpoint.token },
+        ];
+        return {
+          release,
+          servers: [
+            sandboxed
+              ? { name: 'kestrel', command: 'node', args: [CONTAINER_MCP_BRIDGE], env }
+              : {
+                  name: 'kestrel',
+                  // Kestrel's own runtime runs the bridge as plain Node.
+                  command: process.execPath,
+                  args: [mcpBridge],
+                  env: [...env, { name: 'ELECTRON_RUN_AS_NODE', value: '1' }],
+                },
+          ],
+        };
+      },
   });
   app.on('before-quit', () => {
     for (const window of BrowserWindow.getAllWindows()) void agents.release(window.webContents.id);

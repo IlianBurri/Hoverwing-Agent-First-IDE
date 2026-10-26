@@ -16,6 +16,7 @@ const input: AgentContainerInput = {
   emptyFile: '/data/sandbox/empty',
   limits: { memoryMb: 4096, cpus: 2 },
   labels: { 'dev.kestrel.sandbox.instance': 'i1' },
+  mcpBridge: null,
 };
 
 describe('agentContainerPlan', () => {

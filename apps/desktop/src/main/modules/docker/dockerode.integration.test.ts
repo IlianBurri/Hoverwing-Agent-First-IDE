@@ -76,6 +76,7 @@ describe.skipIf(!enabled)('dockerode adapter with real Docker', () => {
       memoryMb: 256,
       cpus: 0.5,
       pidsLimit: 64,
+      extraHosts: [],
     });
     const listed = (await docker.listContainerInfos()).find((entry) => entry.id === container.id);
     expect(listed).toMatchObject({ state: 'running', image: tag });

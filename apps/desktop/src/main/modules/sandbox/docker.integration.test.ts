@@ -43,6 +43,7 @@ describe.skipIf(!enabled)('sandbox with real Docker', () => {
       instance: 'integration-test',
       onLog: (line) => logs.push(line),
       onStatus: () => undefined,
+      mcpBridge: () => null,
     });
   });
 

@@ -17,7 +17,7 @@ import { refreshSandboxStatus, registerSandboxCommands } from './features/sandbo
 import { appendSandboxLog, setSandboxStatus } from './stores/sandbox';
 import { refreshDocker, registerDockerCommands } from './features/docker';
 import { deliverStream, endStream } from './stores/docker';
-import { openBrowser, registerBrowserCommands } from './features/browser';
+import { openBrowser, registerBrowserCommands, showBrowserTab } from './features/browser';
 import { setBrowserState } from './stores/browser';
 import { refreshCheckpoints } from './stores/checkpoints';
 import { refreshReview } from './stores/review';
@@ -54,6 +54,7 @@ export function App() {
       window.kestrel.on('browser:openTab', ({ url }) => {
         void openBrowser(url);
       }),
+      window.kestrel.on('browser:opened', showBrowserTab),
     ];
     return () => {
       for (const off of offs) off();

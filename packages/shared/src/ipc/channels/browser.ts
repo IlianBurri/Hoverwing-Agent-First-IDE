@@ -28,4 +28,6 @@ export const browserEvents = {
   'browser:state': browserStateSchema,
   /** A page wants a new window (or an agent opened a page): show it in a new tab. */
   'browser:openTab': z.object({ url }),
+  /** Main opened a tab itself (an agent asked for it): show it in the editor area. */
+  'browser:opened': browserStateSchema,
 } as const;

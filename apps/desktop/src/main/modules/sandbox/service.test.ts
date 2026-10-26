@@ -91,6 +91,7 @@ function service(api: DockerApi, logs: string[] = []) {
     instance: 'test',
     onLog: (line) => logs.push(line),
     onStatus: () => undefined,
+    mcpBridge: () => '/data/mcp/kestrel-mcp-bridge.mjs',
   });
 }
 
@@ -164,6 +165,13 @@ describe('SandboxService', () => {
       readOnly: true,
     });
     expect(spec?.labels['dev.kestrel.sandbox.instance']).toBe('test');
+    expect(spec?.mounts).toContainEqual({
+      type: 'bind',
+      source: '/data/mcp/kestrel-mcp-bridge.mjs',
+      target: '/opt/kestrel/kestrel-mcp-bridge.mjs',
+      readOnly: true,
+    });
+    expect(spec?.extraHosts).toEqual(['host.docker.internal:host-gateway']);
   });
 
   it('removes containers left over from an earlier run', async () => {

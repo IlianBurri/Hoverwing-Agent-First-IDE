@@ -9,12 +9,73 @@
 //   slow                   -> waits until cancelled
 //   peek <path>            -> reads a file itself and reports its content (sandbox tests)
 //   whoami                 -> reports HOME and whether it runs in the sandbox
+//   mcp <tool> [arg]       -> calls a tool of Kestrel's MCP server and reports the result
+//                             (HTTP; with MOCK_MCP_STDIO=1 via the stdio bridge)
+import { spawn } from 'node:child_process';
 import { readFile, writeFile } from 'node:fs/promises';
+import { createInterface } from 'node:readline';
 import { join } from 'node:path';
 import { Readable, Writable } from 'node:stream';
 import { RequestError, agent, ndJsonStream } from '@agentclientprotocol/sdk';
 
 const sessions = new Map();
+const viaStdio = process.env.MOCK_MCP_STDIO === '1';
+
+const initialize = {
+  jsonrpc: '2.0',
+  id: 1,
+  method: 'initialize',
+  params: {
+    protocolVersion: '2025-06-18',
+    capabilities: {},
+    clientInfo: { name: 'mock', version: '1' },
+  },
+};
+
+/** Calls one tool of an MCP server (as given in session/new) and returns the result. */
+async function callTool(server, name, args) {
+  const call = { jsonrpc: '2.0', id: 2, method: 'tools/call', params: { name, arguments: args } };
+  if (server.type === 'http') {
+    const headers = {
+      'content-type': 'application/json',
+      accept: 'application/json, text/event-stream',
+    };
+    for (const header of server.headers) headers[header.name] = header.value;
+    const post = async (body) => {
+      const response = await fetch(server.url, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(body),
+      });
+      const text = await response.text();
+      return text ? JSON.parse(text) : null;
+    };
+    await post(initialize);
+    return (await post(call)).result;
+  }
+  const env = { ...process.env };
+  for (const variable of server.env) env[variable.name] = variable.value;
+  const child = spawn(server.command, server.args, { env, stdio: ['pipe', 'pipe', 'inherit'] });
+  const lines = createInterface({ input: child.stdout });
+  const answer = (id) =>
+    new Promise((resolve) => {
+      const onLine = (line) => {
+        const message = JSON.parse(line);
+        if (message.id === id) {
+          lines.off('line', onLine);
+          resolve(message);
+        }
+      };
+      lines.on('line', onLine);
+    });
+  child.stdin.write(`${JSON.stringify(initialize)}\n`);
+  await answer(1);
+  child.stdin.write(`${JSON.stringify({ jsonrpc: '2.0', method: 'notifications/initialized' })}\n`);
+  child.stdin.write(`${JSON.stringify(call)}\n`);
+  const result = (await answer(2)).result;
+  child.stdin.end();
+  return result;
+}
 let toolId = 0;
 
 const say = (client, sessionId, text) =>
@@ -26,17 +87,21 @@ const say = (client, sessionId, text) =>
 const app = agent({ name: 'mock-agent' })
   .onRequest('initialize', () => ({
     protocolVersion: 1,
-    agentCapabilities: { loadSession: true },
+    agentCapabilities: { loadSession: true, mcpCapabilities: { http: !viaStdio } },
     agentInfo: { name: 'mock-agent', version: '1.0.0' },
   }))
   .onRequest('session/new', ({ params }) => {
     if (process.env.MOCK_AUTH_REQUIRED === '1') throw RequestError.authRequired();
     const sessionId = `mock-${String(sessions.size + 1)}`;
-    sessions.set(sessionId, { cwd: params.cwd, cancelled: false });
+    sessions.set(sessionId, { cwd: params.cwd, cancelled: false, mcpServers: params.mcpServers });
     return { sessionId };
   })
   .onRequest('session/load', async ({ params, client }) => {
-    sessions.set(params.sessionId, { cwd: params.cwd, cancelled: false });
+    sessions.set(params.sessionId, {
+      cwd: params.cwd,
+      cancelled: false,
+      mcpServers: params.mcpServers,
+    });
     await client.notify('session/update', {
       sessionId: params.sessionId,
       update: {
@@ -128,6 +193,26 @@ const app = agent({ name: 'mock-agent' })
         (error) => `<${String(error.code)}>`,
       );
       await say(client, sessionId, `Content of ${path}: [${content.trim()}]`);
+    } else if (command === 'mcp') {
+      const server = session.mcpServers.find((entry) => entry.name === 'kestrel');
+      if (!server) {
+        await say(client, sessionId, 'No Kestrel MCP server.');
+      } else {
+        const args = path === 'browser_open' ? { url: rest[0] } : {};
+        try {
+          const result = await callTool(server, path, args);
+          const parts = result.content.map((item) =>
+            item.type === 'text' ? item.text : `[${item.type} ${item.mimeType}]`,
+          );
+          await say(
+            client,
+            sessionId,
+            `${result.isError ? 'Tool error' : 'Tool result'}:\n${parts.join('\n')}`,
+          );
+        } catch (error) {
+          await say(client, sessionId, `Tool call failed: ${String(error)}`);
+        }
+      }
     } else if (command === 'whoami') {
       await say(
         client,

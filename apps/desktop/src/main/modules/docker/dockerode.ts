@@ -70,6 +70,7 @@ export function toCreateOptions(spec: ContainerSpec): Dockerode.ContainerCreateO
       MemorySwap: memory,
       NanoCpus: Math.round(spec.cpus * 1e9),
       PidsLimit: spec.pidsLimit,
+      ...(spec.extraHosts.length > 0 ? { ExtraHosts: spec.extraHosts } : {}),
       Mounts: spec.mounts.map(toDockerMount),
     },
   };
@@ -260,6 +261,16 @@ export function createDockerApi(options: { socketPath: string | undefined }): Do
     },
     async removeContainer(id, options = { force: true }) {
       await ignoreGone(docker.getContainer(id).remove({ force: options.force }), [404]);
+    },
+    async bridgeGateway() {
+      try {
+        const network = (await docker.getNetwork('bridge').inspect()) as {
+          IPAM?: { Config?: { Gateway?: string }[] };
+        };
+        return network.IPAM?.Config?.[0]?.Gateway ?? null;
+      } catch {
+        return null;
+      }
     },
     async run(spec) {
       const container = await docker.createContainer(toCreateOptions(spec));

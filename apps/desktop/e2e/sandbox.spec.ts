@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import { expect, test } from '@playwright/test';
 import type { ElectronApplication, Page } from '@playwright/test';
 import { bundleMockAgent, configureMockAgent, stubMessageBox } from './agent-helpers';
+import { startTestSite } from './browser-helpers';
 import { createUserDataDir, launchApp } from './launch';
 import { createProject, stubOpenDialog } from './workspace-helpers';
 
@@ -151,6 +152,22 @@ test.describe('in a Docker container', () => {
     await page.keyboard.type('echo "home is $HOME"');
     await page.keyboard.press('Enter');
     await expect(rows).toContainText('home is /home/kestrel');
+  });
+
+  test("reaches Kestrel's browser tools from the container", async () => {
+    const site = await startTestSite();
+    try {
+      await page.keyboard.press('Control+Shift+O');
+      const address = page.getByRole('textbox', { name: 'Address' });
+      await address.fill(site.url);
+      await address.press('Enter');
+      await expect(page.getByRole('tab', { name: 'Test home' })).toBeVisible();
+      await send(page, 'mcp browser_list_tabs');
+      await expect(conversation(page)).toContainText(`Tool result:`);
+      await expect(conversation(page)).toContainText(`${site.url}/`);
+    } finally {
+      await site.close();
+    }
   });
 
   test('removes its containers when the app quits', async () => {

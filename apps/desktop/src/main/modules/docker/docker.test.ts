@@ -74,6 +74,7 @@ describe('toCreateOptions', () => {
     memoryMb: 4096,
     cpus: 2,
     pidsLimit: 1024,
+    extraHosts: ['host.docker.internal:host-gateway'],
   };
 
   it('hardens the container and applies the limits', () => {
@@ -90,6 +91,7 @@ describe('toCreateOptions', () => {
       MemorySwap: 4096 * 1024 * 1024,
       NanoCpus: 2e9,
       PidsLimit: 1024,
+      ExtraHosts: ['host.docker.internal:host-gateway'],
     });
     expect(options.HostConfig?.Mounts).toEqual([
       { Type: 'bind', Source: '/project', Target: '/project', ReadOnly: false },

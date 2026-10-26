@@ -1,9 +1,20 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { isAbsolute } from 'node:path';
 import { PROTOCOL_VERSION, RequestError, client } from '@agentclientprotocol/sdk';
-import type { ClientConnection, ClientContext, ToolCallUpdate } from '@agentclientprotocol/sdk';
+import type {
+  ClientConnection,
+  ClientContext,
+  McpServer,
+  ToolCallUpdate,
+} from '@agentclientprotocol/sdk';
 import { idleAgentStatus } from '@kestrel/shared';
-import type { AgentConfig, AgentEvent, AgentStatus, ToolCallView } from '@kestrel/shared';
+import type {
+  AgentConfig,
+  AgentEvent,
+  AgentStatus,
+  PermissionKind,
+  ToolCallView,
+} from '@kestrel/shared';
 import { UserError } from '../../ipc/errors';
 import { redact } from '../../lib/redact';
 import type { PermissionService } from '../permissions';
@@ -24,6 +35,15 @@ export interface RuntimeEvents {
   log(line: string): void;
 }
 
+/** Kestrel's own MCP servers for one agent session (browser tools). */
+export type SessionMcp = (options: {
+  sandboxed: boolean;
+  /** The agent can connect to MCP servers over HTTP. */
+  http: boolean;
+  /** Permission check in the context of this session. */
+  check: (kind: PermissionKind, target: string, title: string) => Promise<boolean>;
+}) => Promise<{ servers: McpServer[]; release: () => void }>;
+
 export interface RuntimeDeps {
   ownerId: number;
   startTransport: (options: SpawnOptions) => Promise<AgentTransport>;
@@ -40,6 +60,8 @@ export interface RuntimeDeps {
   onSessionStarted: (root: string, agentId: string, sessionId: string, title: string) => void;
   events: RuntimeEvents;
   clientVersion: string;
+  /** Optional: Kestrel's MCP tools for the agent (e.g. the browser). */
+  mcp?: SessionMcp;
 }
 
 /**
@@ -59,6 +81,7 @@ export class AgentRuntime {
   private readonly stderrTail: string[] = [];
   private cancelTimer: ReturnType<typeof setTimeout> | null = null;
   private turnTitle = '';
+  private releaseMcp: (() => void) | null = null;
 
   constructor(private readonly deps: RuntimeDeps) {}
 
@@ -81,14 +104,44 @@ export class AgentRuntime {
     return this.connection.agent;
   }
 
-  /** Builds the ACP client: these handlers answer the agent's requests. */
-  private clientApp(sessionCheck: () => string | null) {
-    const context = () => ({
+  private permissionContext(sessionId: string) {
+    return {
       ownerId: this.deps.ownerId,
       root: this.root,
       agentName: this.config?.name ?? 'Agent',
-      sessionId: sessionCheck() ?? '',
-    });
+      sessionId,
+    };
+  }
+
+  /** Kestrel's MCP servers for this session (none if unavailable). */
+  private async sessionMcpServers(
+    http: boolean,
+    sandboxed: boolean,
+    sessionId: () => string | null,
+  ): Promise<McpServer[]> {
+    if (!this.deps.mcp) return [];
+    try {
+      const mcp = await this.deps.mcp({
+        sandboxed,
+        http,
+        check: (kind, target, title) =>
+          this.deps.permissions.check(this.permissionContext(sessionId() ?? ''), {
+            kind,
+            target,
+            title,
+          }),
+      });
+      this.releaseMcp = mcp.release;
+      return mcp.servers;
+    } catch (error) {
+      this.deps.events.log(redact(`Kestrel tools unavailable: ${String(error)}`));
+      return [];
+    }
+  }
+
+  /** Builds the ACP client: these handlers answer the agent's requests. */
+  private clientApp(sessionCheck: () => string | null) {
+    const context = () => this.permissionContext(sessionCheck() ?? '');
 
     return client({ name: 'Kestrel' })
       .onNotification('session/update', ({ params }) => {
@@ -209,6 +262,8 @@ export class AgentRuntime {
     });
     transport.onExit((code) => {
       if (this.transport !== transport) return;
+      this.releaseMcp?.();
+      this.releaseMcp = null;
       this.transport = null;
       this.connection = null;
       this.deps.permissions.cancel(this.deps.ownerId);
@@ -233,6 +288,11 @@ export class AgentRuntime {
         'The agent did not answer in time.',
       );
       const canLoadSession = init.agentCapabilities?.loadSession === true;
+      const mcpServers = await this.sessionMcpServers(
+        init.agentCapabilities?.mcpCapabilities?.http === true,
+        isolated !== undefined,
+        () => sessionId,
+      );
       if (resumeSessionId && canLoadSession) {
         // Set first: the agent replays the history as session updates.
         sessionId = resumeSessionId;
@@ -242,12 +302,12 @@ export class AgentRuntime {
         await this.agent.request('session/load', {
           sessionId: resumeSessionId,
           cwd: this.agentRoot,
-          mcpServers: [],
+          mcpServers,
         });
       } else {
         const session = await this.agent.request('session/new', {
           cwd: this.agentRoot,
-          mcpServers: [],
+          mcpServers,
         });
         sessionId = session.sessionId;
       }
@@ -322,6 +382,8 @@ export class AgentRuntime {
   }
 
   private disconnect(): void {
+    this.releaseMcp?.();
+    this.releaseMcp = null;
     const transport = this.transport;
     this.transport = null;
     this.connection?.close();

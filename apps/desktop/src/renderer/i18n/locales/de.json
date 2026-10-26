@@ -318,7 +318,8 @@
       "network": "auf das Netzwerk zugreifen",
       "browser": "den Browser nutzen",
       "mcpTool": "ein MCP-Tool nutzen",
-      "docker": "eine Docker-Aktion ausführen"
+      "docker": "eine Docker-Aktion ausführen",
+      "browserControl": "Seiten im Browser öffnen"
     },
     "why": {
       "fileRead": "Der Inhalt wird an das Modell des Agenten gesendet.",
@@ -328,7 +329,8 @@
       "network": "Daten könnten dein Gerät verlassen.",
       "browser": "Der Agent sieht Inhalte von Webseiten. Diese gelten als nicht vertrauenswürdig.",
       "mcpTool": "Das Tool läuft ausserhalb von Kestrel und kann eigene Aktionen ausführen.",
-      "docker": "Container und Images auf deinem System werden verändert."
+      "docker": "Container und Images auf deinem System werden verändert.",
+      "browserControl": "Der Agent öffnet eine Web-Adresse in Kestrels Browser. Der Seiteninhalt bleibt nicht vertrauenswürdig."
     },
     "level": {
       "allow": "Erlauben",
@@ -377,7 +379,8 @@
       "network": "Netzwerk",
       "browser": "Browser",
       "mcpTool": "MCP-Tool",
-      "docker": "Docker"
+      "docker": "Docker",
+      "browserControl": "Browser steuern"
     }
   },
   "checkpoints": {
