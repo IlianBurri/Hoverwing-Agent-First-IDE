@@ -1,5 +1,5 @@
-import { access } from 'node:fs/promises';
-import { delimiter, join, parse } from 'node:path';
+import { join, parse } from 'node:path';
+import { findProgram } from '../../lib/which';
 import type { Backend, GpuInfo, HardwareInfo } from '@kestrel/shared';
 
 /** The parts of `systeminformation` we use (injectable for tests). */
@@ -27,29 +27,16 @@ export interface HardwareDeps {
   exists: (path: string) => Promise<boolean>;
 }
 
-export async function pathExists(path: string): Promise<boolean> {
-  try {
-    await access(path);
-    return true;
-  } catch {
-    return false;
-  }
-}
+export { pathExists } from '../../lib/which';
 
-/** Finds a program in PATH (with .exe on Windows). */
-export async function findInPath(
+/** Finds a program in PATH (with .exe and friends on Windows). */
+export function findInPath(
   name: string,
   platform: NodeJS.Platform,
   env: NodeJS.ProcessEnv,
   exists: (path: string) => Promise<boolean>,
 ): Promise<string | null> {
-  const dirs = (env['PATH'] ?? env['Path'] ?? '').split(platform === 'win32' ? ';' : delimiter);
-  const file = platform === 'win32' ? `${name}.exe` : name;
-  for (const dir of dirs.filter(Boolean)) {
-    const candidate = join(dir, file);
-    if (await exists(candidate)) return candidate;
-  }
-  return null;
+  return findProgram(name, { platform, env, exists });
 }
 
 const MB = 1024 ** 2;

@@ -1,4 +1,6 @@
-import { join } from 'node:path';
+// Sockets and CLI paths only exist on macOS/Linux: always build POSIX paths.
+import { posix } from 'node:path';
+
 import type { DockerState } from '@kestrel/shared';
 
 /**
@@ -14,13 +16,13 @@ export function dockerSocketCandidates(
 ): string[] | null {
   if (env['DOCKER_HOST'] || platform === 'win32') return null;
   const candidates = ['/var/run/docker.sock'];
-  if (platform === 'darwin') candidates.push(join(home, '.docker/run/docker.sock'));
+  if (platform === 'darwin') candidates.push(posix.join(home, '.docker/run/docker.sock'));
   const runtimeDir = env['XDG_RUNTIME_DIR'];
-  if (platform === 'linux' && runtimeDir) candidates.push(join(runtimeDir, 'docker.sock'));
+  if (platform === 'linux' && runtimeDir) candidates.push(posix.join(runtimeDir, 'docker.sock'));
   candidates.push(
-    join(home, '.docker/desktop/docker.sock'),
-    join(home, '.colima/default/docker.sock'),
-    join(home, '.rd/docker.sock'),
+    posix.join(home, '.docker/desktop/docker.sock'),
+    posix.join(home, '.colima/default/docker.sock'),
+    posix.join(home, '.rd/docker.sock'),
   );
   return candidates;
 }
@@ -36,7 +38,7 @@ export function dockerInstallPaths(
   }
   const paths = ['/usr/bin/docker', '/usr/local/bin/docker', '/opt/homebrew/bin/docker'];
   if (platform === 'darwin') paths.push('/Applications/Docker.app');
-  for (const dir of (env['PATH'] ?? '').split(':')) if (dir) paths.push(join(dir, 'docker'));
+  for (const dir of (env['PATH'] ?? '').split(':')) if (dir) paths.push(posix.join(dir, 'docker'));
   return paths;
 }
 

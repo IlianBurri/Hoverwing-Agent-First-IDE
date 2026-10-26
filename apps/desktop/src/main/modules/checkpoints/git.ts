@@ -1,5 +1,23 @@
 import { execFile } from 'node:child_process';
-import { devNull } from 'node:os';
+import { writeFileSync } from 'node:fs';
+import { devNull, tmpdir } from 'node:os';
+import { join } from 'node:path';
+
+let emptyConfig: string | null = null;
+
+/**
+ * A global git config that is guaranteed to be empty. On Windows git rejects
+ * the null device (NUL) as config file, so an empty file is written
+ * once per app start (overwriting whatever might be there).
+ */
+export function emptyGitConfig(platform: NodeJS.Platform = process.platform): string {
+  if (platform !== 'win32') return devNull;
+  if (emptyConfig === null) {
+    emptyConfig = join(tmpdir(), `kestrel-empty-gitconfig-${String(process.pid)}`);
+    writeFileSync(emptyConfig, '');
+  }
+  return emptyConfig;
+}
 
 export interface GitResult {
   stdout: string;
@@ -24,7 +42,7 @@ export function runGit(
     PATH: process.env['PATH'],
     SYSTEMROOT: process.env['SYSTEMROOT'],
     GIT_CONFIG_NOSYSTEM: '1',
-    GIT_CONFIG_GLOBAL: devNull,
+    GIT_CONFIG_GLOBAL: emptyGitConfig(),
     GIT_TERMINAL_PROMPT: '0',
     GIT_AUTHOR_NAME: 'Kestrel',
     GIT_AUTHOR_EMAIL: 'checkpoints@kestrel.local',

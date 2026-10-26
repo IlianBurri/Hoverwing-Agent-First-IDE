@@ -50,17 +50,21 @@ describe('readDirectory', () => {
 
   it('handles 10,000 entries quickly', async () => {
     await mkdir(join(root, 'many'));
-    await Promise.all(
-      Array.from({ length: 10_000 }, (_, index) =>
-        writeFile(join(root, 'many', `f${index}.txt`), ''),
-      ),
-    );
+    // In batches: Windows limits how many files may be open at once.
+    for (let start = 0; start < 10_000; start += 500) {
+      await Promise.all(
+        Array.from({ length: 500 }, (_, offset) =>
+          writeFile(join(root, 'many', `f${start + offset}.txt`), ''),
+        ),
+      );
+    }
     const started = performance.now();
     const entries = await readDirectory(root, 'many');
     expect(entries).toHaveLength(10_000);
     expect(entries[1]?.name).toBe('f1.txt');
     expect(performance.now() - started).toBeLessThan(1000);
-  });
+    // Creating the files is slow on Windows; only reading them is measured.
+  }, 60_000);
 });
 
 describe('readTextFile', () => {

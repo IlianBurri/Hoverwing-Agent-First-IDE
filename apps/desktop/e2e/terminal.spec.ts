@@ -18,6 +18,9 @@ function terminalText(): Promise<string> {
     );
 }
 
+/** The default shell on Windows is PowerShell, elsewhere bash/zsh. */
+const windows = process.platform === 'win32';
+
 async function run(command: string): Promise<void> {
   await page.keyboard.type(command);
   await page.keyboard.press('Enter');
@@ -75,14 +78,22 @@ test('runs full-screen programs (less)', async () => {
 });
 
 test('supports interactive programs', async () => {
-  await run('read -p "Name? " name; echo "Hello, $name!"');
+  await run(
+    windows
+      ? // PowerShell's Read-Host ignores input typed through ConPTY in tests.
+        "node -e \"require('readline').createInterface({ input: process.stdin, output: process.stdout }).question('Name? ', (name) => { console.log('Hello, ' + name + '!'); process.exit(); })\""
+      : 'read -p "Name? " name; echo "Hello, $name!"',
+  );
   await expect.poll(terminalText).toContain('Name?');
   await run('Ada');
   await expect.poll(terminalText).toContain('Hello, Ada!');
 });
 
 test('sends Ctrl+C to the shell, not to the IDE', async () => {
-  await run('sleep 30; echo not-interrupted');
+  // The quotes keep the typed command from containing the marker itself.
+  await run(
+    windows ? 'Start-Sleep 30; echo not-"interrupted"' : 'sleep 30; echo not-"interrupted"',
+  );
   await page.keyboard.press('Control+C');
   await run('echo after-interrupt');
   await expect.poll(terminalText).toContain('after-interrupt');

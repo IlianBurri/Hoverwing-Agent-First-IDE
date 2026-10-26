@@ -2,6 +2,7 @@ import { createInterface } from 'node:readline';
 import type { Readable } from 'node:stream';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
+import { findProgram } from '../../lib/which';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import type { Transport } from '@modelcontextprotocol/sdk/shared/transport.js';
 import type { McpTransport } from '@kestrel/shared';
@@ -104,6 +105,17 @@ export const connectMcp: ConnectMcp = async (target, onLog) => {
   const { transport } = target;
   let clientTransport: StdioClientTransport | StreamableHTTPClientTransport;
   if (transport.type === 'stdio') {
+    // Checked first: on Windows the SDK starts programs through a shell, so a
+    // missing program would only show up as "connection closed".
+    const program = await findProgram(transport.command, {
+      platform: process.platform,
+      env: target.env,
+      cwd: target.cwd,
+    });
+    if (!program) {
+      onLog(`Program not found: ${transport.command}`);
+      throw new McpConnectError('The program was not found.');
+    }
     const env: Record<string, string> = { ...target.env };
     for (const name of transport.env) {
       const value = target.secrets[name];

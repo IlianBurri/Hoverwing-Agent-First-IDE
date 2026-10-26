@@ -93,6 +93,9 @@ test('an allowed change is written, and the checkpoint brings the old state back
     .click();
   await expect(page.getByText('Restored 1 file.')).toBeVisible();
   expect(readFileSync(join(root, 'src', 'app.ts'), 'utf8')).toBe('export const version = 1;\n');
+  // The next prompt must not race the closing dialogs.
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await expect(input()).toBeEditable();
 });
 
 test('secret files are blocked without asking', async () => {

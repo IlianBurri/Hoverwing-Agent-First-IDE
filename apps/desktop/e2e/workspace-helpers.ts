@@ -1,6 +1,6 @@
 import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { dirname, join } from 'node:path';
+import { basename, dirname, join } from 'node:path';
 import type { ElectronApplication } from '@playwright/test';
 
 /** Creates a project folder with the given files (path -> content). */
@@ -27,7 +27,7 @@ export async function stubOpenDialog(app: ElectronApplication, folder: string): 
  * `<root>/../.test-trash`. Returns that folder.
  */
 export async function stubTrash(app: ElectronApplication, root: string): Promise<string> {
-  const trash = join(dirname(root), `${root.split('/').pop() ?? 'x'}-trash`);
+  const trash = join(dirname(root), `${basename(root)}-trash`);
   mkdirSync(trash, { recursive: true });
   await app.evaluate(({ shell }, target) => {
     // Dynamic import is not available inside evaluate(); builtins are.

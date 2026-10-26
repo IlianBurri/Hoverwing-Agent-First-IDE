@@ -16,8 +16,9 @@ beforeAll(async () => {
   await mkdir(outside);
   await writeFile(join(outside, 'id_rsa'), 'secret');
   await writeFile(join(root, 'src', 'index.ts'), '');
-  await symlink(outside, join(root, 'escape'));
-  await symlink(join(root, 'src'), join(root, 'inner-link'));
+  // Junctions: directory links Windows allows without admin rights.
+  await symlink(outside, join(root, 'escape'), 'junction');
+  await symlink(join(root, 'src'), join(root, 'inner-link'), 'junction');
 });
 
 afterAll(async () => {

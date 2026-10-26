@@ -1,5 +1,5 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { basename, join } from 'node:path';
 import { expect, test } from '@playwright/test';
 import type { ElectronApplication, Page } from '@playwright/test';
 import { launchApp } from './launch';
@@ -34,7 +34,7 @@ test('opens a folder and shows its files', async () => {
   await expect(item('src')).toBeVisible();
   await expect(item('README.md')).toBeVisible();
   await expect(item('node_modules')).toBeVisible();
-  const name = root.split('/').pop() ?? '';
+  const name = basename(root);
   await expect(page.getByRole('button', { name: 'Search commands' })).toContainText(name);
   expect(
     await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]?.getTitle()),
@@ -128,7 +128,7 @@ test('reopens the folder from the recent list', async () => {
   await page.keyboard.type('Close folder');
   await page.keyboard.press('Enter');
   await expect(page.getByText('No folder open').first()).toBeVisible();
-  const name = root.split('/').pop() ?? '';
+  const name = basename(root);
   await page
     .getByRole('navigation', { name: 'Recently opened' })
     .first()
