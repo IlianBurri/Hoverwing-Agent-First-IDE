@@ -7,10 +7,11 @@ Guidance for working on Kestrel. Read `SPEC.md` for the product spec and phases.
 Phases 0 (foundation), 1 (layout, palette, workspace, Monaco, search, terminal),
 2 (permissions, agents via ACP, checkpoints, diff review), 3 (agent sandbox in
 Docker), 4 (Docker panel), 5 (integrated browser + agent browser tools), 6
-(MCP manager), 7 (model providers, simple chat, autocompletion) and 8 (setup
-assistant: hardware detection, model catalog, Ollama install) are done, plus
-installers for Windows/macOS/Linux with auto-update. Next: phase 9 (LSP and
-Git panel). Every phase: present a plan, wait for OK, implement in small
+(MCP manager), 7 (model providers, simple chat, autocompletion), 8 (setup
+assistant: hardware detection, model catalog, Ollama install) and 9 (project
+trust, language servers, Git panel) are done, plus installers for
+Windows/macOS/Linux with auto-update. All phases of SPEC.md are done; new work
+follows the same flow: present a plan, wait for OK, implement in small
 commits, keep lint/typecheck/tests green, update this file.
 
 Windows: unit and E2E tests run on Windows too (PowerShell is the default
@@ -236,6 +237,36 @@ so use `KESTREL_SANDBOX_BASE_IMAGE` / `KESTREL_E2E_SANDBOX_BASE_IMAGE` =
   after a native confirm; no automatic install on Linux. The assistant opens
   while `settings.setupDone` is false; E2E `createUserDataDir()` writes
   `setupDone: true` unless `{ firstStart: true }`.
+- **Project trust:** `modules/trust` (`TrustStore`, userData/trust.json, real
+  paths). Granting = native confirm in main (`trust:grant`); `trust:changed`
+  goes to the project's windows. Untrusted = restricted mode (status bar badge):
+  no language servers, Git read-only. Anything that can run project code
+  (tsserver plugins, git hooks/filters) must check trust.
+- **Language servers:** `modules/lsp`. `LspConfigStore` (userData/lsp/
+  servers.json: overrides of `BUILTIN_SERVERS` + custom servers, approved
+  command-line fingerprints). `LspService` keeps one server per window and
+  config, started lazily on `lsp:open` (trusted + native confirm + program
+  found, else state `declined`/`missing`), restarts crashes (max 3), stops on
+  trust revoke. `LspClient` (vscode-jsonrpc over stdio) declares
+  `CLIENT_CAPABILITIES` (publishDiagnostics is needed or tsserver sends none)
+  and refuses `workspace/applyEdit`. Documents are the editor models, synced as
+  full text (`features/editor/monaco/lsp.ts`: debounced, flushed before each
+  request, Monaco cancel -> `lsp:cancel`); secret files are never opened.
+  `convert.ts` maps LSP results; targets outside the project are dropped.
+  While tsserver is ready, Monaco's own TS features are switched off
+  (`setModeConfiguration`). Diagnostics -> markers, Problems tab, status bar;
+  agents get them via the MCP tool `get_diagnostics` (`file.read`).
+- **Git panel:** `modules/git` (system git via `runGitProcess`; non-zero exit
+  is a result, only ENOENT rejects). `GitService` serializes commands per
+  repo, parses `status --porcelain=v2 -z` (`status.ts`), works for projects
+  inside a bigger repo (`--show-prefix`). Untrusted reads add
+  `core.fsmonitor=false` and empty all `filter.<driver>.*` (a test proves no
+  filter runs); writes throw `not_trusted`. Paths go via
+  `--pathspec-from-file=- --pathspec-file-nul` with `--literal-pathspecs`;
+  untracked files are discarded to the trash. English messages
+  (`LC_MESSAGES=C`) so `classifyGitError` can map them; raw output goes to
+  Logs › Git (`redact` hides URL credentials). Watches HEAD/index/refs plus
+  workspace changes -> debounced `git:changed`. Agents have no access.
 - **Commands:** every user action is a `Command` registered by its feature
   (`register<Feature>Commands`), with an i18n title, optional default keybinding(s)
   (`Mod+…`, overridable via `settings.keybindings`) and a `when` condition. One
@@ -278,7 +309,11 @@ so use `KESTREL_SANDBOX_BASE_IMAGE` / `KESTREL_E2E_SANDBOX_BASE_IMAGE` =
   `injection`, `fail`, `whoami`. Setup tests use `startFakeOllama()`
   (`e2e/fake-ollama.ts`). Model tests use `startFakeOpenAi()`
   (`e2e/fake-openai.ts`: `busy-model` always 429, streamed `Echo: …` chat,
-  `slow` for stopping, FIM answers `42`). Browser
+  `slow` for stopping, FIM answers `42`). Language server tests use
+  `e2e/fixtures/fake-lsp.mjs` (ERROR/WARN lines -> diagnostics, completion
+  `fakeCompletion`, hover, definition incl. one outside the project, `CRASH`
+  exits); E2E writes `lsp/servers.json` and `trust.json` into the user-data dir.
+  Git E2E uses a real repo plus a local bare remote. Browser
   tests use `startTestSite()` (`e2e/browser-helpers.ts`). Sandbox E2E bundles the mock
   agent into the project (`bundleMockAgent`, via Vite) because the container
   only sees the project. A failing test restarts the worker (and the app),
@@ -310,6 +345,12 @@ package names are deprecated). Checkpoints need system `git`.
 systeminformation 5.33.16, electron-builder 26.15, electron-updater 6.8.10
 (checked 2026-10-26; 6.8.11+ were days old, so not taken yet).
 Ollama release v0.40.11 assets carry `digest: sha256:…` in the GitHub API.
+
+vscode-jsonrpc 9.0.3 + vscode-languageserver-protocol 3.18.4 (types only;
+checked 2026-10-27, 10.0.0/3.18.5 were days old). TypeScript template:
+`npx -y -p typescript-language-server@6.0.2 -p typescript@6.0.3
+typescript-language-server --stdio`. Git ≥ 2.31 (`--path-format`,
+`--pathspec-from-file`).
 
 openai 7.43.0 (checked 2026-10-26; Node ≥ 22; reads `OPENAI_*` env defaults
 unless options are passed explicitly; `max_tokens` is marked deprecated but

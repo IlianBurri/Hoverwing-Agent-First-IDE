@@ -88,6 +88,15 @@ AI you already use**.
       speed.
     </td>
     <td width="50%" valign="top">
+      <h3>🧠 Language servers &amp; Git</h3>
+      Completion, hover, go to definition and a Problems list from real language
+      servers (TypeScript, Pyright, rust-analyzer, gopls or your own). A Git panel to
+      stage, commit, switch branches, diff, pull and push. Agents can read the current
+      problems through Kestrel's <code>get_diagnostics</code> tool.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top" colspan="2">
       <h3>🧰 Everything around it</h3>
       Monaco editor, ripgrep project search, terminals, a Docker panel, an integrated
       browser the agent can inspect (content marked as untrusted), an MCP manager with
@@ -162,6 +171,10 @@ installers are unsigned).
 - **Verified downloads:** installers only from official GitHub releases, checked
   against the published SHA-256 before anything runs; app updates are verified by
   electron-updater (SHA-512).
+- **Restricted mode for unknown projects:** language servers and Git actions can run
+  code from a project (tsserver plugins, hooks, filters). They only run after you
+  trust the project in a native dialog; until then Git only reads, with the
+  repository's filters and fsmonitor disabled.
 - **No telemetry.** Kestrel does not sell or proxy AI usage.
 
 ## Architecture
@@ -279,7 +292,7 @@ the app data folder: `"keybindings": { "view.toggleSidebar": "Mod+Shift+B" }`.
 | 5–6   | Integrated browser with agent tools, MCP manager                    | ✅     |
 | 7     | Model providers, built-in chat, inline autocompletion               | ✅     |
 | 8     | Setup assistant, installers and auto-update                         | ✅     |
-| 9     | Language servers (go to definition, diagnostics) and a Git panel    | ⏳     |
+| 9     | Language servers (go to definition, diagnostics) and a Git panel    | ✅     |
 
 ## Trademarks
 
