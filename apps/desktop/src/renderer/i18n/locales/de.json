@@ -212,7 +212,8 @@
       "secret_file": "Geheime Dateien (z. B. .env oder Schlüssel) werden nie an ein Modell geschickt.",
       "download_failed": "Der Download ist fehlgeschlagen. Prüfe die Internetverbindung und versuche es erneut.",
       "download_corrupt": "Die geladene Datei stimmte nicht mit der offiziellen Prüfsumme überein und wurde gelöscht.",
-      "ollama_unavailable": "Ollama läuft nicht. Starte Ollama und versuche es erneut."
+      "ollama_unavailable": "Ollama läuft nicht. Starte Ollama und versuche es erneut.",
+      "not_trusted": "Diesem Projekt wird noch nicht vertraut."
     }
   },
   "palette": {
@@ -961,5 +962,14 @@
     "restart": "Neu starten für {{version}}",
     "turnOff": "Automatische Update-Suche ausschalten",
     "turnOn": "Automatische Update-Suche einschalten"
+  },
+  "trust": {
+    "grant": "Diesem Projekt vertrauen",
+    "revoke": "Projekt nicht mehr vertrauen",
+    "revokeTitle": "Projekt nicht mehr vertrauen?",
+    "revokeMessage": "Sprach-Server werden beendet, und das Git-Panel zeigt nur noch Änderungen an, bis du dem Projekt wieder vertraust.",
+    "restricted": "Eingeschränkter Modus",
+    "restrictedTitle": "Sprach-Server und Git-Aktionen sind in diesem Projekt aus. Klicke, um ihm zu vertrauen.",
+    "restrictedHint": "Eingeschränkter Modus: Sprach-Server und Git-Aktionen sind aus, bis du diesem Projekt vertraust (Statusleiste)."
   }
 }

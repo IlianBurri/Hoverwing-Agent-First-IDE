@@ -32,6 +32,8 @@ import { refreshCheckpoints } from './stores/checkpoints';
 import { refreshReview } from './stores/review';
 import { useWorkspaceStore } from './stores/workspace';
 import { registerTerminalCommands } from './features/terminal';
+import { onWorkspaceOpened, registerTrustCommands } from './features/trust';
+import { setTrusted } from './stores/trust';
 import { setPanelOpen } from './stores/layout';
 import { useModalStore } from './stores/modals';
 import { addLogEntry, addPending, loadPending, removePending } from './stores/permissions';
@@ -62,6 +64,7 @@ export function App() {
   useEffect(() => registerChatCommands(), []);
   useEffect(() => registerSetupCommands(), []);
   useEffect(() => registerUpdateCommands(), []);
+  useEffect(() => registerTrustCommands(), []);
   useEffect(() => {
     void loadUpdateStatus();
     return window.kestrel.on('updates:status', setUpdateStatus);
@@ -156,7 +159,16 @@ export function App() {
     void refreshReview();
     // Also feeds the container count in the status bar.
     void refreshDocker();
+    if (workspaceRoot) void onWorkspaceOpened();
+    else setTrusted(null);
   }, [workspaceRoot]);
+  useEffect(
+    () =>
+      window.kestrel.on('trust:changed', ({ trusted }) => {
+        setTrusted(trusted);
+      }),
+    [],
+  );
   useEffect(
     () =>
       window.kestrel.on('review:changed', () => {

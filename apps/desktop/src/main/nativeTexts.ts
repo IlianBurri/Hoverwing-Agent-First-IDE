@@ -19,6 +19,14 @@ export const nativeTexts = {
     installDetail:
       'Die Datei wurde von der offiziellen Quelle geladen und ihre SHA-256-Prüfsumme stimmt.\n\nQuelle: {source}\nDatei: {file}\nSHA-256: {sha256}',
     installStart: 'Installieren',
+    trustMessage: 'Diesem Projekt vertrauen?',
+    trustDetail:
+      'Sprach-Server und Git können Code aus dem Projekt ausführen (z. B. tsserver-Plugins, Git-Hooks und -Filter). Vertraue nur Projekten, deren Herkunft du kennst.\n\n{root}',
+    trustAllow: 'Vertrauen',
+    lspMessage: 'Sprach-Server «{name}» starten?',
+    lspDetail:
+      'Kestrel startet dieses Programm in deinem Projektordner, mit deinen Rechten. Es liest den Code und kann Werkzeuge aus dem Projekt laden.\n\n{command}',
+    lspStart: 'Starten',
   },
   en: {
     unsavedMessage: 'Discard unsaved changes?',
@@ -39,6 +47,14 @@ export const nativeTexts = {
     installDetail:
       'The file was downloaded from the official source and its SHA-256 checksum matches.\n\nSource: {source}\nFile: {file}\nSHA-256: {sha256}',
     installStart: 'Install',
+    trustMessage: 'Trust this project?',
+    trustDetail:
+      'Language servers and Git can run code from the project (e.g. tsserver plugins, Git hooks and filters). Only trust projects whose origin you know.\n\n{root}',
+    trustAllow: 'Trust',
+    lspMessage: 'Start language server “{name}”?',
+    lspDetail:
+      'Kestrel will start this program in your project folder, with your rights. It reads the code and can load tools from the project.\n\n{command}',
+    lspStart: 'Start',
   },
 } as const;
 

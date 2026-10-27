@@ -212,7 +212,8 @@
       "secret_file": "Secret files (e.g. .env or keys) are never sent to a model.",
       "download_failed": "The download failed. Check the internet connection and try again.",
       "download_corrupt": "The downloaded file did not match the official checksum and was deleted.",
-      "ollama_unavailable": "Ollama is not running. Start Ollama and try again."
+      "ollama_unavailable": "Ollama is not running. Start Ollama and try again.",
+      "not_trusted": "This project is not trusted yet."
     }
   },
   "palette": {
@@ -961,5 +962,14 @@
     "restart": "Restart for {{version}}",
     "turnOff": "Turn off automatic update check",
     "turnOn": "Turn on automatic update check"
+  },
+  "trust": {
+    "grant": "Trust this project",
+    "revoke": "Stop trusting this project",
+    "revokeTitle": "Stop trusting this project?",
+    "revokeMessage": "Language servers stop, and the Git panel can only show changes until you trust the project again.",
+    "restricted": "Restricted mode",
+    "restrictedTitle": "Language servers and Git actions are off in this project. Click to trust it.",
+    "restrictedHint": "Restricted mode: language servers and Git actions are off until you trust this project (status bar)."
   }
 }

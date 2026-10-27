@@ -75,6 +75,7 @@ import { SearchRunner, createSearchHandlers } from './modules/search';
 import { createSettingsHandlers, createSettingsStore } from './modules/settings';
 import { TerminalManager, createTerminalHandlers, spawnNodePty } from './modules/terminal';
 import { WorkspaceManager, createWorkspaceHandlers, watchWorkspace } from './modules/workspace';
+import { TrustStore, createTrustHandlers } from './modules/trust';
 import { broadcastEvent, sendEvent } from './ipc/events';
 import { registerIpc } from './ipc/register';
 import {
@@ -280,6 +281,14 @@ void app.whenReady().then(async () => {
       : await dialog.showMessageBox(options);
     return result.response === 1;
   };
+  const trust = new TrustStore(join(dataDir, 'trust.json'));
+  trust.onChange((root, trusted) => {
+    for (const window of BrowserWindow.getAllWindows()) {
+      if (workspaces.get(window.webContents.id)?.root === root) {
+        sendEvent(window.webContents, 'trust:changed', { trusted });
+      }
+    }
+  });
   const secrets = new SecretStore(join(dataDir, 'secrets.json'), safeStorage);
   const mcp = new McpService({
     configs: new McpConfigStore(join(dataDir, 'mcp')),
@@ -578,6 +587,14 @@ void app.whenReady().then(async () => {
         async (agentId) => (await agentConfigs.get(agentId)) !== undefined,
       ),
       ...createSearchHandlers(search, workspaces),
+      ...createTrustHandlers(trust, workspaces, (ownerId, root) => {
+        const text = nativeTexts[dialogLanguage(settings.get())];
+        return askNatively(ownerId, {
+          message: text.trustMessage,
+          detail: text.trustDetail.replace('{root}', root),
+          confirm: text.trustAllow,
+        });
+      }),
       'window:setTitleBarTheme': (theme, { sender }) => {
         const window = BrowserWindow.fromWebContents(sender);
         if (window && process.platform !== 'darwin') {

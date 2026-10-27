@@ -34,7 +34,8 @@ export type IpcErrorCode =
   | 'secret_file'
   | 'download_failed'
   | 'download_corrupt'
-  | 'ollama_unavailable';
+  | 'ollama_unavailable'
+  | 'not_trusted';
 
 export interface IpcError {
   code: IpcErrorCode;

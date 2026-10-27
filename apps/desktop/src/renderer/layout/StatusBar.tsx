@@ -20,6 +20,7 @@ import { downloadUpdate, installUpdate } from '../features/updates';
 import { useUpdateStore } from '../stores/updates';
 import { useProvidersStore } from '../stores/providers';
 import { SandboxBadge } from '../features/sandbox';
+import { TrustBadge } from '../features/trust';
 import { runningContainers, useDockerStore } from '../stores/docker';
 import styles from './StatusBar.module.css';
 
@@ -114,6 +115,7 @@ export function StatusBar() {
             <span className={styles['item']}>{cursor.language}</span>
           </>
         )}
+        <TrustBadge className={`${styles['button'] ?? ''} ${styles['warning'] ?? ''}`} />
         <span className={styles['item']} title={workspace?.root}>
           <FolderClosed size={14} aria-hidden="true" />
           {workspace?.name ?? t('status.noProject')}
