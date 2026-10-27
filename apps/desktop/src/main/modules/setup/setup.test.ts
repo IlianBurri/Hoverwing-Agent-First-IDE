@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { mkdtemp, readFile, rm, stat } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, win32 } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { defaultSettings } from '@kestrel/shared';
 import type { InstallPlan, ProviderConfig, Settings } from '@kestrel/shared';
@@ -82,11 +82,14 @@ describe('hardware detection', () => {
       ...base,
       exists: (path: string) => Promise.resolve(files.includes(path)),
     });
-    expect(await detectBackend(nvidia, withFiles([join('C:\\bin', 'nvidia-smi.exe')]))).toBe(
+    expect(await detectBackend(nvidia, withFiles([win32.join('C:\\bin', 'nvidia-smi.exe')]))).toBe(
       'cuda',
     );
     expect(
-      await detectBackend(nvidia, withFiles([join('C:\\Windows', 'System32', 'vulkan-1.dll')])),
+      await detectBackend(
+        nvidia,
+        withFiles([win32.join('C:\\Windows', 'System32', 'vulkan-1.dll')]),
+      ),
     ).toBe('vulkan');
     expect(await detectBackend(nvidia, withFiles([]))).toBe('cpu');
     expect(await detectBackend([], { ...withFiles([]), platform: 'darwin', arch: 'arm64' })).toBe(

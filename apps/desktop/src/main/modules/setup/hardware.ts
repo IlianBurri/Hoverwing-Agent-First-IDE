@@ -1,4 +1,5 @@
-import { join, parse } from 'node:path';
+// Windows paths are built with win32 helpers on every host (tests simulate platforms).
+import { win32 } from 'node:path';
 import { findProgram } from '../../lib/which';
 import type { Backend, GpuInfo, HardwareInfo } from '@kestrel/shared';
 
@@ -58,7 +59,7 @@ export function toGpus(
 
 function vulkanLoaders(platform: NodeJS.Platform, env: NodeJS.ProcessEnv): string[] {
   if (platform === 'win32') {
-    return [join(env['SystemRoot'] ?? 'C:\\Windows', 'System32', 'vulkan-1.dll')];
+    return [win32.join(env['SystemRoot'] ?? 'C:\\Windows', 'System32', 'vulkan-1.dll')];
   }
   return [
     '/usr/lib/x86_64-linux-gnu/libvulkan.so.1',
@@ -101,7 +102,7 @@ export async function detectHardware(deps: HardwareDeps): Promise<HardwareInfo> 
   const gpus = toGpus(graphics.controllers);
   // The disk that holds the home folder (where Ollama stores models).
   const home =
-    deps.platform === 'win32' ? parse(deps.homeDir).root.replace(/\\$/, '') : deps.homeDir;
+    deps.platform === 'win32' ? win32.parse(deps.homeDir).root.replace(/\\$/, '') : deps.homeDir;
   const disk = disks
     .filter((entry) =>
       deps.platform === 'win32'
