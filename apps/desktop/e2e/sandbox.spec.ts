@@ -77,6 +77,9 @@ test.describe('in a Docker container', () => {
   let root: string;
 
   test.beforeAll(async () => {
+    // Bundling the mock agent and a cold app start take longer than the
+    // default 30 s on CI runners.
+    test.setTimeout(180_000);
     root = realpathSync(
       createProject({
         'src/app.ts': 'export const version = 1;\n',

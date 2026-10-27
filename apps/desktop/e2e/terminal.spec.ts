@@ -21,6 +21,16 @@ function terminalText(): Promise<string> {
 /** The default shell on Windows is PowerShell, elsewhere bash/zsh. */
 const windows = process.platform === 'win32';
 
+/**
+ * Tests share one terminal. On CI a failed test is retried in a fresh app,
+ * so every test after the first opens a terminal itself if there is none.
+ */
+async function ensureTerminal(): Promise<void> {
+  if ((await page.locator('[data-terminal]').count()) > 0) return;
+  await page.keyboard.press('Control+Backquote');
+  await expect(page.getByRole('textbox', { name: 'Terminal input' })).toBeFocused();
+}
+
 async function run(command: string): Promise<void> {
   await page.keyboard.type(command);
   await page.keyboard.press('Enter');
@@ -57,16 +67,21 @@ test('opens a terminal in the project folder with Ctrl+`', async () => {
 });
 
 test('runs git status', async () => {
+  await ensureTerminal();
   await run('git status');
-  await expect.poll(terminalText).toMatch(/No commits yet|On branch/);
+  // The untracked files show in every language; the header lines may already
+  // have scrolled out of a small terminal.
+  await expect.poll(terminalText).toContain('README.md');
 });
 
 test('runs npm install', async () => {
+  await ensureTerminal();
   await run('npm install --no-audit --no-fund');
   await expect.poll(terminalText, { timeout: 30_000 }).toMatch(/up to date|added 0 packages/);
 });
 
 test('runs full-screen programs (less)', async () => {
+  await ensureTerminal();
   await run('clear; seq 1 500 | less');
   // less switches to the alternate screen and shows the first page.
   await expect.poll(terminalText).toMatch(/^1\n2\n3/);
@@ -78,6 +93,7 @@ test('runs full-screen programs (less)', async () => {
 });
 
 test('supports interactive programs', async () => {
+  await ensureTerminal();
   await run(
     windows
       ? // PowerShell's Read-Host ignores input typed through ConPTY in tests.
@@ -90,6 +106,7 @@ test('supports interactive programs', async () => {
 });
 
 test('sends Ctrl+C to the shell, not to the IDE', async () => {
+  await ensureTerminal();
   // The quotes keep the typed command from containing the marker itself.
   await run(
     windows ? 'Start-Sleep 30; echo not-"interrupted"' : 'sleep 30; echo not-"interrupted"',
@@ -107,6 +124,7 @@ test('sends Ctrl+C to the shell, not to the IDE', async () => {
 });
 
 test('keeps several terminals and ends them', async () => {
+  await ensureTerminal();
   await run('clear; echo first-terminal');
   await expect.poll(terminalText).toContain('first-terminal');
   await page.getByRole('button', { name: 'New terminal' }).click();
@@ -124,6 +142,7 @@ test('keeps several terminals and ends them', async () => {
 });
 
 test('shows that the shell ended after exit', async () => {
+  await ensureTerminal();
   await page.getByRole('tablist', { name: 'Terminals' }).getByRole('tab').first().click();
   await page.locator('[data-terminal]:not([hidden])').click();
   await run('exit 3');
