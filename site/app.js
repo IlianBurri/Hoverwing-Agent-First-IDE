@@ -71,4 +71,60 @@ async function main() {
   }
 }
 
+// ---------- Motion (skipped when the system asks for reduced motion) ----------
+
+const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/** Staggers the scroll animations (style.css) within a group. */
+function setupStagger() {
+  for (const group of document.querySelectorAll('.reveal-group')) {
+    [...group.querySelectorAll('.reveal')].forEach((element, index) => {
+      element.style.setProperty('--i', String(index % 4));
+    });
+  }
+}
+
+/** "Bring your own coding agent / API key / local model". */
+function setupRotator() {
+  const word = document.getElementById('rotator');
+  if (!word || calm) return;
+  const words = ['coding agent', 'API key', 'local model'];
+  let index = 0;
+  window.setInterval(() => {
+    word.classList.add('out');
+    window.setTimeout(() => {
+      index = (index + 1) % words.length;
+      word.textContent = words[index];
+      word.classList.remove('out');
+    }, 350);
+  }, 2600);
+}
+
+/** The navigation gets a shadow once the page is scrolled. */
+function setupNav() {
+  const nav = document.getElementById('nav');
+  if (!nav) return;
+  const update = () => {
+    nav.classList.toggle('scrolled', window.scrollY > 8);
+  };
+  window.addEventListener('scroll', update, { passive: true });
+  update();
+}
+
+/** A soft light under the pointer on cards. */
+function setupSpotlight() {
+  if (calm) return;
+  for (const card of document.querySelectorAll('.spotlight')) {
+    card.addEventListener('pointermove', (event) => {
+      const rect = card.getBoundingClientRect();
+      card.style.setProperty('--x', `${event.clientX - rect.left}px`);
+      card.style.setProperty('--y', `${event.clientY - rect.top}px`);
+    });
+  }
+}
+
+setupStagger();
+setupRotator();
+setupNav();
+setupSpotlight();
 void main();

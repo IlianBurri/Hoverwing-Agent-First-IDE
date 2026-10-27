@@ -13,13 +13,18 @@
       property="og:description"
       content="Bring your own AI – keep control of your code. Free and open source for Windows, macOS and Linux."
     />
-    <meta property="og:image" content="images/agent.png" />
+    <meta
+      property="og:image"
+      content="https://ilianburri.github.io/Kestrel-Agen-Harness-IDE/images/agent.png"
+    />
+    <meta property="og:type" content="website" />
     <link rel="icon" type="image/png" href="images/icon.png" />
     <link rel="stylesheet" href="style.css" />
     <script src="app.js" defer></script>
   </head>
   <body>
-    <header class="nav">
+    <a class="skip" href="#top">Skip to content</a>
+    <header class="nav" id="nav">
       <a class="brand" href="#top">
         <img src="images/icon.png" alt="" width="28" height="28" />
         <span>Kestrel</span>
@@ -34,36 +39,58 @@
 
     <main id="top">
       <section class="hero">
-        <h1>The agent-first desktop IDE</h1>
-        <p class="lead">
-          Bring your own AI – keep control of your code. Run coding agents like Claude Code or
-          Gemini CLI, your own API key or a local model, in an editor that makes every agent action
-          visible, reviewable and reversible.
+        <div class="aurora" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="grid-bg" aria-hidden="true"></div>
+        <p class="eyebrow reveal">Free · Open source · Windows, macOS &amp; Linux</p>
+        <h1 class="reveal">The <span class="gradient-text">agent-first</span><br />desktop IDE</h1>
+        <p class="lead reveal">
+          Bring your own
+          <span class="rotator" aria-hidden="true"
+            ><span class="rotator-word" id="rotator">coding agent</span></span
+          ><span class="visually-hidden">coding agent, API key or local model</span>
+          – and keep control of your code. Every agent action is visible, reviewable and reversible.
         </p>
-        <div class="cta">
-          <a class="button primary" id="primary-download" href="#download">Download for free</a>
+        <div class="cta reveal">
+          <a class="button primary shine" id="primary-download" href="#download"
+            >Download for free</a
+          >
           <a class="button" href="https://github.com/IlianBurri/Kestrel-Agen-Harness-IDE"
             >View source on GitHub</a
           >
         </div>
-        <p class="small" id="release-line">Free and open source (MIT) · Windows · macOS · Linux</p>
-        <img
-          class="shot"
-          src="images/agent.png"
-          alt="Kestrel with a coding agent: plan, tool calls, a change held for review and a permission request"
-          width="1600"
-          height="1000"
-        />
+        <p class="small reveal" id="release-line">
+          Free and open source (MIT) · Windows · macOS · Linux
+        </p>
+        <div class="shot-frame">
+          <img
+            class="shot"
+            src="images/agent.png"
+            alt="Kestrel with a coding agent: plan, tool calls, a change held for review and a permission request"
+            width="2878"
+            height="1758"
+          />
+        </div>
+      </section>
+
+      <section class="stats reveal-group" aria-label="Highlights">
+        <div class="stat reveal"><strong>0</strong><span>telemetry, accounts or ads</span></div>
+        <div class="stat reveal">
+          <strong>100%</strong><span>of agent writes reviewable before they land</span>
+        </div>
+        <div class="stat reveal">
+          <strong>3</strong><span>platforms: Windows, macOS, Linux</span>
+        </div>
+        <div class="stat reveal"><strong>MIT</strong><span>licensed, built in the open</span></div>
       </section>
 
       <section id="download" class="section">
-        <h2>Download</h2>
-        <p class="muted">
+        <h2 class="reveal">Download</h2>
+        <p class="muted reveal">
           The newest version from GitHub Releases. Kestrel checks for updates on start and asks
           before installing them.
         </p>
-        <div class="cards" id="downloads">
-          <article class="card" data-os="windows">
+        <div class="cards reveal-group" id="downloads">
+          <article class="card reveal spotlight" data-os="windows">
             <h3>Windows</h3>
             <p class="muted">Windows 10/11, x64 · installer (.exe)</p>
             <a
@@ -76,7 +103,7 @@
               Until code signing is approved, SmartScreen may warn: <em>More info → Run anyway</em>.
             </p>
           </article>
-          <article class="card" data-os="mac">
+          <article class="card reveal spotlight" data-os="mac">
             <h3>macOS</h3>
             <p class="muted">Apple Silicon · disk image (.dmg)</p>
             <a
@@ -90,7 +117,7 @@
               <em>System Settings → Privacy &amp; Security → Open Anyway</em>.
             </p>
           </article>
-          <article class="card" data-os="linux">
+          <article class="card reveal spotlight" data-os="linux">
             <h3>Linux</h3>
             <p class="muted">x64 · AppImage</p>
             <a
@@ -102,22 +129,23 @@
             <p class="note"><code>chmod +x Kestrel-*.AppImage</code>, then start it.</p>
           </article>
         </div>
-        <p class="small">
+        <p class="small reveal">
           All versions and release notes:
           <a href="https://github.com/IlianBurri/Kestrel-Agen-Harness-IDE/releases"
             >GitHub Releases</a
           >
           · <a href="#code-signing">Code signing policy</a> ·
           <a href="https://github.com/IlianBurri/Kestrel-Agen-Harness-IDE/blob/HEAD/PRIVACY.md"
-            >Privacy</a
+            >App privacy</a
           >
         </p>
       </section>
 
       <section id="features" class="section">
-        <h2>What Kestrel does</h2>
-        <div class="features">
-          <article>
+        <h2 class="reveal">What Kestrel does</h2>
+        <div class="features reveal-group">
+          <article class="feature reveal spotlight">
+            <span class="icon" aria-hidden="true">01</span>
             <h3>Agents with guard rails</h3>
             <p>
               Start Claude Code, Gemini CLI or any ACP agent in your project. See its plan, tool
@@ -125,35 +153,40 @@
               Optionally in a Docker sandbox.
             </p>
           </article>
-          <article>
+          <article class="feature reveal spotlight">
+            <span class="icon" aria-hidden="true">02</span>
             <h3>Diff review &amp; checkpoints</h3>
             <p>
               Agent edits are held until you accept them – per file or per section. Before every
               turn Kestrel saves a checkpoint, so any change can be undone.
             </p>
           </article>
-          <article>
+          <article class="feature reveal spotlight">
+            <span class="icon" aria-hidden="true">03</span>
             <h3>Bring your own AI</h3>
             <p>
               Use your own agent, an OpenRouter or OpenAI-style key, or a local model through Ollama
               or llama.cpp. The setup assistant detects your hardware and recommends models.
             </p>
           </article>
-          <article>
+          <article class="feature reveal spotlight">
+            <span class="icon" aria-hidden="true">04</span>
             <h3>A real editor</h3>
             <p>
               Monaco editor, language servers (completion, go to definition, problems), Git panel,
               terminals, project search, Docker panel and an integrated browser.
             </p>
           </article>
-          <article>
+          <article class="feature reveal spotlight">
+            <span class="icon" aria-hidden="true">05</span>
             <h3>Your layout</h3>
             <p>
               Any command as a toolbar button, panels on either side, saved layouts – or describe
               the IDE you want and let your model propose it, with a preview and undo.
             </p>
           </article>
-          <article>
+          <article class="feature reveal spotlight">
+            <span class="icon" aria-hidden="true">06</span>
             <h3>Chat &amp; autocompletion</h3>
             <p>
               A built-in chat without file access unless you attach a file, and ghost-text
@@ -161,32 +194,44 @@
             </p>
           </article>
         </div>
-        <div class="gallery">
-          <figure>
+        <div class="gallery reveal-group">
+          <figure class="reveal">
             <img
               src="images/review.png"
               alt="Reviewing an agent change section by section"
               loading="lazy"
+              width="2878"
+              height="1758"
             />
             <figcaption>Review agent changes before they reach the disk.</figcaption>
           </figure>
-          <figure>
+          <figure class="reveal">
             <img
               src="images/setup.png"
               alt="Setup assistant with hardware detection"
               loading="lazy"
+              width="2878"
+              height="1758"
             />
             <figcaption>Setup assistant: hardware check and model recommendations.</figcaption>
           </figure>
-          <figure>
-            <img src="images/chat.png" alt="Models view and built-in chat" loading="lazy" />
+          <figure class="reveal">
+            <img
+              src="images/chat.png"
+              alt="Models view and built-in chat"
+              loading="lazy"
+              width="2878"
+              height="1758"
+            />
             <figcaption>Your models, your providers, your keys.</figcaption>
           </figure>
-          <figure>
+          <figure class="reveal">
             <img
               src="images/autocomplete.png"
               alt="Ghost-text autocompletion in the editor"
               loading="lazy"
+              width="2878"
+              height="1758"
             />
             <figcaption>Inline suggestions from a local model.</figcaption>
           </figure>
@@ -194,29 +239,29 @@
       </section>
 
       <section id="security" class="section">
-        <h2>Safe by default</h2>
-        <ul class="checks">
-          <li>
+        <h2 class="reveal">Safe by default</h2>
+        <ul class="checks reveal-group">
+          <li class="reveal">
             <strong>Ask first:</strong> every risky agent action goes through one permission system
             with an audit log.
           </li>
-          <li>
+          <li class="reveal">
             <strong>Secrets stay secret:</strong> <code>.env</code> files and keys are never shown
             to agents or sent to models; API keys live in your system keychain.
           </li>
-          <li>
+          <li class="reveal">
             <strong>Restricted mode:</strong> language servers and Git only run code from a project
             after you trust it.
           </li>
-          <li>
+          <li class="reveal">
             <strong>No telemetry, no account.</strong> Kestrel does not sell or proxy AI usage.
           </li>
         </ul>
       </section>
 
       <section id="code-signing" class="section">
-        <h2>Code signing policy</h2>
-        <p>
+        <h2 class="reveal">Code signing policy</h2>
+        <p class="reveal">
           Free code signing provided by <a href="https://about.signpath.io">SignPath.io</a>,
           certificate by <a href="https://signpath.org">SignPath Foundation</a>. (Application in
           progress; until it is approved, the Windows installers are unsigned.) Only binaries built
@@ -226,13 +271,13 @@
             >code signing policy</a
           >.
         </p>
-        <p>
-          <strong>Privacy:</strong> this program will not transfer any information to other
-          networked systems unless specifically requested by the user or the person installing or
-          operating it. Exceptions, both can be turned off: the update check on start (GitHub) and
-          the first download of the TypeScript language server (npm).
+        <p class="reveal">
+          <strong>Privacy of the app:</strong> this program will not transfer any information to
+          other networked systems unless specifically requested by the user or the person installing
+          or operating it. Exceptions, both can be turned off: the update check on start (GitHub)
+          and the first download of the TypeScript language server (npm).
           <a href="https://github.com/IlianBurri/Kestrel-Agen-Harness-IDE/blob/HEAD/PRIVACY.md"
-            >Privacy statement</a
+            >App privacy statement</a
           >.
         </p>
       </section>
@@ -240,17 +285,24 @@
 
     <footer class="footer">
       <p>
-        Kestrel is free software under the
+        © 2026 Kestrel contributors. Kestrel is free software under the
         <a href="https://github.com/IlianBurri/Kestrel-Agen-Harness-IDE/blob/HEAD/LICENSE"
           >MIT license</a
-        >. Not affiliated with Anthropic or Google; “Claude” and “Gemini” are trademarks of their
-        owners.
+        >; the screenshots show Kestrel itself with a demo project.
       </p>
       <p>
-        <a href="https://github.com/IlianBurri/Kestrel-Agen-Harness-IDE/issues">Report a problem</a>
-        ·
+        Kestrel is an independent project and not affiliated with or endorsed by Anthropic, Google,
+        OpenAI, Microsoft, Apple or GitHub. Claude, Gemini, Windows, macOS, GitHub and other names
+        are trademarks of their respective owners and are used only to describe compatibility.
+      </p>
+      <p>
+        <a href="privacy.html">Website privacy</a> ·
         <a href="https://github.com/IlianBurri/Kestrel-Agen-Harness-IDE/blob/HEAD/PRIVACY.md"
-          >Privacy</a
+          >App privacy</a
+        >
+        ·
+        <a href="https://github.com/IlianBurri/Kestrel-Agen-Harness-IDE/issues"
+          >Contact &amp; issues</a
         >
       </p>
     </footer>
