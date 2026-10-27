@@ -1116,5 +1116,25 @@
     "logEmptyTitle": "No Git output yet",
     "logEmptyText": "Messages from git (e.g. push and pull) appear here.",
     "folderChanged": "Contains changes"
+  },
+  "toolbar": {
+    "label": "Toolbar",
+    "menuLabel": "Toolbar menu",
+    "customize": "Customize toolbar …",
+    "dialogTitle": "Customize toolbar",
+    "intro": "Any command can become a button in the title bar. Buttons are greyed out while their command is not available (e.g. Push outside a Git repository).",
+    "current": "In the toolbar",
+    "empty": "No buttons yet. Add commands on the right.",
+    "add": "Add a command",
+    "search": "Search commands",
+    "addName": "Add {{name}}",
+    "removeName": "Remove {{name}}",
+    "moveEarlier": "Move {{name}} left",
+    "moveLater": "Move {{name}} right",
+    "moveLeft": "Move left",
+    "moveRight": "Move right",
+    "remove": "Remove from toolbar",
+    "reset": "Restore default (Pull, Push)",
+    "full": "The toolbar is full ({{max}} buttons)."
   }
 }

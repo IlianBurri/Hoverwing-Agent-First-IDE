@@ -6,6 +6,7 @@ import { KestrelMark } from '../components/KestrelMark';
 import { runCommand, useKeybindingLabel } from '../features/commands';
 import { togglePanel, useLayoutStore } from '../stores/layout';
 import { useWorkspaceStore } from '../stores/workspace';
+import { Toolbar } from '../features/toolbar';
 import styles from './TitleBar.module.css';
 
 /**
@@ -39,6 +40,7 @@ export function TitleBar() {
         </button>
       </div>
       <div className={styles['actions']}>
+        <Toolbar />
         <IconButton
           size="sm"
           icon={PanelLeft}

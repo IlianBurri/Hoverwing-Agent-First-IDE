@@ -271,6 +271,11 @@ so use `KESTREL_SANDBOX_BASE_IMAGE` / `KESTREL_E2E_SANDBOX_BASE_IMAGE` =
   (`register<Feature>Commands`), with an i18n title, optional default keybinding(s)
   (`Mod+…`, overridable via `settings.keybindings`) and a `when` condition. One
   window-level listener runs them; in a terminal, `Ctrl+<letter>` goes to the shell.
+- **Toolbar:** `features/toolbar`. `settings.toolbar` = command ids shown as
+  buttons in the title bar (default `git.pull`, `git.push`, max 30); any
+  registered command can be added (dialog `toolbar.customize`, context menu).
+  Unknown ids are skipped; unavailable commands are disabled. `when` is not
+  reactive, so `Toolbar` subscribes to the stores most conditions read.
 - **Dialogs/toasts:** use `prompt`, `confirm`, `choose` (stores/dialogs) and
   `notify` (stores/toasts). Destructive actions always confirm, with the safe
   option focused.

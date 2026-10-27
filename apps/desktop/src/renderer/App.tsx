@@ -43,6 +43,7 @@ import {
 import { appendLspLog, setDiagnostics, useLspStore } from './stores/lsp';
 import { GitDiffModal, refreshGit, registerGitCommands } from './features/git';
 import { appendGitLog } from './stores/git';
+import { ToolbarDialog, registerToolbarCommands } from './features/toolbar';
 import { setPanelOpen } from './stores/layout';
 import { useModalStore } from './stores/modals';
 import { addLogEntry, addPending, loadPending, removePending } from './stores/permissions';
@@ -76,6 +77,7 @@ export function App() {
   useEffect(() => registerTrustCommands(), []);
   useEffect(() => registerLspCommands(), []);
   useEffect(() => registerGitCommands(), []);
+  useEffect(() => registerToolbarCommands(), []);
   useEffect(() => {
     const offs = [
       window.kestrel.on('git:changed', () => {
@@ -282,6 +284,7 @@ export function App() {
       {modal?.id === 'provider' && <ProviderDialog provider={modal.provider} />}
       {modal?.id === 'setup' && <SetupWizard />}
       {modal?.id === 'lspServers' && <LspServersDialog />}
+      {modal?.id === 'toolbar' && <ToolbarDialog />}
       {modal?.id === 'gitDiff' && (
         <GitDiffModal key={modal.path} path={modal.path} staged={modal.staged} diff={modal.diff} />
       )}

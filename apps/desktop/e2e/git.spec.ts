@@ -104,7 +104,11 @@ test('creates a branch and pushes it after confirming', async () => {
   await page.getByRole('button', { name: 'Create branch' }).click();
   await expect(page.getByRole('combobox', { name: 'Branch' })).toHaveValue('feature/demo');
 
-  await page.getByRole('button', { name: 'Push', exact: true }).click();
+  // The Git panel's Push (the title bar has its own toolbar button too).
+  await page
+    .getByRole('region', { name: 'Git' })
+    .getByRole('button', { name: 'Push', exact: true })
+    .click();
   await page.getByRole('dialog').getByRole('button', { name: 'Push' }).click();
   await expect(page.getByText('Pushed.')).toBeVisible();
   expect(git(remote, 'branch', '--list', 'feature/demo').trim()).toContain('feature/demo');

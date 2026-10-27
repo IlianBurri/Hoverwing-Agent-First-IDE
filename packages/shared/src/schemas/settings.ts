@@ -25,6 +25,11 @@ export const layoutSettingsSchema = z.object({
 });
 export type LayoutSettings = z.infer<typeof layoutSettingsSchema>;
 
+/** Command ids shown as buttons in the title bar, in order. */
+export const toolbarSchema = z.array(z.string().min(1).max(100)).max(30);
+export const MAX_TOOLBAR_ITEMS = 30;
+export const defaultToolbar: readonly string[] = ['git.pull', 'git.push'];
+
 /** User overrides: command id -> key combination, e.g. "Mod+Shift+P". */
 export const keybindingsSchema = z.record(z.string().max(100), z.string().max(50));
 
@@ -34,6 +39,7 @@ export const settingsSchema = z.object({
   language: languageSchema.nullable(),
   layout: layoutSettingsSchema,
   keybindings: keybindingsSchema,
+  toolbar: toolbarSchema,
   /** Absolute paths, most recent first. Written by the main process only. */
   recentWorkspaces: z.array(z.string().max(4096)).max(10),
   /** Base image of the agent sandbox (e.g. a mirror of node:22-bookworm-slim). */
@@ -61,6 +67,7 @@ export const defaultSettings: Settings = {
     bottomView: 'terminal',
   },
   keybindings: {},
+  toolbar: [...defaultToolbar],
   recentWorkspaces: [],
   sandboxBaseImage: DEFAULT_SANDBOX_BASE_IMAGE,
   chatModel: null,

@@ -1116,5 +1116,25 @@
     "logEmptyTitle": "Noch keine Git-Ausgabe",
     "logEmptyText": "Meldungen von git (z. B. Push und Pull) erscheinen hier.",
     "folderChanged": "Enthält Änderungen"
+  },
+  "toolbar": {
+    "label": "Werkzeugleiste",
+    "menuLabel": "Menü der Werkzeugleiste",
+    "customize": "Werkzeugleiste anpassen …",
+    "dialogTitle": "Werkzeugleiste anpassen",
+    "intro": "Jeder Befehl kann ein Knopf in der Titelleiste werden. Knöpfe sind ausgegraut, solange ihr Befehl nicht verfügbar ist (z. B. Push ausserhalb eines Git-Repositorys).",
+    "current": "In der Werkzeugleiste",
+    "empty": "Noch keine Knöpfe. Füge rechts Befehle hinzu.",
+    "add": "Befehl hinzufügen",
+    "search": "Befehle suchen",
+    "addName": "{{name}} hinzufügen",
+    "removeName": "{{name}} entfernen",
+    "moveEarlier": "{{name}} nach links",
+    "moveLater": "{{name}} nach rechts",
+    "moveLeft": "Nach links",
+    "moveRight": "Nach rechts",
+    "remove": "Aus der Werkzeugleiste entfernen",
+    "reset": "Standard wiederherstellen (Pull, Push)",
+    "full": "Die Werkzeugleiste ist voll ({{max}} Knöpfe)."
   }
 }

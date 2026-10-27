@@ -1,0 +1,18 @@
+.root {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding-right: var(--space-2);
+  margin-right: var(--space-1);
+  border-right: 1px solid var(--border);
+  -webkit-app-region: no-drag;
+}
+
+.customize {
+  opacity: 0.6;
+}
+
+.customize:hover,
+.customize:focus-visible {
+  opacity: 1;
+}

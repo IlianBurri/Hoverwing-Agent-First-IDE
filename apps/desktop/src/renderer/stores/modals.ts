@@ -12,6 +12,7 @@ export type ModalState =
   | { id: 'provider'; provider: ProviderView | null }
   | { id: 'setup' }
   | { id: 'lspServers' }
+  | { id: 'toolbar' }
   | { id: 'gitDiff'; path: string; staged: boolean; diff: GitDiff }
   | null;
 

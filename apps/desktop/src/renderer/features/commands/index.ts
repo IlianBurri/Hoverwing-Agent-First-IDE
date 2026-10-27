@@ -1,5 +1,5 @@
 export { CommandPalette } from './CommandPalette';
-export { registerCommands, runCommand, useCommandStore } from './registry';
+export { isCommandEnabled, registerCommands, runCommand, useCommandStore } from './registry';
 export type { Command } from './registry';
 export { registerWorkbenchCommands } from './workbenchCommands';
 export { useGlobalKeybindings } from './useGlobalKeybindings';
