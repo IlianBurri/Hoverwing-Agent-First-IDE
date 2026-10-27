@@ -9,6 +9,11 @@
   background: var(--surface);
 }
 
+.root[data-side='right'] {
+  border-right: 0;
+  border-left: 1px solid var(--border);
+}
+
 .group {
   display: flex;
   flex-direction: column;

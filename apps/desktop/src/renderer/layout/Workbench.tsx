@@ -1,11 +1,18 @@
-import { useMemo, useRef } from 'react';
+import { Fragment, useEffect, useMemo, useRef } from 'react';
 import type { ReactNode } from 'react';
 import { Group, Panel, Separator } from 'react-resizable-panels';
 import type { Layout, PanelSize } from 'react-resizable-panels';
 import { useTranslation } from 'react-i18next';
+import { mainPanelOrder } from '@kestrel/shared';
 import { AgentPanel } from '../features/agent';
 import { EditorArea } from '../features/editor';
-import { registerPanel, useLayoutStore, usableLayout } from '../stores/layout';
+import {
+  applyPanelState,
+  persistPanelState,
+  registerPanel,
+  useLayoutStore,
+  usableLayout,
+} from '../stores/layout';
 import type { CollapsiblePanel } from '../stores/layout';
 import { useSettingsStore } from '../stores/settings';
 import { BottomPanel } from './BottomPanel';
@@ -14,7 +21,6 @@ import styles from './Workbench.module.css';
 
 const MAIN_GROUP = 'main';
 const CENTER_GROUP = 'center';
-const mainPanels = ['sidebar', 'center', 'agent'] as const;
 const centerPanels = ['editor', 'bottom'] as const;
 
 /** Debounce for writing panel sizes while the user drags a separator. */
@@ -36,18 +42,33 @@ function PanelContent({ panel, children }: { panel: CollapsiblePanel; children: 
 function trackCollapse(panel: CollapsiblePanel) {
   return (size: PanelSize) => {
     useLayoutStore.getState().setCollapsed(panel, size.asPercentage === 0);
+    persistPanelState();
   };
 }
 
 /**
- * The resizable area between activity bar and status bar:
- * sidebar | (editor / bottom panel) | agent panel.
+ * The resizable area between activity bar and status bar: sidebar,
+ * (editor / bottom panel) and agent panel, in the order of the settings.
  */
 export function Workbench() {
   const { t } = useTranslation();
   const saveTimers = useRef(new Map<string, number>());
   // Read once: groups take their initial layout on mount only.
   const storedGroups = useMemo(() => useSettingsStore.getState().settings.layout.groups, []);
+  const sidebarSide = useSettingsStore((state) => state.settings.workbench.sidebarSide);
+  const agentSide = useSettingsStore((state) => state.settings.workbench.agentSide);
+  const order = mainPanelOrder({ sidebarSide, agentSide });
+
+  // Restore which panels were open (the panels mount expanded).
+  useEffect(() => {
+    // Next frame: the panels register and lay out first.
+    const frame = window.requestAnimationFrame(() => {
+      applyPanelState(useSettingsStore.getState().settings.workbench.panels, { initial: true });
+    });
+    return () => {
+      window.cancelAnimationFrame(frame);
+    };
+  }, []);
 
   function saveLayout(groupId: string, layout: Layout) {
     const timers = saveTimers.current;
@@ -67,16 +88,10 @@ export function Workbench() {
     <Separator className={styles['separator']} aria-label={t('layout.resizeHandle')} />
   );
 
-  return (
-    <Group
-      id={MAIN_GROUP}
-      orientation="horizontal"
-      className={styles['group']}
-      defaultLayout={usableLayout(storedGroups[MAIN_GROUP], mainPanels)}
-      onLayoutChanged={(layout) => {
-        saveLayout(MAIN_GROUP, layout);
-      }}
-    >
+  // Keyed and reordered rather than rebuilt, so terminals, editors and the
+  // agent session keep their state when a panel changes sides.
+  const panels: Record<(typeof order)[number], ReactNode> = {
+    sidebar: (
       <Panel
         id="sidebar"
         defaultSize="20"
@@ -92,7 +107,8 @@ export function Workbench() {
           <Sidebar />
         </PanelContent>
       </Panel>
-      {separator}
+    ),
+    center: (
       <Panel id="center" minSize={320}>
         <Group
           id={CENTER_GROUP}
@@ -124,7 +140,8 @@ export function Workbench() {
           </Panel>
         </Group>
       </Panel>
-      {separator}
+    ),
+    agent: (
       <Panel
         id="agent"
         defaultSize="26"
@@ -140,6 +157,27 @@ export function Workbench() {
           <AgentPanel />
         </PanelContent>
       </Panel>
+    ),
+  };
+
+  return (
+    <Group
+      id={MAIN_GROUP}
+      orientation="horizontal"
+      className={styles['group']}
+      defaultLayout={usableLayout(storedGroups[MAIN_GROUP], order)}
+      onLayoutChanged={(layout) => {
+        saveLayout(MAIN_GROUP, layout);
+      }}
+    >
+      {order.map((id, index) => (
+        <Fragment key={id}>
+          {index > 0 && (
+            <Separator className={styles['separator']} aria-label={t('layout.resizeHandle')} />
+          )}
+          {panels[id]}
+        </Fragment>
+      ))}
     </Group>
   );
 }

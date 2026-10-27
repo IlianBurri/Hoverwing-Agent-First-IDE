@@ -276,6 +276,17 @@ so use `KESTREL_SANDBOX_BASE_IMAGE` / `KESTREL_E2E_SANDBOX_BASE_IMAGE` =
   registered command can be added (dialog `toolbar.customize`, context menu).
   Unknown ids are skipped; unavailable commands are disabled. `when` is not
   reactive, so `Toolbar` subscribes to the stores most conditions read.
+- **Workbench layout:** `settings.workbench` (`schemas/workbench.ts`): sides of
+  sidebar/agent panel (sidebar outermost, `mainPanelOrder`), open panels,
+  order/hidden entries of activity bar (follows the sidebar's side), bottom
+  tabs (min. 1 visible) and status bar. Panels are keyed and re-ordered, not
+  rebuilt, so terminals/editors survive a side change (E2E proves it). Open
+  state is applied one frame after mount/re-order (`applyPanelState`) and
+  saved debounced. Profiles: shipped `builtinProfiles` (only "Standard"
+  resets everything; the others change open panels/views) plus up to 20
+  saved ones in `settings.layoutProfiles`, each a `layout.profile.<id>`
+  command. The restricted-mode badge can never be hidden. Stage 3 (a model
+  proposing layouts) should produce exactly this schema.
 - **Dialogs/toasts:** use `prompt`, `confirm`, `choose` (stores/dialogs) and
   `notify` (stores/toasts). Destructive actions always confirm, with the safe
   option focused.

@@ -25,7 +25,7 @@ test('opens the palette with Ctrl+K and runs a command with the keyboard', async
   await page.keyboard.press('Control+K');
   const dialog = page.getByRole('dialog');
   await expect(dialog).toBeVisible();
-  await page.keyboard.type('agent panel');
+  await page.keyboard.type('toggle agent panel');
   await expect(dialog.getByRole('option')).toHaveCount(1);
   await page.keyboard.press('Enter');
   await expect(dialog).toBeHidden();

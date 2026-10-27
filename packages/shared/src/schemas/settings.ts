@@ -2,6 +2,13 @@ import { z } from 'zod';
 import { completionSettingsSchema, defaultCompletionSettings } from './completion';
 import { modelRefSchema } from './providers';
 import { DEFAULT_SANDBOX_BASE_IMAGE, imageReferenceSchema } from './sandbox';
+import {
+  bottomViewSchema,
+  defaultWorkbench,
+  layoutProfileSchema,
+  sidebarViewSchema,
+  workbenchSchema,
+} from './workbench';
 
 export const themePreferenceSchema = z.enum(['dark', 'light', 'system']);
 export type ThemePreference = z.infer<typeof themePreferenceSchema>;
@@ -11,12 +18,6 @@ export type Language = z.infer<typeof languageSchema>;
 
 /** Panel sizes of one resizable group, keyed by panel id, in percent. */
 export const panelLayoutSchema = z.record(z.string().max(50), z.number().min(0).max(100));
-
-export const sidebarViewSchema = z.enum(['files', 'search', 'git', 'docker', 'mcp', 'models']);
-export type SidebarView = z.infer<typeof sidebarViewSchema>;
-
-export const bottomViewSchema = z.enum(['terminal', 'logs', 'problems', 'docker']);
-export type BottomView = z.infer<typeof bottomViewSchema>;
 
 export const layoutSettingsSchema = z.object({
   groups: z.record(z.string().max(50), panelLayoutSchema),
@@ -40,6 +41,10 @@ export const settingsSchema = z.object({
   layout: layoutSettingsSchema,
   keybindings: keybindingsSchema,
   toolbar: toolbarSchema,
+  /** Arrangement of panels, bars and tabs. */
+  workbench: workbenchSchema,
+  /** Layouts the user saved (the shipped ones are not stored). */
+  layoutProfiles: z.array(layoutProfileSchema).max(20),
   /** Absolute paths, most recent first. Written by the main process only. */
   recentWorkspaces: z.array(z.string().max(4096)).max(10),
   /** Base image of the agent sandbox (e.g. a mirror of node:22-bookworm-slim). */
@@ -68,6 +73,8 @@ export const defaultSettings: Settings = {
   },
   keybindings: {},
   toolbar: [...defaultToolbar],
+  workbench: defaultWorkbench,
+  layoutProfiles: [],
   recentWorkspaces: [],
   sandboxBaseImage: DEFAULT_SANDBOX_BASE_IMAGE,
   chatModel: null,

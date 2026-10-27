@@ -1,21 +1,23 @@
 import { Container, Cpu, Files, GitBranch, Monitor, Moon, Plug, Search, Sun } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { orderedVisible, sidebarViews } from '@kestrel/shared';
 import type { SidebarView, ThemePreference } from '@kestrel/shared';
 import { IconButton } from '../components/IconButton';
+import { openLayoutMenu } from '../features/layout';
 import { setPanelOpen, useLayoutStore } from '../stores/layout';
 import { useSettingsStore } from '../stores/settings';
 import { nextThemePreference } from '../stores/theme';
 import styles from './ActivityBar.module.css';
 
-const views: readonly { id: SidebarView; icon: LucideIcon }[] = [
-  { id: 'files', icon: Files },
-  { id: 'search', icon: Search },
-  { id: 'git', icon: GitBranch },
-  { id: 'docker', icon: Container },
-  { id: 'mcp', icon: Plug },
-  { id: 'models', icon: Cpu },
-];
+export const viewIcons: Record<SidebarView, LucideIcon> = {
+  files: Files,
+  search: Search,
+  git: GitBranch,
+  docker: Container,
+  mcp: Plug,
+  models: Cpu,
+};
 
 const themeIcons: Record<ThemePreference, LucideIcon> = {
   dark: Moon,
@@ -29,6 +31,12 @@ export function ActivityBar() {
   const layout = useSettingsStore((state) => state.settings.layout);
   const theme = useSettingsStore((state) => state.settings.theme);
   const update = useSettingsStore((state) => state.update);
+  const activityBar = useSettingsStore((state) => state.settings.workbench.activityBar);
+  const sidebarSide = useSettingsStore((state) => state.settings.workbench.sidebarSide);
+  const views = orderedVisible(sidebarViews, activityBar.order, activityBar.hidden).map((id) => ({
+    id,
+    icon: viewIcons[id],
+  }));
 
   function selectView(view: SidebarView) {
     if (!sidebarCollapsed && layout.sidebarView === view) {
@@ -40,7 +48,12 @@ export function ActivityBar() {
   }
 
   return (
-    <nav className={styles['root']} aria-label={t('activity.label')}>
+    <nav
+      className={styles['root']}
+      data-side={sidebarSide}
+      aria-label={t('activity.label')}
+      onContextMenu={openLayoutMenu}
+    >
       <div className={styles['group']}>
         {views.map((view) => (
           <IconButton

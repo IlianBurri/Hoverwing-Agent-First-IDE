@@ -13,6 +13,7 @@ export type ModalState =
   | { id: 'setup' }
   | { id: 'lspServers' }
   | { id: 'toolbar' }
+  | { id: 'layout' }
   | { id: 'gitDiff'; path: string; staged: boolean; diff: GitDiff }
   | null;
 

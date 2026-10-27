@@ -24,6 +24,8 @@ import { TrustBadge } from '../features/trust';
 import { LspStatus } from '../features/lsp';
 import { GitStatusItem } from '../features/git';
 import { runningContainers, useDockerStore } from '../stores/docker';
+import type { StatusItem } from '@kestrel/shared';
+import { openLayoutMenu } from '../features/layout';
 import styles from './StatusBar.module.css';
 
 export function StatusBar() {
@@ -37,31 +39,53 @@ export function StatusBar() {
   const completion = useSettingsStore((state) => state.settings.completion);
   const completionError = useProvidersStore((state) => state.completionError);
   const update = useUpdateStore((state) => state.status);
+  const statusBar = useSettingsStore((state) => state.settings.workbench.statusBar);
+  const show = (item: StatusItem) => !statusBar.hidden.includes(item);
   const agentText =
     agent.agentName && agent.state !== 'idle' && agent.state !== 'stopped'
       ? `${agent.agentName} · ${t(`status.agentState.${agent.state}`)}`
       : t('status.agentNone');
 
+  const trustBadge = (
+    <TrustBadge className={`${styles['button'] ?? ''} ${styles['warning'] ?? ''}`} />
+  );
+  // Hidden status bar: security notices (restricted mode) still show.
+  if (!statusBar.visible) {
+    return (
+      <footer className={styles['minimal']} aria-label={t('status.label')}>
+        {trustBadge}
+      </footer>
+    );
+  }
+
   return (
-    <footer className={styles['root']} aria-label={t('status.label')}>
+    <footer
+      className={styles['root']}
+      aria-label={t('status.label')}
+      onContextMenu={openLayoutMenu}
+    >
       <div className={styles['group']}>
-        <span className={styles['item']}>
-          <Bot size={14} aria-hidden="true" />
-          {agentText}
-        </span>
+        {show('agent') && (
+          <span className={styles['item']}>
+            <Bot size={14} aria-hidden="true" />
+            {agentText}
+          </span>
+        )}
         {agent.agentName && (agent.state === 'ready' || agent.state === 'working') && (
           <SandboxBadge sandboxed={agent.sandboxed} compact />
         )}
-        <button
-          type="button"
-          className={styles['button']}
-          title={t('status.modelHint')}
-          onClick={showModelsView}
-        >
-          <Cpu size={14} aria-hidden="true" />
-          {chatModel ? chatModel.model : t('status.modelNone')}
-        </button>
-        {completion.model && (
+        {show('model') && (
+          <button
+            type="button"
+            className={styles['button']}
+            title={t('status.modelHint')}
+            onClick={showModelsView}
+          >
+            <Cpu size={14} aria-hidden="true" />
+            {chatModel ? chatModel.model : t('status.modelNone')}
+          </button>
+        )}
+        {show('completion') && completion.model && (
           <button
             type="button"
             className={styles['button']}
@@ -81,8 +105,8 @@ export function StatusBar() {
               : t('status.completionOff')}
           </button>
         )}
-        <GitStatusItem className={styles['button']} />
-        {docker?.docker === 'available' && (
+        {show('git') && <GitStatusItem className={styles['button']} />}
+        {show('containers') && docker?.docker === 'available' && (
           <button type="button" className={styles['button']} onClick={showDockerView}>
             <Container size={14} aria-hidden="true" />
             {t('status.containers', { count: runningContainers(docker) })}
@@ -108,11 +132,11 @@ export function StatusBar() {
             {t('updates.restart', { version: update.version })}
           </button>
         )}
-        {workspace && (
+        {show('problems') && workspace && (
           <LspStatus buttonClassName={styles['button']} warningClassName={styles['warning']} />
         )}
         {saveError && <StatusMessage kind="error">{t('errors.settingsSave')}</StatusMessage>}
-        {cursor && (
+        {show('cursor') && cursor && (
           <>
             <span className={styles['item']}>
               {t('status.cursor', { line: cursor.line, column: cursor.column })}
@@ -121,11 +145,13 @@ export function StatusBar() {
             <span className={styles['item']}>{cursor.language}</span>
           </>
         )}
-        <TrustBadge className={`${styles['button'] ?? ''} ${styles['warning'] ?? ''}`} />
-        <span className={styles['item']} title={workspace?.root}>
-          <FolderClosed size={14} aria-hidden="true" />
-          {workspace?.name ?? t('status.noProject')}
-        </span>
+        {trustBadge}
+        {show('project') && (
+          <span className={styles['item']} title={workspace?.root}>
+            <FolderClosed size={14} aria-hidden="true" />
+            {workspace?.name ?? t('status.noProject')}
+          </span>
+        )}
       </div>
     </footer>
   );

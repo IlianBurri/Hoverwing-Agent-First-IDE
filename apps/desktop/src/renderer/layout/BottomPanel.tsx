@@ -1,6 +1,6 @@
 import { X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import type { BottomView } from '@kestrel/shared';
+import { bottomViews, orderedVisible } from '@kestrel/shared';
 import { IconButton } from '../components/IconButton';
 import { Tabs } from '../components/Tabs';
 import { DockerOutput } from '../features/docker';
@@ -11,12 +11,16 @@ import { setPanelOpen } from '../stores/layout';
 import { LogsView } from './LogsView';
 import { useSettingsStore } from '../stores/settings';
 
-const viewIds: readonly BottomView[] = ['terminal', 'logs', 'docker', 'problems'];
-
 export function BottomPanel() {
   const { t } = useTranslation();
   const layout = useSettingsStore((state) => state.settings.layout);
   const update = useSettingsStore((state) => state.update);
+  const tabs = useSettingsStore((state) => state.settings.workbench.bottomTabs);
+  const viewIds = orderedVisible(bottomViews, tabs.order, tabs.hidden);
+  // A hidden tab cannot stay selected.
+  const current = viewIds.includes(layout.bottomView)
+    ? layout.bottomView
+    : (viewIds[0] ?? 'terminal');
   const diagnostics = useLspStore((state) => state.diagnostics);
   const problems = countProblems(diagnostics);
   const problemCount = problems.errors + problems.warnings;
@@ -33,7 +37,7 @@ export function BottomPanel() {
               ? t('bottom.problemsCount', { count: problemCount })
               : t(`bottom.${id}`),
         }))}
-        value={layout.bottomView}
+        value={current}
         onChange={(view) => {
           void update({ layout: { ...layout, bottomView: view } });
         }}
@@ -48,10 +52,10 @@ export function BottomPanel() {
           />
         }
       >
-        {layout.bottomView === 'terminal' && <TerminalView />}
-        {layout.bottomView === 'logs' && <LogsView />}
-        {layout.bottomView === 'docker' && <DockerOutput />}
-        {layout.bottomView === 'problems' && <ProblemsView />}
+        {current === 'terminal' && <TerminalView />}
+        {current === 'logs' && <LogsView />}
+        {current === 'docker' && <DockerOutput />}
+        {current === 'problems' && <ProblemsView />}
       </Tabs>
     </section>
   );
