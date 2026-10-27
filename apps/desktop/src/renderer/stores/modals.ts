@@ -11,6 +11,7 @@ export type ModalState =
   /** Add (provider: null) or edit a model provider. */
   | { id: 'provider'; provider: ProviderView | null }
   | { id: 'setup' }
+  | { id: 'lspServers' }
   | null;
 
 export const useModalStore = create<{ open: ModalState }>()(() => ({ open: null }));

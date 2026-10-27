@@ -70,8 +70,10 @@
     "terminalEmptyTitle": "Noch kein Terminal",
     "terminalEmptyText": "Terminals starten im Projektordner (ohne Projekt im Home-Ordner) mit deiner Standard-Shell.",
     "problemsEmptyTitle": "Keine Probleme",
-    "problemsEmptyText": "Fehler und Warnungen aus deinem Code erscheinen hier, sobald die Sprachunterstützung aktiv ist.",
-    "docker": "Docker"
+    "problemsEmptyText": "Fehler und Warnungen der Sprach-Server erscheinen hier, sobald du eine Datei einer unterstützten Sprache öffnest.",
+    "docker": "Docker",
+    "problemsCount_one": "Probleme ({{count}})",
+    "problemsCount_other": "Probleme ({{count}})"
   },
   "agent": {
     "title": "Agent",
@@ -442,7 +444,8 @@
     "permissions": "Berechtigungen",
     "agent": "Agent-Ausgabe",
     "sandbox": "Docker",
-    "mcp": "MCP"
+    "mcp": "MCP",
+    "lsp": "Sprach-Server"
   },
   "agentLog": {
     "title": "Agent-Ausgabe",
@@ -971,5 +974,56 @@
     "restricted": "Eingeschränkter Modus",
     "restrictedTitle": "Sprach-Server und Git-Aktionen sind in diesem Projekt aus. Klicke, um ihm zu vertrauen.",
     "restrictedHint": "Eingeschränkter Modus: Sprach-Server und Git-Aktionen sind aus, bis du diesem Projekt vertraust (Statusleiste)."
+  },
+  "lsp": {
+    "servers": "Sprach-Server",
+    "intro": "Sprach-Server bringen Autovervollständigung, Infos beim Überfahren, «Gehe zu Definition» und Fehlerprüfung. Kestrel startet sie bei Bedarf in vertrauten Projekten; eine neue Befehlszeile bestätigst du einmal. Die Programme sind nicht dabei: Pyright, rust-analyzer oder gopls installierst du selbst, TypeScript wird beim ersten Mal über npx geladen.",
+    "restart": "Sprach-Server neu starten",
+    "showProblems": "Probleme anzeigen",
+    "problemsUntrusted": "Sprach-Server laufen nur in Projekten, denen du vertraust.",
+    "problemsLabel": "{{errors}} Fehler, {{warnings}} Warnungen",
+    "position": "Z. {{line}}, Sp. {{column}}",
+    "severity": {
+      "error": "Fehler",
+      "warning": "Warnung",
+      "info": "Info",
+      "hint": "Hinweis"
+    },
+    "serverState": "{{name}}: {{state}}",
+    "state": {
+      "starting": "startet …",
+      "ready": "bereit",
+      "missing": "nicht installiert",
+      "declined": "nicht erlaubt",
+      "error": "fehlgeschlagen"
+    },
+    "stateHint": {
+      "starting": "Der Sprach-Server startet (beim ersten Mal wird er eventuell heruntergeladen).",
+      "ready": "Der Sprach-Server läuft.",
+      "missing": "Das Programm wurde nicht gefunden. Installiere es oder ändere die Befehlszeile.",
+      "declined": "Du hast diese Befehlszeile nicht erlaubt. Starte die Sprach-Server neu, um erneut gefragt zu werden.",
+      "error": "Der Sprach-Server wurde beendet. Details unter Logs › Sprach-Server."
+    },
+    "logTitle": "Ausgabe der Sprach-Server",
+    "logEmptyTitle": "Noch keine Ausgabe",
+    "logEmptyText": "Meldungen und Fehler der Sprach-Server erscheinen hier.",
+    "name": "Name",
+    "commandLine": "Befehlszeile",
+    "commandHint": "Programm und Argumente, durch Leerzeichen getrennt. Es läuft im Projektordner mit deinen Rechten.",
+    "extensions": "Dateitypen",
+    "extensionsHint": "Endungen ohne Punkt, durch Leerzeichen getrennt (z. B. py pyi).",
+    "approved": "Befehlszeile bestätigt",
+    "notApproved": "Fragt vor dem ersten Start",
+    "add": "Sprach-Server hinzufügen",
+    "save": "Speichern",
+    "editName": "{{name}} bearbeiten",
+    "reset": "Zurücksetzen",
+    "resetName": "{{name}} zurücksetzen",
+    "resetTitle": "«{{name}}» zurücksetzen?",
+    "resetMessage": "Befehlszeile und Dateitypen werden wieder wie in Kestrels Vorlage.",
+    "delete": "Entfernen",
+    "deleteName": "{{name}} entfernen",
+    "deleteTitle": "«{{name}}» entfernen?",
+    "deleteMessage": "Dateien dieser Typen bekommen dann keine Sprachunterstützung mehr."
   }
 }

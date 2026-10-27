@@ -25,7 +25,7 @@ import {
 } from './modules/agent';
 import { SecretStore } from './modules/secrets';
 import { BrowserManager, agentBrowser, createBrowserHandlers } from './modules/browser';
-import { McpHost, browserTools, writeBridge } from './modules/mcpHost';
+import { McpHost, browserTools, diagnosticsTools, writeBridge } from './modules/mcpHost';
 import { McpConfigStore, McpService, connectMcp, createMcpHandlers } from './modules/mcp';
 import {
   ProviderConfigStore,
@@ -549,6 +549,7 @@ void app.whenReady().then(async () => {
         const endpoint = await mcpHost.register(
           async () => [
             ...browserTools(access, check),
+            ...diagnosticsTools(() => lsp.diagnostics(ownerId), check),
             ...(await mcp.agentTools(workspaces.get(ownerId)?.root ?? null, sandboxed, check)),
           ],
           sandboxed,

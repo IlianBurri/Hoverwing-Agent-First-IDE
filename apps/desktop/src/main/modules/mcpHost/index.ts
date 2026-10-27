@@ -11,3 +11,4 @@ export type {
   ToolResult,
 } from './tools';
 export { browserTools, externalData, untrusted } from './tools';
+export { diagnosticsTools } from './diagnostics';

@@ -11,6 +11,7 @@ import JsonWorker from 'monaco-editor/language/json/json.worker?worker';
 import TsWorker from 'monaco-editor/language/typescript/ts.worker?worker';
 import { toHexColor } from './colors';
 import { inlineCompletionProvider } from './inlineCompletion';
+import { installLsp } from './lsp';
 
 self.MonacoEnvironment = {
   getWorker(_workerId: string, label: string): Worker {
@@ -34,9 +35,10 @@ self.MonacoEnvironment = {
   },
 };
 
-// Files are edited without a project context (no tsconfig, no node_modules
-// types), so semantic errors like "cannot find module" would be noise.
-// Syntax errors are still shown. Real diagnostics come with LSP (phase 9).
+// Monaco's own TypeScript service has no project context (no tsconfig, no
+// node_modules types), so semantic errors like "cannot find module" would be
+// noise. Syntax errors are still shown; while tsserver runs (LSP), Monaco's
+// service is switched off and the real diagnostics come from there.
 for (const defaults of [
   monaco.typescript.typescriptDefaults,
   monaco.typescript.javascriptDefaults,
@@ -46,6 +48,9 @@ for (const defaults of [
 
 // Ghost text from the user's autocompletion model, for every language.
 monaco.languages.registerInlineCompletionsProvider('*', inlineCompletionProvider);
+
+// Language servers (completion, hover, definition, diagnostics).
+installLsp(monaco);
 
 export const THEME_DARK = 'kestrel-dark';
 export const THEME_LIGHT = 'kestrel-light';

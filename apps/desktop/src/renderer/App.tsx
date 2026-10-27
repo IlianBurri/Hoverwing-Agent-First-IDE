@@ -34,6 +34,13 @@ import { useWorkspaceStore } from './stores/workspace';
 import { registerTerminalCommands } from './features/terminal';
 import { onWorkspaceOpened, registerTrustCommands } from './features/trust';
 import { setTrusted } from './stores/trust';
+import {
+  LspServersDialog,
+  loadLspState,
+  refreshLspServers,
+  registerLspCommands,
+} from './features/lsp';
+import { appendLspLog, setDiagnostics, useLspStore } from './stores/lsp';
 import { setPanelOpen } from './stores/layout';
 import { useModalStore } from './stores/modals';
 import { addLogEntry, addPending, loadPending, removePending } from './stores/permissions';
@@ -65,6 +72,22 @@ export function App() {
   useEffect(() => registerSetupCommands(), []);
   useEffect(() => registerUpdateCommands(), []);
   useEffect(() => registerTrustCommands(), []);
+  useEffect(() => registerLspCommands(), []);
+  useEffect(() => {
+    const offs = [
+      window.kestrel.on('lsp:diagnostics', setDiagnostics),
+      window.kestrel.on('lsp:status', (statuses) => {
+        useLspStore.setState({ statuses });
+      }),
+      window.kestrel.on('lsp:log', appendLspLog),
+      window.kestrel.on('lsp:changed', () => {
+        void refreshLspServers();
+      }),
+    ];
+    return () => {
+      for (const off of offs) off();
+    };
+  }, []);
   useEffect(() => {
     void loadUpdateStatus();
     return window.kestrel.on('updates:status', setUpdateStatus);
@@ -161,6 +184,7 @@ export function App() {
     void refreshDocker();
     if (workspaceRoot) void onWorkspaceOpened();
     else setTrusted(null);
+    void loadLspState();
   }, [workspaceRoot]);
   useEffect(
     () =>
@@ -242,6 +266,7 @@ export function App() {
       {modal?.id === 'mcpServer' && <McpServerDialog server={modal.server} />}
       {modal?.id === 'provider' && <ProviderDialog provider={modal.provider} />}
       {modal?.id === 'setup' && <SetupWizard />}
+      {modal?.id === 'lspServers' && <LspServersDialog />}
       {modal?.id === 'checkpointChanges' && (
         <ChangesModal key={modal.checkpoint.id} checkpoint={modal.checkpoint} />
       )}

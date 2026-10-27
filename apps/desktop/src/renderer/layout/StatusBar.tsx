@@ -21,6 +21,7 @@ import { useUpdateStore } from '../stores/updates';
 import { useProvidersStore } from '../stores/providers';
 import { SandboxBadge } from '../features/sandbox';
 import { TrustBadge } from '../features/trust';
+import { LspStatus } from '../features/lsp';
 import { runningContainers, useDockerStore } from '../stores/docker';
 import styles from './StatusBar.module.css';
 
@@ -104,6 +105,9 @@ export function StatusBar() {
             <RotateCcw size={14} aria-hidden="true" />
             {t('updates.restart', { version: update.version })}
           </button>
+        )}
+        {workspace && (
+          <LspStatus buttonClassName={styles['button']} warningClassName={styles['warning']} />
         )}
         {saveError && <StatusMessage kind="error">{t('errors.settingsSave')}</StatusMessage>}
         {cursor && (

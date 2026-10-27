@@ -4,10 +4,11 @@ import { SegmentedControl } from '../components/SegmentedControl';
 import { AgentLog } from '../features/agent';
 import { PermissionLog } from '../features/permissions';
 import { McpLog } from '../features/mcp';
+import { LspLog } from '../features/lsp';
 import { SandboxLog } from '../features/sandbox';
 import styles from './LogsView.module.css';
 
-type LogKind = 'permissions' | 'agent' | 'sandbox' | 'mcp';
+type LogKind = 'permissions' | 'agent' | 'sandbox' | 'mcp' | 'lsp';
 
 /** Bottom panel "Logs": permission decisions, agent diagnostics, sandbox builds. */
 export function LogsView() {
@@ -23,6 +24,7 @@ export function LogsView() {
             { value: 'agent', label: t('logs.agent') },
             { value: 'sandbox', label: t('logs.sandbox') },
             { value: 'mcp', label: t('logs.mcp') },
+            { value: 'lsp', label: t('logs.lsp') },
           ]}
           value={kind}
           onChange={setKind}
@@ -33,6 +35,7 @@ export function LogsView() {
         {kind === 'agent' && <AgentLog />}
         {kind === 'sandbox' && <SandboxLog />}
         {kind === 'mcp' && <McpLog />}
+        {kind === 'lsp' && <LspLog />}
       </div>
     </div>
   );

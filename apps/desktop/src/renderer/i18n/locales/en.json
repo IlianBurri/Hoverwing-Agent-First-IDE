@@ -70,8 +70,10 @@
     "terminalEmptyTitle": "No terminal yet",
     "terminalEmptyText": "Terminals start in the project folder (or your home folder) with your default shell.",
     "problemsEmptyTitle": "No problems",
-    "problemsEmptyText": "Errors and warnings from your code appear here once language support is active.",
-    "docker": "Docker"
+    "problemsEmptyText": "Errors and warnings from language servers appear here once you open a file of a supported language.",
+    "docker": "Docker",
+    "problemsCount_one": "Problems ({{count}})",
+    "problemsCount_other": "Problems ({{count}})"
   },
   "agent": {
     "title": "Agent",
@@ -442,7 +444,8 @@
     "permissions": "Permissions",
     "agent": "Agent output",
     "sandbox": "Docker",
-    "mcp": "MCP"
+    "mcp": "MCP",
+    "lsp": "Language servers"
   },
   "agentLog": {
     "title": "Agent output",
@@ -971,5 +974,56 @@
     "restricted": "Restricted mode",
     "restrictedTitle": "Language servers and Git actions are off in this project. Click to trust it.",
     "restrictedHint": "Restricted mode: language servers and Git actions are off until you trust this project (status bar)."
+  },
+  "lsp": {
+    "servers": "Language servers",
+    "intro": "Language servers bring completion, hover, go to definition and error checking. Kestrel starts them on demand in trusted projects; a new command line is confirmed once. The programs are not included: install Pyright, rust-analyzer or gopls yourself; TypeScript is downloaded via npx on first use.",
+    "restart": "Restart language servers",
+    "showProblems": "Show problems",
+    "problemsUntrusted": "Language servers only run in trusted projects.",
+    "problemsLabel": "{{errors}} errors, {{warnings}} warnings",
+    "position": "Ln {{line}}, Col {{column}}",
+    "severity": {
+      "error": "Error",
+      "warning": "Warning",
+      "info": "Info",
+      "hint": "Hint"
+    },
+    "serverState": "{{name}}: {{state}}",
+    "state": {
+      "starting": "starting …",
+      "ready": "ready",
+      "missing": "not installed",
+      "declined": "not allowed",
+      "error": "failed"
+    },
+    "stateHint": {
+      "starting": "The language server is starting (the first start may download it).",
+      "ready": "The language server is running.",
+      "missing": "The program was not found. Install it or change the command line.",
+      "declined": "You did not allow this command line. Restart language servers to be asked again.",
+      "error": "The language server stopped. Details in Logs › Language servers."
+    },
+    "logTitle": "Language server output",
+    "logEmptyTitle": "No output yet",
+    "logEmptyText": "Messages and errors of language servers appear here.",
+    "name": "Name",
+    "commandLine": "Command line",
+    "commandHint": "Program and arguments, separated by spaces. It runs in the project folder with your rights.",
+    "extensions": "File types",
+    "extensionsHint": "Extensions without dot, separated by spaces (e.g. py pyi).",
+    "approved": "Command line confirmed",
+    "notApproved": "Asks before the first start",
+    "add": "Add language server",
+    "save": "Save",
+    "editName": "Edit {{name}}",
+    "reset": "Reset",
+    "resetName": "Reset {{name}}",
+    "resetTitle": "Reset “{{name}}”?",
+    "resetMessage": "The command line and file types return to Kestrel's template.",
+    "delete": "Remove",
+    "deleteName": "Remove {{name}}",
+    "deleteTitle": "Remove “{{name}}”?",
+    "deleteMessage": "Files of its types no longer get language support."
   }
 }
