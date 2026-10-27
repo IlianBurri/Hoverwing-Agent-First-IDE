@@ -109,6 +109,10 @@ AI you already use**.
   <tr>
     <td colspan="2"><img src="docs/images/setup.png" alt="Setup assistant with hardware detection and model recommendation" width="100%" /></td>
   </tr>
+  <tr>
+    <td><img src="docs/images/git.png" alt="Git panel with a staged change and a commit message" width="100%" /></td>
+    <td><img src="docs/images/layout-ai.png" alt="Customize layout with AI: a proposal with a preview of the changes" width="100%" /></td>
+  </tr>
 </table>
 
 ## Bring your own AI

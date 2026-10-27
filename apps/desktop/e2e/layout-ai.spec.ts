@@ -55,7 +55,7 @@ test('previews the proposal in plain words and changes nothing before applying',
   await wish('sidebar right, no status bar, a terminal button');
   const preview = dialog().getByRole('region', { name: 'Proposed changes' });
   await expect(preview).toContainText('Sidebar on the right, status bar hidden');
-  await expect(preview).toContainText('Sidebar moves to the Right side');
+  await expect(preview).toContainText('Sidebar moves to the right');
   await expect(preview).toContainText('Status bar is hidden');
   await expect(preview).toContainText('Toolbar: + New terminal');
   // Unknown commands from the model are dropped.

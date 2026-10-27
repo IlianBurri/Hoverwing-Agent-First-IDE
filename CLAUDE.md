@@ -44,7 +44,7 @@ Programs are looked up with `lib/which.ts` (`findProgram`, PATHEXT-aware).
   `publish` in `electron-builder.yml` (GitHub). Only in the packaged app and
   while `settings.checkForUpdates`; macOS needs a signed build. A private repo
   makes the check fail quietly (logged).
-- README screenshots: run `e2e/screenshots.spec.ts` with
+- README screenshots (2880×1800 via CDP device emulation, also under xvfb): run `e2e/screenshots.spec.ts` with
   `KESTREL_SCREENSHOTS=1` (after `pnpm build`); it uses
   `e2e/fixtures/demo-agent.mjs` and a demo project and writes `docs/images/`.
 - `dependencies` of the desktop app = only what main loads at runtime (the

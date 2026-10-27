@@ -96,7 +96,7 @@
         "agent": "Agent panel"
       },
       "change": {
-        "side": "{{panel}} moves to the {{side}} side",
+        "side": "{{panel}} moves to the {{side}}",
         "panelOpen": "{{panel}} opens",
         "panelClosed": "{{panel}} closes",
         "barShown": "{{bar}} is shown",
@@ -109,6 +109,10 @@
         "toolbarOrder": "Toolbar: new order",
         "sidebarView": "Sidebar shows {{view}}",
         "bottomView": "Bottom panel shows {{view}}"
+      },
+      "side": {
+        "left": "left",
+        "right": "right"
       }
     }
   },

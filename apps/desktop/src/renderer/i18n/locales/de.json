@@ -109,6 +109,10 @@
         "toolbarOrder": "Werkzeugleiste: neue Reihenfolge",
         "sidebarView": "Seitenleiste zeigt {{view}}",
         "bottomView": "Unteres Panel zeigt {{view}}"
+      },
+      "side": {
+        "left": "links",
+        "right": "rechts"
       }
     }
   },

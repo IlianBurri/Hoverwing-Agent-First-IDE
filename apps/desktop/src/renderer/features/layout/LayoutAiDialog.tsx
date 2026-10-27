@@ -30,7 +30,7 @@ function describe(change: LayoutChange, t: TFunction, title: (id: string) => str
     case 'side':
       return t('layout.ai.change.side', {
         panel: t(change.panel === 'sidebar' ? 'layout.sidebar' : 'layout.agentPanel'),
-        side: t(change.side === 'left' ? 'layout.left' : 'layout.right'),
+        side: t(change.side === 'left' ? 'layout.ai.side.left' : 'layout.ai.side.right'),
       });
     case 'panel':
       return t(change.open ? 'layout.ai.change.panelOpen' : 'layout.ai.change.panelClosed', {
