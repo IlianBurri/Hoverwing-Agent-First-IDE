@@ -93,7 +93,8 @@ test.describe('in a Docker container', () => {
     if (baseImage) {
       writeFileSync(
         join(instanceDir, 'settings.json'),
-        JSON.stringify({ sandboxBaseImage: baseImage }),
+        // Keep setupDone (written by createUserDataDir), or the setup assistant opens.
+        JSON.stringify({ setupDone: true, sandboxBaseImage: baseImage }),
       );
     }
     app = await launchApp(instanceDir);
