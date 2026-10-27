@@ -57,6 +57,59 @@
       "problems": "Probleme und Sprach-Server",
       "cursor": "Cursor-Position und Sprache",
       "project": "Projektname"
+    },
+    "ai": {
+      "command": "Layout mit KI anpassen …",
+      "undoCommand": "KI-Layoutänderung rückgängig machen",
+      "title": "Layout mit KI anpassen",
+      "noModel": "Wähle zuerst ein Chat-Modell (Ansicht Modelle). Die KI nutzt es für den Vorschlag.",
+      "openModels": "Modelle öffnen",
+      "wish": "Wie möchtest du die IDE haben?",
+      "placeholder": "z. B. Git rechts, kein Terminal, Push und Pull in der Werkzeugleiste",
+      "examples": "Beispiele",
+      "exampleLabel": {
+        "writing": "Schreibmodus",
+        "review": "Code-Review",
+        "cockpit": "Agent-Cockpit",
+        "minimal": "Minimal"
+      },
+      "example": {
+        "writing": "Nur der Editor: Seitenleiste, unteres Panel und Agent-Panel schliessen, Aktivitätsleiste ausblenden.",
+        "review": "Code-Review: Git-Ansicht in der Seitenleiste, Probleme im unteren Panel, Agent-Panel offen.",
+        "cockpit": "Agent-Cockpit: Agent-Panel links, Seitenleiste rechts, Werkzeugleiste mit Agent starten, Pull und Push.",
+        "minimal": "Minimal: Statusleiste ausser Git und Problemen ausblenden, Werkzeugleiste leer."
+      },
+      "privacy": "Dein Wunsch, das aktuelle Layout und die Befehlsnamen gehen an {{model}}. Keine Dateien.",
+      "propose": "Layout vorschlagen",
+      "thinking": "Denkt nach …",
+      "preview": "Vorgeschlagene Änderungen",
+      "previewBy": "Vorschlag von {{model}}",
+      "noChanges": "Der Vorschlag ändert nichts.",
+      "apply": "Übernehmen",
+      "discard": "Verwerfen",
+      "applied": "Layout übernommen.",
+      "undo": "Rückgängig",
+      "undone": "Vorheriges Layout wiederhergestellt.",
+      "panel": {
+        "sidebar": "Seitenleiste",
+        "bottom": "Unteres Panel",
+        "agent": "Agent-Panel"
+      },
+      "change": {
+        "side": "{{panel}} wechselt nach {{side}}",
+        "panelOpen": "{{panel}} öffnet sich",
+        "panelClosed": "{{panel}} schliesst sich",
+        "barShown": "{{bar}} wird angezeigt",
+        "barHidden": "{{bar}} wird ausgeblendet",
+        "itemShown": "{{place}}: {{item}} anzeigen",
+        "itemHidden": "{{place}}: {{item}} ausblenden",
+        "order": "{{list}}: neue Reihenfolge",
+        "toolbarAdd": "Werkzeugleiste: + {{name}}",
+        "toolbarRemove": "Werkzeugleiste: − {{name}}",
+        "toolbarOrder": "Werkzeugleiste: neue Reihenfolge",
+        "sidebarView": "Seitenleiste zeigt {{view}}",
+        "bottomView": "Unteres Panel zeigt {{view}}"
+      }
     }
   },
   "activity": {
@@ -272,7 +325,8 @@
       "git_conflict": "Lokale Änderungen oder Konflikte verhindern das. Committe, verwirf oder löse sie zuerst.",
       "git_nothing_to_commit": "Nichts ist gestaged. Stage Änderungen vor dem Commit.",
       "git_no_remote": "Das Repository hat kein Remote zum Pushen.",
-      "git_failed": "Git ist fehlgeschlagen (Details unter Logs › Git)."
+      "git_failed": "Git ist fehlgeschlagen (Details unter Logs › Git).",
+      "layout_invalid": "Das Modell hat kein brauchbares Layout geliefert. Versuche es nochmal oder formuliere es anders."
     }
   },
   "palette": {

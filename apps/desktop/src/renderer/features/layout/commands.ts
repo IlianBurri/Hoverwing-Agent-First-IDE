@@ -5,14 +5,18 @@ import {
   PanelLeftClose,
   RotateCcw,
   Save,
+  Sparkles,
+  Undo2,
 } from 'lucide-react';
 import type { LayoutProfile } from '@kestrel/shared';
 import { i18next } from '../../i18n';
 import { registerCommands } from '../commands';
+import { undoAiLayout, useLayoutAiStore } from './ai';
 import {
   allProfiles,
   applyProfile,
   isBuiltinProfile,
+  openLayoutAiDialog,
   openLayoutDialog,
   resetLayout,
   saveCurrentAsProfile,
@@ -30,6 +34,21 @@ export function registerLayoutCommands(): () => void {
       title: () => i18next.t('layout.customize'),
       icon: LayoutTemplate,
       run: openLayoutDialog,
+    },
+    {
+      id: 'layout.ai',
+      category,
+      title: () => i18next.t('layout.ai.command'),
+      icon: Sparkles,
+      run: openLayoutAiDialog,
+    },
+    {
+      id: 'layout.undoAi',
+      category,
+      title: () => i18next.t('layout.ai.undoCommand'),
+      icon: Undo2,
+      when: () => useLayoutAiStore.getState().previous !== null,
+      run: undoAiLayout,
     },
     {
       id: 'layout.moveSidebar',

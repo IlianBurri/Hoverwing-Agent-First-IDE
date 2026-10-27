@@ -11,6 +11,8 @@ interface RequestOptions {
   maxTokens?: number;
   temperature?: number;
   stop?: string[];
+  /** Ask for a JSON object (OpenAI "json_object" mode; Ollama supports it too). */
+  json?: boolean;
 }
 
 /** The few things Kestrel asks a model endpoint (injectable for tests). */
@@ -75,7 +77,7 @@ export function openAiClient({ baseUrl, apiKey }: Endpoint): ModelClient {
         if (text) onDelta(text);
       }
     },
-    async chat({ model, messages, signal, maxTokens, temperature, stop }) {
+    async chat({ model, messages, signal, maxTokens, temperature, stop, json }) {
       const response = await client.chat.completions.create(
         {
           model,
@@ -84,6 +86,7 @@ export function openAiClient({ baseUrl, apiKey }: Endpoint): ModelClient {
           ...(maxTokens === undefined ? {} : { max_tokens: maxTokens }),
           ...(temperature === undefined ? {} : { temperature }),
           ...(stop === undefined ? {} : { stop }),
+          ...(json ? { response_format: { type: 'json_object' as const } } : {}),
         },
         { signal },
       );

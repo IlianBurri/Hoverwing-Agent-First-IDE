@@ -287,6 +287,15 @@ so use `KESTREL_SANDBOX_BASE_IMAGE` / `KESTREL_E2E_SANDBOX_BASE_IMAGE` =
   saved ones in `settings.layoutProfiles`, each a `layout.profile.<id>`
   command. The restricted-mode badge can never be hidden. Stage 3 (a model
   proposing layouts) should produce exactly this schema.
+- **Layout with AI:** `modules/layoutAssistant` (`layout:propose`). The chat
+  model gets the layout schema in words (`prompt.ts`), the current layout and
+  the renderer's command list (id + title) – no files. Answers are untrusted:
+  `extractJson` → `layoutProposalSchema` (partial) → `mergeProposal` (unknown
+  command ids dropped, one bottom tab stays) → full schemas; one correction
+  round, then `layout_invalid` (not a provider fallback). JSON mode via
+  `json: true` (`response_format`). The renderer shows `describeChanges` in
+  words; nothing changes before "Apply"; "Undo" restores the previous state
+  (`features/layout/ai.ts`). E2E: `fake-openai.ts` answers the layout prompt.
 - **Dialogs/toasts:** use `prompt`, `confirm`, `choose` (stores/dialogs) and
   `notify` (stores/toasts). Destructive actions always confirm, with the safe
   option focused.

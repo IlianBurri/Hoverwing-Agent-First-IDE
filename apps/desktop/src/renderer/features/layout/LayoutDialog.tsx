@@ -1,5 +1,13 @@
 import { useId } from 'react';
-import { ArrowDown, ArrowUp, LayoutTemplate, RotateCcw, Save, Trash2 } from 'lucide-react';
+import {
+  ArrowDown,
+  ArrowUp,
+  LayoutTemplate,
+  RotateCcw,
+  Save,
+  Sparkles,
+  Trash2,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { bottomViews, fullOrder, sidebarViews, statusItems } from '@kestrel/shared';
 import type { PanelSide, Workbench } from '@kestrel/shared';
@@ -14,6 +22,7 @@ import {
   applyProfile,
   deleteProfile,
   isBuiltinProfile,
+  openLayoutAiDialog,
   resetLayout,
   saveCurrentAsProfile,
   updateWorkbench,
@@ -147,6 +156,10 @@ export function LayoutDialog() {
             <Button onClick={() => void saveCurrentAsProfile()}>
               <Save size={14} aria-hidden="true" />
               {t('layout.saveProfile')}
+            </Button>
+            <Button onClick={openLayoutAiDialog}>
+              <Sparkles size={14} aria-hidden="true" />
+              {t('layout.ai.command')}
             </Button>
             <Button variant="ghost" onClick={() => void resetLayout()}>
               <RotateCcw size={14} aria-hidden="true" />

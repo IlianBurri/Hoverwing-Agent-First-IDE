@@ -44,7 +44,12 @@ import { appendLspLog, setDiagnostics, useLspStore } from './stores/lsp';
 import { GitDiffModal, refreshGit, registerGitCommands } from './features/git';
 import { appendGitLog } from './stores/git';
 import { ToolbarDialog, registerToolbarCommands } from './features/toolbar';
-import { LayoutDialog, registerLayoutCommands, registerProfileCommands } from './features/layout';
+import {
+  LayoutAiDialog,
+  LayoutDialog,
+  registerLayoutCommands,
+  registerProfileCommands,
+} from './features/layout';
 import { setPanelOpen } from './stores/layout';
 import { useModalStore } from './stores/modals';
 import { addLogEntry, addPending, loadPending, removePending } from './stores/permissions';
@@ -290,6 +295,7 @@ export function App() {
       {modal?.id === 'lspServers' && <LspServersDialog />}
       {modal?.id === 'toolbar' && <ToolbarDialog />}
       {modal?.id === 'layout' && <LayoutDialog />}
+      {modal?.id === 'layoutAi' && <LayoutAiDialog />}
       {modal?.id === 'gitDiff' && (
         <GitDiffModal key={modal.path} path={modal.path} staged={modal.staged} diff={modal.diff} />
       )}

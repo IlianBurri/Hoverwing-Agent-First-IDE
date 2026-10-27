@@ -57,6 +57,59 @@
       "problems": "Problems and language servers",
       "cursor": "Cursor position and language",
       "project": "Project name"
+    },
+    "ai": {
+      "command": "Customize layout with AI …",
+      "undoCommand": "Undo the AI layout change",
+      "title": "Customize layout with AI",
+      "noModel": "Choose a chat model first (Models view). The AI uses it to propose a layout.",
+      "openModels": "Open models",
+      "wish": "How do you want the IDE?",
+      "placeholder": "e.g. Git on the right, no terminal, Push and Pull in the toolbar",
+      "examples": "Examples",
+      "exampleLabel": {
+        "writing": "Writing mode",
+        "review": "Code review",
+        "cockpit": "Agent cockpit",
+        "minimal": "Minimal"
+      },
+      "example": {
+        "writing": "Only the editor: close sidebar, bottom panel and agent panel, hide the activity bar.",
+        "review": "Code review: Git view in the sidebar, problems in the bottom panel, agent panel open.",
+        "cockpit": "Agent cockpit: agent panel on the left, sidebar on the right, toolbar with Start agent, Pull and Push.",
+        "minimal": "Minimal: hide the status bar except Git and problems, toolbar empty."
+      },
+      "privacy": "Your wish, the current layout and the command names go to {{model}}. No files.",
+      "propose": "Propose layout",
+      "thinking": "Thinking …",
+      "preview": "Proposed changes",
+      "previewBy": "Proposal from {{model}}",
+      "noChanges": "The proposal changes nothing.",
+      "apply": "Apply",
+      "discard": "Discard",
+      "applied": "Layout applied.",
+      "undo": "Undo",
+      "undone": "Previous layout restored.",
+      "panel": {
+        "sidebar": "Sidebar",
+        "bottom": "Bottom panel",
+        "agent": "Agent panel"
+      },
+      "change": {
+        "side": "{{panel}} moves to the {{side}} side",
+        "panelOpen": "{{panel}} opens",
+        "panelClosed": "{{panel}} closes",
+        "barShown": "{{bar}} is shown",
+        "barHidden": "{{bar}} is hidden",
+        "itemShown": "{{place}}: show {{item}}",
+        "itemHidden": "{{place}}: hide {{item}}",
+        "order": "{{list}}: new order",
+        "toolbarAdd": "Toolbar: + {{name}}",
+        "toolbarRemove": "Toolbar: − {{name}}",
+        "toolbarOrder": "Toolbar: new order",
+        "sidebarView": "Sidebar shows {{view}}",
+        "bottomView": "Bottom panel shows {{view}}"
+      }
     }
   },
   "activity": {
@@ -272,7 +325,8 @@
       "git_conflict": "Local changes or conflicts prevent this. Commit, discard or resolve them first.",
       "git_nothing_to_commit": "Nothing is staged. Stage changes before committing.",
       "git_no_remote": "The repository has no remote to push to.",
-      "git_failed": "Git failed (details in Logs › Git)."
+      "git_failed": "Git failed (details in Logs › Git).",
+      "layout_invalid": "The model did not return a usable layout. Try again or phrase it differently."
     }
   },
   "palette": {

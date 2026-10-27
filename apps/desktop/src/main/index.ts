@@ -34,6 +34,7 @@ import {
   openAiClient,
 } from './modules/providers';
 import { ChatService, ChatStore, createChatHandlers } from './modules/chat';
+import { LayoutAssistant, createLayoutHandlers } from './modules/layoutAssistant';
 import { CompletionService, createCompletionHandlers } from './modules/completion';
 import * as systemInformation from 'systeminformation';
 import electronUpdater from 'electron-updater';
@@ -394,6 +395,22 @@ void app.whenReady().then(async () => {
       if (contents) sendEvent(contents, 'chat:event', { chatId, event });
     },
   });
+  const layoutAssistant = new LayoutAssistant({
+    providers,
+    model: () => settings.get().chatModel,
+    current: () => {
+      const { workbench, toolbar, layout } = settings.get();
+      return {
+        workbench,
+        toolbar,
+        sidebarView: layout.sidebarView,
+        bottomView: layout.bottomView,
+      };
+    },
+    log: (line) => {
+      console.warn('[layout]', line);
+    },
+  });
   const completion = new CompletionService({
     providers,
     settings: () => settings.get().completion,
@@ -639,6 +656,7 @@ void app.whenReady().then(async () => {
       ...createMcpHandlers(mcp, workspaces),
       ...createProviderHandlers(providers),
       ...createChatHandlers(chat),
+      ...createLayoutHandlers(layoutAssistant),
       ...createCompletionHandlers(completion),
       ...createSetupHandlers(setup),
       ...createUpdateHandlers(updates),

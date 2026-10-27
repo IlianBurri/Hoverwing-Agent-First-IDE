@@ -14,6 +14,10 @@ export function openLayoutDialog(): void {
   openModal({ id: 'layout' });
 }
 
+export function openLayoutAiDialog(): void {
+  openModal({ id: 'layoutAi' });
+}
+
 /** Right-click on a bar: open the layout dialog (instead of a one-item menu). */
 export function openLayoutMenu(event: MouseEvent): void {
   if (event.defaultPrevented) return;

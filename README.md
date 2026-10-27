@@ -98,6 +98,9 @@ AI you already use**.
   <tr>
     <td width="50%" valign="top" colspan="2">
       <h3>🧰 Everything around it</h3>
+      Your layout: any command as a toolbar button, panels on either side, saved
+      layouts – or describe the IDE you want and let your chat model propose it
+      (preview first, undo anytime).<br />
       Monaco editor, ripgrep project search, terminals, a Docker panel, an integrated
       browser the agent can inspect (content marked as untrusted), an MCP manager with
       per-tool permissions, command palette, German and English, dark and light themes.

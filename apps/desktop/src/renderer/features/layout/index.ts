@@ -7,3 +7,4 @@ export {
 } from './actions';
 export { registerLayoutCommands, registerProfileCommands } from './commands';
 export { LayoutDialog } from './LayoutDialog';
+export { LayoutAiDialog } from './LayoutAiDialog';

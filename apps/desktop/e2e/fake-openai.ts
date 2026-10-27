@@ -42,12 +42,32 @@ const sleep = (ms: number) =>
     setTimeout(resolve, ms);
   });
 
+/** The layout prompt starts with this sentence (see layoutAssistant/prompt.ts). */
+const LAYOUT_PROMPT = 'You arrange the user interface of Kestrel';
+
+/**
+ * Layout assistant: a fixed proposal. A wish containing "broken" first gets
+ * an invalid answer, so the correction round trip is exercised.
+ */
+function layoutAnswer(messages: { role: string; content: string }[]): string | null {
+  if (!messages[0]?.content.startsWith(LAYOUT_PROMPT)) return null;
+  const wish = messages[1]?.content ?? '';
+  const correcting = messages.length > 2;
+  if (wish.includes('broken') && !correcting) return 'Sure! {"workbench":{"sidebarSide":"top"}}';
+  return JSON.stringify({
+    workbench: { sidebarSide: 'right', statusBar: { visible: false } },
+    toolbar: ['git.pull', 'git.push', 'terminal.new', 'not.a.command'],
+    explanation: 'Sidebar on the right, status bar hidden, terminal button added.',
+  });
+}
+
 /**
  * A scripted OpenAI-compatible endpoint for E2E tests:
  * - "busy-model" always answers 429 (rate limit) → fallback,
  * - chat streams "Echo: <first line of the last message>" word by word,
  *   or a long, slow answer for "slow",
- * - /completions (fill-in-the-middle) answers "42" for "coder".
+ * - /completions (fill-in-the-middle) answers "42" for "coder",
+ * - the layout assistant gets a fixed proposal (see layoutAnswer).
  */
 export async function startFakeOpenAi(): Promise<{
   url: string;
@@ -90,6 +110,7 @@ export async function startFakeOpenAi(): Promise<{
       const last = messages?.at(-1)?.content ?? '';
       const question = last.split('\n')[0] ?? '';
       if (!stream) {
+        const content = layoutAnswer(messages ?? []) ?? '42';
         json(response, 200, {
           id: 'chat',
           object: 'chat.completion',
@@ -98,7 +119,7 @@ export async function startFakeOpenAi(): Promise<{
           choices: [
             {
               index: 0,
-              message: { role: 'assistant', content: '42' },
+              message: { role: 'assistant', content },
               finish_reason: 'stop',
               logprobs: null,
             },
