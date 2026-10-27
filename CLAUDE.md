@@ -215,7 +215,10 @@ so use `KESTREL_SANDBOX_BASE_IMAGE` / `KESTREL_E2E_SANDBOX_BASE_IMAGE` =
   (`providers/testing.ts`) in unit tests.
 - **Chat:** `modules/chat`. No tools, no file access: the model sees only the
   conversation and files the user attached (`<attached-file>` blocks, marked
-  as data; secret paths refused in main and renderer). One stream per window
+  as data; secret paths refused in main and renderer). For Ollama providers
+  (`template: 'ollama'`) the system prompt names the answering model as an
+  open-source model running locally via Ollama (`localModelIdentity`), so
+  small models stop claiming to be a Microsoft/OpenAI assistant. One stream per window
   (`chat:event`), chats in userData/chats. The renderer picks the id of a new
   chat so events can never arrive before it knows it. Settings
   `chatModel` = provider + model.

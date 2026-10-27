@@ -39,7 +39,7 @@ export class ChatService {
     }
     const ref = this.deps.model();
     if (!ref) throw new UserError('model_not_set', 'No chat model chosen.');
-    const { client, models } = await this.deps.providers.resolve(ref);
+    const { client, models, template } = await this.deps.providers.resolve(ref);
     await this.stop(ownerId);
 
     const now = this.deps.now?.() ?? Date.now();
@@ -74,7 +74,12 @@ export class ChatService {
             answeredBy = model;
             emit({ type: 'started', model });
             await client.streamChat(
-              { model, messages: chatTurns(chat.messages), signal: controller.signal },
+              {
+                model,
+                // Built per attempt: a fallback model must name itself.
+                messages: chatTurns(chat.messages, undefined, template === 'ollama' ? model : null),
+                signal: controller.signal,
+              },
               (text) => {
                 answer += text;
                 emit({ type: 'delta', text });

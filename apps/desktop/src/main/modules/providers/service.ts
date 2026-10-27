@@ -1,4 +1,4 @@
-import type { ModelRef, ProviderConfig, ProviderView } from '@kestrel/shared';
+import type { ModelRef, ProviderConfig, ProviderTemplate, ProviderView } from '@kestrel/shared';
 import { UserError } from '../../ipc/errors';
 import type { SecretStore } from '../secrets';
 import type { CreateModelClient, ModelClient } from './client';
@@ -86,11 +86,14 @@ export class ProviderService {
    * Client and model order for a request: the chosen model first, then the
    * provider's other models as fallbacks.
    */
-  async resolve(ref: ModelRef): Promise<{ client: ModelClient; models: string[] }> {
+  async resolve(
+    ref: ModelRef,
+  ): Promise<{ client: ModelClient; models: string[]; template?: ProviderTemplate }> {
     const config = await this.require(ref.providerId);
     return {
       client: await this.client(config),
       models: [ref.model, ...config.models.filter((model) => model !== ref.model)],
+      template: config.template,
     };
   }
 }

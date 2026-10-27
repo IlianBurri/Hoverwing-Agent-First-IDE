@@ -1,7 +1,7 @@
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ChatEvent, ModelRef } from '@kestrel/shared';
 import type { ModelClient } from '../providers';
 import { fakeModelClient, httpError } from '../providers/testing';
@@ -168,6 +168,36 @@ describe('chat prompt', () => {
       ({ role: 'user', text, attachment: null, model: null }) as const;
     const turns = chatTurns([message('a'.repeat(50)), message('b'.repeat(50))], 80);
     expect(turns.map((turn) => turn.content[0])).toEqual(['Y', 'b']);
+  });
+
+  it('tells Ollama models who they are, and only Ollama models', () => {
+    const message = { role: 'user', text: 'Who are you?', attachment: null, model: null } as const;
+    const local = chatTurns([message], undefined, 'qwen2.5-coder:7b')[0]?.content ?? '';
+    expect(local).toContain('open-source model "qwen2.5-coder:7b"');
+    expect(local).toContain('through Ollama');
+    expect(local).toContain('Do not claim to be ChatGPT, Copilot');
+    expect(chatTurns([message])[0]?.content).not.toContain('Ollama');
+  });
+
+  it('names the Ollama model that actually answers, also after a fallback', async () => {
+    const client = fakeModelClient((call) => {
+      if (call.model === 'first') throw httpError(429);
+      return 'Hi';
+    });
+    const service = new ChatService({
+      providers: {
+        resolve: (ref) =>
+          Promise.resolve({ client, models: [ref.model, 'second'], template: 'ollama' as const }),
+      },
+      store: new ChatStore(dir),
+      model: () => ({ providerId: 'p', model: 'first' }),
+      emit: () => undefined,
+    });
+    await service.send(1, { chatId: 'c-ollama', text: 'Who are you?', attachment: null });
+    await vi.waitFor(() => {
+      expect(client.calls.map((call) => call.model)).toEqual(['first', 'second']);
+    });
+    expect(client.calls[1]?.messages?.[0]?.content).toContain('"second"');
   });
 
   it('builds short one-line titles', () => {
