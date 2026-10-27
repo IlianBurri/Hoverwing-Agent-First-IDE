@@ -16,8 +16,11 @@ const patterns: readonly RegExp[] = [
 const assignment =
   /\b([A-Za-z0-9_]*(?:key|token|secret|password|passwd|pwd)[A-Za-z0-9_]*)(\s*[=:]\s*|\s+)(["']?)[^\s"']{4,}\3/gi;
 
+/** Credentials inside URLs, e.g. https://user:token@github.com. */
+const urlCredentials = /\b([a-z][a-z0-9+.-]*:\/\/)[^\s/@]+@/gi;
+
 export function redact(text: string): string {
-  let result = text;
+  let result = text.replace(urlCredentials, '$1[redacted]@');
   for (const pattern of patterns) result = result.replace(pattern, '[redacted]');
   return result.replace(
     assignment,

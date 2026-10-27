@@ -78,6 +78,7 @@ import { WorkspaceManager, createWorkspaceHandlers, watchWorkspace } from './mod
 import { TrustStore, createTrustHandlers } from './modules/trust';
 import { LspConfigStore, LspService, createLspHandlers, spawnLspTransport } from './modules/lsp';
 import { findProgram } from './lib/which';
+import { GitService, createGitHandlers, runGitProcess } from './modules/git';
 import { broadcastEvent, sendEvent } from './ipc/events';
 import { registerIpc } from './ipc/register';
 import {
@@ -165,6 +166,7 @@ void app.whenReady().then(async () => {
       const contents = webContents.fromId(ownerId);
       if (contents) sendEvent(contents, 'workspace:changed', changes);
       if (!changes.overflow) void lsp.filesChanged(ownerId, changes.changes);
+      git.touch(ownerId);
     },
   });
   const search = new SearchRunner();
@@ -238,6 +240,7 @@ void app.whenReady().then(async () => {
       completion.release(contents.id);
       setup.release(contents.id);
       lsp.release(contents.id);
+      git.release(contents.id);
     };
     contents.on('destroyed', release);
     contents.on('did-start-navigation', (details) => {
@@ -248,6 +251,7 @@ void app.whenReady().then(async () => {
     void workspaces.closeAll();
     terminals.killAll();
     lsp.releaseAll();
+    git.releaseAll();
   });
 
   const dataDir = app.getPath('userData');
@@ -294,6 +298,24 @@ void app.whenReady().then(async () => {
       }
     }
     void lsp.trustChanged(root, trusted);
+    for (const window of BrowserWindow.getAllWindows()) {
+      if (workspaces.get(window.webContents.id)?.root === root) {
+        sendEvent(window.webContents, 'git:changed', {});
+      }
+    }
+  });
+  const git = new GitService({
+    run: runGitProcess,
+    isTrusted: (root) => trust.isTrusted(root),
+    trash: (absolute) => shell.trashItem(absolute),
+    env: () => childEnv(process.env),
+    log: (line) => {
+      broadcastEvent('git:log', { line, time: Date.now() });
+    },
+    onChanged: (ownerId) => {
+      const contents = webContents.fromId(ownerId);
+      if (contents) sendEvent(contents, 'git:changed', {});
+    },
   });
   const lspConfigs = new LspConfigStore(join(dataDir, 'lsp'));
   const lsp = new LspService({
@@ -605,6 +627,7 @@ void app.whenReady().then(async () => {
         terminals.killAll(ownerId);
         void agents.stop(ownerId);
         lsp.release(ownerId);
+        git.release(ownerId);
       }),
       ...createTerminalHandlers(terminals, workspaces),
       ...createPermissionHandlers(permissions, workspaces),
@@ -625,6 +648,7 @@ void app.whenReady().then(async () => {
         async (agentId) => (await agentConfigs.get(agentId)) !== undefined,
       ),
       ...createSearchHandlers(search, workspaces),
+      ...createGitHandlers(git, workspaces),
       ...createLspHandlers(lsp, lspConfigs, workspaces, () => {
         broadcastEvent('lsp:changed', {});
       }),

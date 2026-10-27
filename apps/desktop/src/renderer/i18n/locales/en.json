@@ -215,7 +215,14 @@
       "download_failed": "The download failed. Check the internet connection and try again.",
       "download_corrupt": "The downloaded file did not match the official checksum and was deleted.",
       "ollama_unavailable": "Ollama is not running. Start Ollama and try again.",
-      "not_trusted": "This project is not trusted yet."
+      "not_trusted": "This project is not trusted yet.",
+      "git_not_repo": "This folder is not a Git repository.",
+      "git_auth": "Git could not sign in to the remote. Check your SSH key or credential helper (details in Logs › Git).",
+      "git_rejected": "The remote has changes you do not have yet. Pull first.",
+      "git_conflict": "Local changes or conflicts prevent this. Commit, discard or resolve them first.",
+      "git_nothing_to_commit": "Nothing is staged. Stage changes before committing.",
+      "git_no_remote": "The repository has no remote to push to.",
+      "git_failed": "Git failed (details in Logs › Git)."
     }
   },
   "palette": {

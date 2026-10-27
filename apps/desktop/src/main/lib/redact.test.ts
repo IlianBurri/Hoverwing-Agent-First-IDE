@@ -12,6 +12,13 @@ describe('redact', () => {
     expect(redact('AKIAABCDEFGHIJKLMNOP')).toBe('[redacted]');
   });
 
+  it('hides credentials in URLs', () => {
+    expect(redact("fatal: unable to access 'https://me:s3cr3t@example.com/repo.git/'")).toBe(
+      "fatal: unable to access 'https://[redacted]@example.com/repo.git/'",
+    );
+    expect(redact('ssh://git@github.com/x.git')).toBe('ssh://[redacted]@github.com/x.git');
+  });
+
   it('hides values of secret-looking assignments', () => {
     expect(redact('export API_KEY=hunter22 && npm test')).toBe(
       'export API_KEY=[redacted] && npm test',

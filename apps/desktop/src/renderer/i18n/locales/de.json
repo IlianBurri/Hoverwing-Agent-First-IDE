@@ -215,7 +215,14 @@
       "download_failed": "Der Download ist fehlgeschlagen. Prüfe die Internetverbindung und versuche es erneut.",
       "download_corrupt": "Die geladene Datei stimmte nicht mit der offiziellen Prüfsumme überein und wurde gelöscht.",
       "ollama_unavailable": "Ollama läuft nicht. Starte Ollama und versuche es erneut.",
-      "not_trusted": "Diesem Projekt wird noch nicht vertraut."
+      "not_trusted": "Diesem Projekt wird noch nicht vertraut.",
+      "git_not_repo": "Dieser Ordner ist kein Git-Repository.",
+      "git_auth": "Git konnte sich beim Remote nicht anmelden. Prüfe deinen SSH-Schlüssel oder Credential-Helper (Details unter Logs › Git).",
+      "git_rejected": "Auf dem Remote gibt es Änderungen, die du noch nicht hast. Hole sie zuerst (Pull).",
+      "git_conflict": "Lokale Änderungen oder Konflikte verhindern das. Committe, verwirf oder löse sie zuerst.",
+      "git_nothing_to_commit": "Nichts ist gestaged. Stage Änderungen vor dem Commit.",
+      "git_no_remote": "Das Repository hat kein Remote zum Pushen.",
+      "git_failed": "Git ist fehlgeschlagen (Details unter Logs › Git)."
     }
   },
   "palette": {

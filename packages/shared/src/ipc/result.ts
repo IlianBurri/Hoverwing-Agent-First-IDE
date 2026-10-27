@@ -35,7 +35,14 @@ export type IpcErrorCode =
   | 'download_failed'
   | 'download_corrupt'
   | 'ollama_unavailable'
-  | 'not_trusted';
+  | 'not_trusted'
+  | 'git_not_repo'
+  | 'git_auth'
+  | 'git_rejected'
+  | 'git_conflict'
+  | 'git_nothing_to_commit'
+  | 'git_no_remote'
+  | 'git_failed';
 
 export interface IpcError {
   code: IpcErrorCode;
