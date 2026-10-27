@@ -36,6 +36,8 @@ win:
 nsis:
   # A normal installer (not one-click): choose the folder, get shortcuts.
   oneClick: false
+  # Shown before installing: privacy notice (SignPath condition) and MIT license.
+  license: build/license.txt
   perMachine: false
   allowToChangeInstallationDirectory: true
   createDesktopShortcut: always

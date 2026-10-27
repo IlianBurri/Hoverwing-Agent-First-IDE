@@ -1,0 +1,46 @@
+Kestrel – license and privacy
+
+PRIVACY
+Kestrel has no telemetry, no analytics and no account. It only connects to
+other systems when you use a feature that needs it (your model provider, an
+agent, an MCP server, the integrated browser, Docker, git fetch/pull/push, the
+setup assistant). Two connections happen without such a click:
+
+- Update check: on start, the installed app asks GitHub (github.com) whether a
+  newer version exists. Nothing is downloaded without your click. Turn it off
+  with "Turn off automatic update check" in the command palette (Ctrl+K).
+- TypeScript language server: the first time you open a TypeScript or
+  JavaScript file in a project you trusted, Kestrel downloads the language
+  server from the npm registry (registry.npmjs.org). Turn it off in the
+  command palette under "Language servers".
+
+Full privacy statement: https://github.com/IlianBurri/Kestrel-Agen-Harness-IDE/blob/HEAD/PRIVACY.md
+
+Uninstall: Windows Settings > Apps > Installed apps > Kestrel > Uninstall.
+Your settings stay in %APPDATA%\Kestrel; delete that folder to remove them.
+
+Code signing: free code signing provided by SignPath.io, certificate by
+SignPath Foundation.
+
+LICENSE (MIT)
+MIT License
+
+Copyright (c) 2026 Kestrel contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

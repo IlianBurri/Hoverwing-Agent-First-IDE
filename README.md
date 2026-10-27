@@ -135,12 +135,17 @@ _Turn off automatic update check_ in the command palette). Settings, keys and
 checkpoints survive updates and uninstalling. What the app connects to, and when,
 is listed in [PRIVACY.md](PRIVACY.md).
 
+**Uninstall:** Windows – _Settings → Apps → Installed apps → Kestrel → Uninstall_;
+macOS – move Kestrel from _Applications_ to the trash; Linux – delete the AppImage.
+Settings, keys and checkpoints stay in the app data folder (`%APPDATA%\Kestrel`,
+`~/Library/Application Support/Kestrel`, `~/.config/Kestrel`); delete it to remove
+them too.
+
 ### Code signing policy
 
-Windows releases are going to be signed through the
-[SignPath Foundation](https://signpath.org) with free code signing provided by
-[SignPath.io](https://about.signpath.io) (application in progress; until then the
-installers are unsigned).
+Free code signing provided by [SignPath.io](https://about.signpath.io), certificate
+by [SignPath Foundation](https://signpath.org). (Application in progress; until it
+is approved, the Windows installers are unsigned.)
 
 - Only binaries built by GitHub Actions from this repository
   ([Release workflow](.github/workflows/release.yml)) are signed. Upstream
@@ -152,8 +157,10 @@ installers are unsigned).
 - **Approvers:** [IlianBurri](https://github.com/IlianBurri)
 - **Privacy:** this program will not transfer any information to other networked
   systems unless specifically requested by the user or the person installing or
-  operating it. The only exception is the update check on start, which can be
-  turned off. Details in [PRIVACY.md](PRIVACY.md).
+  operating it. Exceptions, both can be turned off: the update check on start
+  (GitHub) and the first download of the TypeScript language server (npm) in a
+  trusted project. The Windows installer shows this notice before installing. Details in
+  [PRIVACY.md](PRIVACY.md).
 
 ## Security by default
 
