@@ -16,7 +16,7 @@ in an editor that makes every agent action visible, reviewable and reversible.
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-[**Download**](#download) · [Features](#features) · [Security](#security-by-default) ·
+[**Website**](https://ilianburri.github.io/Kestrel-Agen-Harness-IDE/) · [**Download**](#download) · [Features](#features) · [Security](#security-by-default) ·
 [Development](#development) · [Roadmap](#roadmap) · [Privacy](PRIVACY.md)
 
 <br />

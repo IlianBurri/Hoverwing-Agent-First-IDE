@@ -35,5 +35,10 @@ export default tseslint.config(
     files: ['**/*.js', '**/*.mjs', '**/*.cjs'],
     ...tseslint.configs.disableTypeChecked,
   },
+  {
+    // The GitHub Pages website runs in the browser.
+    files: ['site/**/*.js'],
+    languageOptions: { globals: { ...globals.browser } },
+  },
   prettier,
 );
