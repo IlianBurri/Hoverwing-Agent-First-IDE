@@ -5,10 +5,11 @@ import { AgentLog } from '../features/agent';
 import { PermissionLog } from '../features/permissions';
 import { McpLog } from '../features/mcp';
 import { LspLog } from '../features/lsp';
+import { GitLog } from '../features/git';
 import { SandboxLog } from '../features/sandbox';
 import styles from './LogsView.module.css';
 
-type LogKind = 'permissions' | 'agent' | 'sandbox' | 'mcp' | 'lsp';
+type LogKind = 'permissions' | 'agent' | 'sandbox' | 'mcp' | 'lsp' | 'git';
 
 /** Bottom panel "Logs": permission decisions, agent diagnostics, sandbox builds. */
 export function LogsView() {
@@ -25,6 +26,7 @@ export function LogsView() {
             { value: 'sandbox', label: t('logs.sandbox') },
             { value: 'mcp', label: t('logs.mcp') },
             { value: 'lsp', label: t('logs.lsp') },
+            { value: 'git', label: t('logs.git') },
           ]}
           value={kind}
           onChange={setKind}
@@ -36,6 +38,7 @@ export function LogsView() {
         {kind === 'sandbox' && <SandboxLog />}
         {kind === 'mcp' && <McpLog />}
         {kind === 'lsp' && <LspLog />}
+        {kind === 'git' && <GitLog />}
       </div>
     </div>
   );

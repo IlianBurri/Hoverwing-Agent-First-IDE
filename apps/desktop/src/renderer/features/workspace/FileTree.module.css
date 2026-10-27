@@ -83,3 +83,34 @@
   flex-shrink: 0;
   color: var(--text-muted);
 }
+
+.git,
+.gitDot {
+  flex-shrink: 0;
+  margin-left: auto;
+  padding-right: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+
+.gitDot {
+  color: var(--warning);
+}
+
+.git-modified,
+.git-renamed,
+.git-copied,
+.git-typeChanged {
+  color: var(--warning);
+}
+
+.git-added,
+.git-untracked {
+  color: var(--success);
+}
+
+.git-deleted,
+.git-conflict {
+  color: var(--error);
+}

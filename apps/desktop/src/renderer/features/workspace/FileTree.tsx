@@ -12,6 +12,7 @@ import { select, setExpanded, useWorkspaceStore } from '../../stores/workspace';
 import { createEntry, moveEntry, renameEntry, trashEntry } from './actions';
 import { iconForEntry } from './fileIcon';
 import { flattenTree } from './flatten';
+import { GitBadge } from './GitBadge';
 import type { TreeRow } from './flatten';
 import styles from './FileTree.module.css';
 
@@ -283,6 +284,7 @@ export function FileTree({ onOpenFile }: FileTreeProps) {
                 />
                 <Icon size={15} aria-hidden="true" className={styles['icon']} />
                 <span className={styles['name']}>{entry.name}</span>
+                <GitBadge path={entry.path} directory={entry.kind === 'directory'} />
                 {entry.symlink && (
                   <Link2
                     size={12}

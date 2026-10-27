@@ -1,0 +1,189 @@
+.root {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-height: 0;
+  padding: 0 var(--space-2) var(--space-3);
+  overflow: auto;
+}
+
+.root[aria-busy='true'] .list {
+  opacity: 0.7;
+}
+
+.muted {
+  margin: 0;
+  padding: 0 var(--space-3);
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.notice {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  align-items: flex-start;
+  padding: 0 var(--space-1);
+}
+
+.branchBar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-1);
+}
+
+.branchLabel {
+  display: inline-flex;
+  color: var(--text-muted);
+}
+
+.select {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--font-size-xs);
+}
+
+.sync {
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  white-space: nowrap;
+}
+
+.commit {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: 0 var(--space-1);
+}
+
+.message {
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  resize: vertical;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-1);
+}
+
+.heading {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.count {
+  font-weight: 500;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-sm);
+}
+
+.row:hover,
+.row:focus-within {
+  background: var(--surface-raised);
+}
+
+.file {
+  display: flex;
+  flex: 1;
+  align-items: baseline;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: var(--space-1) 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  text-align: left;
+  cursor: pointer;
+}
+
+.name {
+  flex-shrink: 0;
+}
+
+.folder {
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.actions {
+  display: flex;
+  flex-shrink: 0;
+  opacity: 0;
+}
+
+.row:hover .actions,
+.row:focus-within .actions,
+.sectionHeader .actions {
+  opacity: 1;
+}
+
+.badge {
+  flex-shrink: 0;
+  width: var(--space-4);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  text-align: center;
+}
+
+.modified,
+.renamed,
+.copied,
+.typeChanged {
+  color: var(--warning);
+}
+
+.added,
+.untracked {
+  color: var(--success);
+}
+
+.deleted,
+.conflict {
+  color: var(--error);
+}

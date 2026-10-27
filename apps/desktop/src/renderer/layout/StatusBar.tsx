@@ -22,6 +22,7 @@ import { useProvidersStore } from '../stores/providers';
 import { SandboxBadge } from '../features/sandbox';
 import { TrustBadge } from '../features/trust';
 import { LspStatus } from '../features/lsp';
+import { GitStatusItem } from '../features/git';
 import { runningContainers, useDockerStore } from '../stores/docker';
 import styles from './StatusBar.module.css';
 
@@ -80,6 +81,7 @@ export function StatusBar() {
               : t('status.completionOff')}
           </button>
         )}
+        <GitStatusItem className={styles['button']} />
         {docker?.docker === 'available' && (
           <button type="button" className={styles['button']} onClick={showDockerView}>
             <Container size={14} aria-hidden="true" />

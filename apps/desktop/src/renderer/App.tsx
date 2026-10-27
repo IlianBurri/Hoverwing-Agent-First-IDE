@@ -41,6 +41,8 @@ import {
   registerLspCommands,
 } from './features/lsp';
 import { appendLspLog, setDiagnostics, useLspStore } from './stores/lsp';
+import { GitDiffModal, refreshGit, registerGitCommands } from './features/git';
+import { appendGitLog } from './stores/git';
 import { setPanelOpen } from './stores/layout';
 import { useModalStore } from './stores/modals';
 import { addLogEntry, addPending, loadPending, removePending } from './stores/permissions';
@@ -73,6 +75,18 @@ export function App() {
   useEffect(() => registerUpdateCommands(), []);
   useEffect(() => registerTrustCommands(), []);
   useEffect(() => registerLspCommands(), []);
+  useEffect(() => registerGitCommands(), []);
+  useEffect(() => {
+    const offs = [
+      window.kestrel.on('git:changed', () => {
+        void refreshGit();
+      }),
+      window.kestrel.on('git:log', appendGitLog),
+    ];
+    return () => {
+      for (const off of offs) off();
+    };
+  }, []);
   useEffect(() => {
     const offs = [
       window.kestrel.on('lsp:diagnostics', setDiagnostics),
@@ -185,6 +199,7 @@ export function App() {
     if (workspaceRoot) void onWorkspaceOpened();
     else setTrusted(null);
     void loadLspState();
+    void refreshGit();
   }, [workspaceRoot]);
   useEffect(
     () =>
@@ -267,6 +282,9 @@ export function App() {
       {modal?.id === 'provider' && <ProviderDialog provider={modal.provider} />}
       {modal?.id === 'setup' && <SetupWizard />}
       {modal?.id === 'lspServers' && <LspServersDialog />}
+      {modal?.id === 'gitDiff' && (
+        <GitDiffModal key={modal.path} path={modal.path} staged={modal.staged} diff={modal.diff} />
+      )}
       {modal?.id === 'checkpointChanges' && (
         <ChangesModal key={modal.checkpoint.id} checkpoint={modal.checkpoint} />
       )}

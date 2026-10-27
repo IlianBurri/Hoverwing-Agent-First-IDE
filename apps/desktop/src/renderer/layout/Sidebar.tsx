@@ -1,4 +1,5 @@
 import { DockerView } from '../features/docker';
+import { GitView } from '../features/git';
 import { McpView } from '../features/mcp';
 import { ModelsView } from '../features/providers';
 import { openFile } from '../features/editor';
@@ -13,6 +14,7 @@ export function Sidebar() {
     <section className="panel-fill" aria-labelledby="sidebar-title">
       {view === 'files' && <FilesView onOpenFile={(path) => void openFile(path)} />}
       {view === 'search' && <SearchView />}
+      {view === 'git' && <GitView />}
       {view === 'docker' && <DockerView />}
       {view === 'mcp' && <McpView />}
       {view === 'models' && <ModelsView />}

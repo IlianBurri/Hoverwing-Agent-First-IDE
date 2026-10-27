@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { Checkpoint, McpServerView, ProviderView } from '@kestrel/shared';
+import type { Checkpoint, GitDiff, McpServerView, ProviderView } from '@kestrel/shared';
 
 /** The app-level modal that is open (one at a time), with its data. */
 export type ModalState =
@@ -12,6 +12,7 @@ export type ModalState =
   | { id: 'provider'; provider: ProviderView | null }
   | { id: 'setup' }
   | { id: 'lspServers' }
+  | { id: 'gitDiff'; path: string; staged: boolean; diff: GitDiff }
   | null;
 
 export const useModalStore = create<{ open: ModalState }>()(() => ({ open: null }));
