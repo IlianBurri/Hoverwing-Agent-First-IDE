@@ -76,6 +76,8 @@ import { createSettingsHandlers, createSettingsStore } from './modules/settings'
 import { TerminalManager, createTerminalHandlers, spawnNodePty } from './modules/terminal';
 import { WorkspaceManager, createWorkspaceHandlers, watchWorkspace } from './modules/workspace';
 import { TrustStore, createTrustHandlers } from './modules/trust';
+import { LspConfigStore, LspService, createLspHandlers, spawnLspTransport } from './modules/lsp';
+import { findProgram } from './lib/which';
 import { broadcastEvent, sendEvent } from './ipc/events';
 import { registerIpc } from './ipc/register';
 import {
@@ -162,6 +164,7 @@ void app.whenReady().then(async () => {
     onChanges: (ownerId, changes) => {
       const contents = webContents.fromId(ownerId);
       if (contents) sendEvent(contents, 'workspace:changed', changes);
+      if (!changes.overflow) void lsp.filesChanged(ownerId, changes.changes);
     },
   });
   const search = new SearchRunner();
@@ -234,6 +237,7 @@ void app.whenReady().then(async () => {
       chat.release(contents.id);
       completion.release(contents.id);
       setup.release(contents.id);
+      lsp.release(contents.id);
     };
     contents.on('destroyed', release);
     contents.on('did-start-navigation', (details) => {
@@ -243,6 +247,7 @@ void app.whenReady().then(async () => {
   app.on('before-quit', () => {
     void workspaces.closeAll();
     terminals.killAll();
+    lsp.releaseAll();
   });
 
   const dataDir = app.getPath('userData');
@@ -288,6 +293,37 @@ void app.whenReady().then(async () => {
         sendEvent(window.webContents, 'trust:changed', { trusted });
       }
     }
+    void lsp.trustChanged(root, trusted);
+  });
+  const lspConfigs = new LspConfigStore(join(dataDir, 'lsp'));
+  const lsp = new LspService({
+    configs: lspConfigs,
+    isTrusted: (root) => trust.isTrusted(root),
+    confirmStart: (ownerId, server) => {
+      const text = nativeTexts[dialogLanguage(settings.get())];
+      return askNatively(ownerId, {
+        message: text.lspMessage.replace('{name}', server.name),
+        detail: text.lspDetail.replace('{command}', [server.command, ...server.args].join(' ')),
+        confirm: text.lspStart,
+      });
+    },
+    programExists: async (command, cwd) =>
+      (await findProgram(command, { platform: process.platform, env: process.env, cwd })) !== null,
+    startTransport: spawnLspTransport,
+    env: () => childEnv(process.env),
+    events: {
+      diagnostics: (ownerId, diagnostics) => {
+        const contents = webContents.fromId(ownerId);
+        if (contents) sendEvent(contents, 'lsp:diagnostics', diagnostics);
+      },
+      status: (ownerId, statuses) => {
+        const contents = webContents.fromId(ownerId);
+        if (contents) sendEvent(contents, 'lsp:status', statuses);
+      },
+      log: (line) => {
+        broadcastEvent('lsp:log', { line, time: Date.now() });
+      },
+    },
   });
   const secrets = new SecretStore(join(dataDir, 'secrets.json'), safeStorage);
   const mcp = new McpService({
@@ -567,6 +603,7 @@ void app.whenReady().then(async () => {
       ...createWorkspaceHandlers(workspaces, settings, (ownerId) => {
         terminals.killAll(ownerId);
         void agents.stop(ownerId);
+        lsp.release(ownerId);
       }),
       ...createTerminalHandlers(terminals, workspaces),
       ...createPermissionHandlers(permissions, workspaces),
@@ -587,6 +624,9 @@ void app.whenReady().then(async () => {
         async (agentId) => (await agentConfigs.get(agentId)) !== undefined,
       ),
       ...createSearchHandlers(search, workspaces),
+      ...createLspHandlers(lsp, lspConfigs, workspaces, () => {
+        broadcastEvent('lsp:changed', {});
+      }),
       ...createTrustHandlers(trust, workspaces, (ownerId, root) => {
         const text = nativeTexts[dialogLanguage(settings.get())];
         return askNatively(ownerId, {

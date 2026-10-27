@@ -6,6 +6,7 @@ import { chatChannels, chatEvents } from './channels/chat';
 import { checkpointChannels, checkpointEvents } from './channels/checkpoints';
 import { completionChannels } from './channels/completion';
 import { dockerChannels, dockerEvents } from './channels/docker';
+import { lspChannels, lspEvents } from './channels/lsp';
 import { mcpChannels, mcpEvents } from './channels/mcp';
 import { permissionChannels, permissionEvents } from './channels/permissions';
 import { providerChannels, providerEvents } from './channels/providers';
@@ -41,6 +42,7 @@ export const ipcContract = {
   ...checkpointChannels,
   ...completionChannels,
   ...dockerChannels,
+  ...lspChannels,
   ...mcpChannels,
   ...permissionChannels,
   ...providerChannels,
@@ -62,6 +64,7 @@ export const ipcEvents = {
   ...chatEvents,
   ...checkpointEvents,
   ...dockerEvents,
+  ...lspEvents,
   ...mcpEvents,
   ...permissionEvents,
   ...providerEvents,
