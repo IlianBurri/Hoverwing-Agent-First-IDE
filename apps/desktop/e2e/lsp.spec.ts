@@ -86,6 +86,9 @@ test('updates diagnostics while typing', async () => {
   const problems = page.getByRole('region', { name: 'Problems' });
   await expect(problems.getByRole('button', { name: /Fake warning/ })).toBeVisible();
   await expect(problemsTab()).toHaveText('Problems (2)');
+  // Saved, so closing the app does not stop at the "unsaved changes" dialog.
+  await page.keyboard.press('Control+S');
+  await expect(page.getByRole('tab', { name: 'app.fake', exact: true })).toBeVisible();
 });
 
 test('jumps to a problem from the list', async () => {

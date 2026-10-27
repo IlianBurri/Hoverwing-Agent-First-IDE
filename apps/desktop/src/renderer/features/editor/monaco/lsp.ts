@@ -214,8 +214,13 @@ function applyMarkers(monaco: MonacoApi, model: editor.ITextModel): void {
   );
 }
 
+let builtinTypeScript = true;
+
 /** Monaco's own TypeScript service would answer twice while tsserver runs. */
 function useBuiltinTypeScript(monaco: MonacoApi, enabled: boolean): void {
+  // Each call re-registers Monaco's providers, so only act on a change.
+  if (enabled === builtinTypeScript) return;
+  builtinTypeScript = enabled;
   for (const defaults of [
     monaco.typescript.typescriptDefaults,
     monaco.typescript.javascriptDefaults,
