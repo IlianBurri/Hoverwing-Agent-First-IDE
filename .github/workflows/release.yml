@@ -184,6 +184,11 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # pnpm restores node-pty already compiled from its cache, which may come
+      # from a newer runner: compile it again on this machine.
+      - name: Compile node-pty on this runner
+        if: runner.os == 'Linux'
+        run: pnpm --filter @kestrel/desktop rebuild node-pty
       - run: pnpm typecheck
       - name: Build the installer
         # A missing secret arrives as an empty CSC_LINK, which electron-builder
