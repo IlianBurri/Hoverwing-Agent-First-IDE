@@ -49,8 +49,9 @@ AI you already use**.
       <h3>🤖 Agents with guard rails</h3>
       Start Claude Code, Gemini CLI or any ACP agent in your project. See its plan,
       tool calls and answers live; approve commands once or always for the project;
-      stop it at any time. Run up to four agents side by side in tabs – a file one
-      agent is changing stays locked for the others until you decide.
+      stop it at any time. Pick model, effort and mode per tab where the agent offers
+      them, and see how full its context is. Run up to four agents side by side in
+      tabs – a file one agent is changing stays locked for the others until you decide.
     </td>
     <td width="50%" valign="top">
       <h3>🧾 Diff review &amp; checkpoints</h3>
@@ -92,8 +93,9 @@ AI you already use**.
       <h3>🧠 Language servers &amp; Git</h3>
       Completion, hover, go to definition and a Problems list from real language
       servers (TypeScript, Pyright, rust-analyzer, gopls or your own). A Git panel to
-      stage, commit, switch branches, diff, pull and push. Agents can read the current
-      problems through Kestrel's <code>get_diagnostics</code> tool.
+      stage, commit, switch branches, diff, pull and push. Sign in with GitHub to clone
+      your repositories and push over HTTPS – the token stays in your keychain. Agents
+      can read the current problems through Kestrel's <code>get_diagnostics</code> tool.
     </td>
   </tr>
   <tr>
@@ -167,8 +169,9 @@ as soon as releases are signed.
   systems unless specifically requested by the user or the person installing or
   operating it. Exceptions, both can be turned off: the update check on start
   (GitHub) and the first download of the TypeScript language server (npm) in a
-  trusted project. The Windows installer shows this notice before installing. Details in
-  [PRIVACY.md](PRIVACY.md).
+  trusted project. Signing in to GitHub contacts `github.com` and `api.github.com`
+  only when you ask for it. The Windows installer shows this notice before installing.
+  Details in [PRIVACY.md](PRIVACY.md).
 
 ## Security by default
 

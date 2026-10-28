@@ -17,11 +17,13 @@ The app only connects to other systems in these cases:
 | You open a page in the integrated browser                               | The website                                                                          | What any browser sends                                              | Do not open pages                                                                |
 | You open a TypeScript/JavaScript file in a trusted project (first time) | npm registry (`registry.npmjs.org`) via `npx`                                        | Download requests for `typescript-language-server` and `typescript` | Disable the TypeScript language server (command palette → _Language servers_)    |
 | You fetch, pull or push in the Git panel                                | The remote of your repository (e.g. GitHub)                                          | What git sends: your commits and branch names (push)                | Do not use these buttons                                                         |
+| You sign in to GitHub, list your repositories or clone one              | GitHub (`github.com`, `api.github.com`)                                              | Kestrel's public app id, then your access token with each request   | Do not sign in; _Sign out of GitHub_ forgets the token                           |
 | You pull images or start containers in the Docker panel                 | Your Docker daemon and its registries                                                | Decided by Docker                                                   | Do not use the Docker features                                                   |
 
 Secret files (`.env`, keys, `.ssh`, …) are never sent to models or agents.
 API keys stay in your system keychain and are only sent to the provider they
-belong to.
+belong to. The GitHub access token stays there too and is only given to git for
+`https://github.com`, never written into a project or a remote URL.
 
 The data of the services above is handled under their own privacy policies.
 Kestrel keeps your settings, chats, checkpoints and logs only on your computer

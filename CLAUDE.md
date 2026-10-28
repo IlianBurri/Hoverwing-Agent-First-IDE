@@ -11,7 +11,9 @@ Docker), 4 (Docker panel), 5 (integrated browser + agent browser tools), 6
 assistant: hardware detection, model catalog, Ollama install) and 9 (project
 trust, language servers, Git panel) are done, plus installers for
 Windows/macOS/Linux with auto-update, and parallel agents (stage A: up to 4
-agent tabs per window in the same folder; stage B, isolated copies, is open).
+agent tabs per window in the same folder; stage B, isolated copies, is open),
+session options for agents (model/effort/mode, context meter), chat model
+options and GitHub sign-in with clone and HTTPS push/pull.
 All phases of SPEC.md are done; new work follows the same flow: present a
 plan, wait for OK, implement in small commits, keep lint/typecheck/tests
 green, update this file.
@@ -149,6 +151,17 @@ so use `KESTREL_SANDBOX_BASE_IMAGE` / `KESTREL_E2E_SANDBOX_BASE_IMAGE` =
   `cancel(ownerId, slotId)`) and review locks (`ChangeAuthor.key` =
   `<ownerId>:<slotId>`) are keyed by slot. All agents share the project folder
   (no isolated copies yet).
+  Session options (`options.ts`): ACP `configOptions` (category model /
+  thought_level → effort / mode / other; select and boolean, the client
+  advertises `session.configOptions.boolean`), else `modes` (`session/set_mode`)
+  and the unstable `models` field (Gemini CLI, `session/set_model` as a plain
+  request). They arrive in `AgentStatus.options`; `usage_update` fills
+  `status.usage` (context meter). `agent:setOption` only between turns and only
+  listed values; modes that skip permission questions (`bypassPermissions`,
+  `auto`, `dontAsk`, `yolo`) are never offered or accepted. Choices are kept
+  per project and agent (`AgentPrefsStore`, userData/agent-sessions/prefs-*)
+  and applied again after start. Agents without ACP options take their model
+  as command-line args (e.g. Gemini `--model`).
 - **Checkpoints:** `modules/checkpoints` uses a shadow git dir in app data with
   the project as work tree and an isolated git config; the project's own `.git`
   is never touched. Heavy folders and secret files are excluded. One checkpoint
@@ -240,7 +253,10 @@ so use `KESTREL_SANDBOX_BASE_IMAGE` / `KESTREL_E2E_SANDBOX_BASE_IMAGE` =
   small models stop claiming to be a Microsoft/OpenAI assistant. One stream per window
   (`chat:event`), chats in userData/chats. The renderer picks the id of a new
   chat so events can never arrive before it knows it. Settings
-  `chatModel` = provider + model.
+  `chatModel` = provider + model; `chatModelOptions[modelRefKey]` =
+  temperature / maxTokens / reasoningEffort (null = not sent). The context
+  size cannot be set over the OpenAI-compatible API (Ollama:
+  `OLLAMA_CONTEXT_LENGTH`).
 - **Completion:** `modules/completion` + `features/editor/monaco/inlineCompletion.ts`
   (Monaco inline completions, 250 ms debounce, cancel → `completion:cancel`).
   Main runs only the newest request per window, 10 s timeout; FIM via
@@ -279,7 +295,8 @@ so use `KESTREL_SANDBOX_BASE_IMAGE` / `KESTREL_E2E_SANDBOX_BASE_IMAGE` =
   (`setModeConfiguration`). Diagnostics -> markers, Problems tab, status bar;
   agents get them via the MCP tool `get_diagnostics` (`file.read`).
 - **Git panel:** `modules/git` (system git via `runGitProcess`; non-zero exit
-  is a result, only ENOENT rejects). `GitService` serializes commands per
+  is a result, only ENOENT rejects). Network commands (fetch, pull, push,
+  clone) get `deps.credentials` (the GitHub credential helper, see below). `GitService` serializes commands per
   repo, parses `status --porcelain=v2 -z` (`status.ts`), works for projects
   inside a bigger repo (`--show-prefix`). Untrusted reads add
   `core.fsmonitor=false` and empty all `filter.<driver>.*` (a test proves no
@@ -289,6 +306,21 @@ so use `KESTREL_SANDBOX_BASE_IMAGE` / `KESTREL_E2E_SANDBOX_BASE_IMAGE` =
   (`LC_MESSAGES=C`) so `classifyGitError` can map them; raw output goes to
   Logs › Git (`redact` hides URL credentials). Watches HEAD/index/refs plus
   workspace changes -> debounced `git:changed`. Agents have no access.
+- **GitHub:** `modules/github`. Device flow (`deviceFlow.ts`; client id
+  `GITHUB_CLIENT_ID` in `endpoints.ts`, empty = not configured, setup in
+  `docs/github-sign-in.md`; scopes `repo read:user`). Token in `SecretStore`
+  (`github:token`), account name in userData/github.json; the renderer only
+  sees `GitHubStatus`. Only the GitHub web origin is opened as verification
+  page. `GitCredentialBroker` listens on 127.0.0.1; each network git command
+  gets `KESTREL_GIT_CREDENTIALS=<port>:<one-off key>` plus
+  `credential.<origin>.helper` (first reset to empty, then the helper script
+  written to userData/github, run with Electron as Node) via `GIT_CONFIG_*`,
+  so nothing lands in `.git/config`, URLs or argv; the broker answers only the
+  GitHub protocol+host and known keys, keys are released after the command.
+  `github:clone` takes only `owner/name`; main builds the URL, picks the
+  parent natively, refuses existing folders and opens the clone via
+  `workspaceOpener` (restricted mode until trusted). A 401 from the API signs
+  out. `KESTREL_GITHUB_CLIENT_ID/URL/API_URL` point at fakes in tests.
 - **Commands:** every user action is a `Command` registered by its feature
   (`register<Feature>Commands`), with an i18n title, optional default keybinding(s)
   (`Mod+…`, overridable via `settings.keybindings`) and a `when` condition. One
@@ -349,7 +381,9 @@ so use `KESTREL_SANDBOX_BASE_IMAGE` / `KESTREL_E2E_SANDBOX_BASE_IMAGE` =
   scripted ACP agent `e2e/fixtures/mock-agent.mjs` (configured with
   `configureMockAgent`); prompts like `hello`, `edit <path> <text>`,
   `direct <path> <text>`, `twohunks <path>`, `secret`, `run <cmd>`, `slow`,
-  `peek <path>`, `whoami`, `mcp <tool> [arg]` (calls Kestrel's MCP server;
+  `peek <path>`, `whoami`, `settings` (reports model/effort/mode, sends a
+  usage update; sessions offer config options `model`/`effort` and modes incl.
+  `bypassPermissions`), `mcp <tool> [arg]` (calls Kestrel's MCP server;
   `MOCK_MCP_STDIO=1` uses the stdio bridge; a JSON argument is passed as tool
   arguments) trigger fixed behaviour. `e2e/fixtures/test-mcp-server.mjs` is a
   test MCP server (stdio, or `--http` with a bearer token) with `echo`,
@@ -360,7 +394,10 @@ so use `KESTREL_SANDBOX_BASE_IMAGE` / `KESTREL_E2E_SANDBOX_BASE_IMAGE` =
   `e2e/fixtures/fake-lsp.mjs` (ERROR/WARN lines -> diagnostics, completion
   `fakeCompletion`, hover, definition incl. one outside the project, `CRASH`
   exits); E2E writes `lsp/servers.json` and `trust.json` into the user-data dir.
-  Git E2E uses a real repo plus a local bare remote. Browser
+  Git E2E uses a real repo plus a local bare remote. GitHub E2E uses
+  `startFakeGitHub()` (`e2e/fake-github.ts`: device flow, API under `/api`,
+  `octo/demo` over smart HTTP with `git http-backend` behind Basic auth;
+  `shell.openExternal` is stubbed). Push asks for confirmation in the UI. Browser
   tests use `startTestSite()` (`e2e/browser-helpers.ts`). Sandbox E2E bundles the mock
   agent into the project (`bundleMockAgent`, via Vite) because the container
   only sees the project. A failing test restarts the worker (and the app),

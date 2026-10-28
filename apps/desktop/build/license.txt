@@ -3,8 +3,8 @@ Kestrel – license and privacy
 PRIVACY
 Kestrel has no telemetry, no analytics and no account. It only connects to
 other systems when you use a feature that needs it (your model provider, an
-agent, an MCP server, the integrated browser, Docker, git fetch/pull/push, the
-setup assistant). Two connections happen without such a click:
+agent, an MCP server, the integrated browser, Docker, git fetch/pull/push,
+GitHub sign-in, the setup assistant). Two connections happen without such a click:
 
 - Update check: on start, the installed app asks GitHub (github.com) whether a
   newer version exists. Nothing is downloaded without your click. Turn it off
