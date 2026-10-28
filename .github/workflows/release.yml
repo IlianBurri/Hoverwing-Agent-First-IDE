@@ -182,7 +182,11 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
       - name: Build the installer
-        run: pnpm --filter @kestrel/desktop ${{ matrix.script }}
+        # A missing secret arrives as an empty CSC_LINK, which electron-builder
+        # resolves to the working directory ("not a file"): unset it instead.
+        run: |
+          if [ -z "$CSC_LINK" ]; then unset CSC_LINK CSC_KEY_PASSWORD; fi
+          pnpm --filter @kestrel/desktop ${{ matrix.script }}
         env:
           # Without a certificate electron-builder builds unsigned installers.
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
