@@ -23,6 +23,8 @@ export function createAgentHandlers(
       await agents.prompt(sender.id, slotId, text);
       return null;
     },
+    'agent:setOption': ({ slotId, optionId, value }, { sender }) =>
+      agents.setOption(sender.id, slotId, workspaces.requireRoot(sender.id), optionId, value),
     'agent:cancel': async ({ slotId }, { sender }) => {
       await agents.cancel(sender.id, slotId);
       return null;

@@ -81,6 +81,35 @@ export const agentEventSchema = z.discriminatedUnion('type', [
 ]);
 export type AgentEvent = z.infer<typeof agentEventSchema>;
 
+export const agentOptionChoiceSchema = z.object({
+  value: z.string(),
+  name: z.string(),
+  description: z.string().nullable(),
+  /** Name of the group the agent put this value in, if any. */
+  group: z.string().nullable(),
+});
+export type AgentOptionChoice = z.infer<typeof agentOptionChoiceSchema>;
+
+/**
+ * A setting the running agent offers for its session (model, effort, mode …),
+ * translated from ACP config options, modes or the model list.
+ */
+export const agentOptionSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  description: z.string().nullable(),
+  category: z.enum(['model', 'effort', 'mode', 'other']),
+  value: z.union([z.string(), z.boolean()]),
+  /** Selectable values; empty for on/off options. */
+  choices: z.array(agentOptionChoiceSchema),
+});
+export type AgentOption = z.infer<typeof agentOptionSchema>;
+export type AgentOptionValue = AgentOption['value'];
+
+/** Context window use of the session, as reported by the agent. */
+export const agentUsageSchema = z.object({ used: z.number(), size: z.number() });
+export type AgentUsage = z.infer<typeof agentUsageSchema>;
+
 export const agentStatusSchema = z.object({
   state: z.enum(['idle', 'starting', 'ready', 'working', 'stopped', 'error']),
   agentId: z.string().nullable(),
@@ -95,6 +124,9 @@ export const agentStatusSchema = z.object({
   canLoadSession: z.boolean(),
   /** Where the agent runs: in the Docker sandbox or directly on the system. */
   sandboxed: z.boolean(),
+  /** Settings the agent offers for this session (empty if none). */
+  options: z.array(agentOptionSchema),
+  usage: agentUsageSchema.nullable(),
 });
 export type AgentStatus = z.infer<typeof agentStatusSchema>;
 
@@ -122,4 +154,6 @@ export const idleAgentStatus: AgentStatus = {
   detail: null,
   canLoadSession: false,
   sandboxed: false,
+  options: [],
+  usage: null,
 };

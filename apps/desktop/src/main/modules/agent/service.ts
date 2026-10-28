@@ -2,6 +2,7 @@ import type {
   AgentConfig,
   AgentConfigView,
   AgentEvent,
+  AgentOptionValue,
   AgentSlot,
   AgentStatus,
   SessionSummary,
@@ -12,6 +13,7 @@ import { childEnv } from '../../lib/env';
 import type { PermissionService } from '../permissions';
 import type { SecretStore } from '../secrets';
 import type { AgentConfigStore } from './configs';
+import type { AgentPrefsStore } from './prefs';
 import { AgentRuntime } from './runtime';
 import type { RuntimeDeps, SessionMcp } from './runtime';
 import type { SessionHistory } from './sessions';
@@ -21,6 +23,8 @@ export interface AgentServiceDeps {
   configs: AgentConfigStore;
   secrets: SecretStore;
   sessions: SessionHistory;
+  /** Session settings the user chose, applied again on the next start. */
+  prefs: AgentPrefsStore;
   permissions: PermissionService;
   startTransport: StartTransport;
   /** Runs agents with `sandbox.enabled` in a Docker container. */
@@ -154,14 +158,42 @@ export class AgentService {
       const value = await this.deps.secrets.get(secretKey(config.id, name));
       if (value !== null) secrets[name] = value;
     }
-    if (config.sandbox.enabled) {
-      // The container gets only the agent's own variables, not the host's.
-      return runtime.start(config, root, secrets, resumeSessionId, {
-        start: () => this.deps.sandbox.startAgent(config, root, secrets),
-      });
+    // The container gets only the agent's own variables, not the host's.
+    const status = config.sandbox.enabled
+      ? await runtime.start(config, root, secrets, resumeSessionId, {
+          start: () => this.deps.sandbox.startAgent(config, root, secrets),
+        })
+      : await runtime.start(
+          config,
+          root,
+          { ...childEnv(process.env), ...secrets },
+          resumeSessionId,
+        );
+    if (status.state !== 'ready') return status;
+    return this.applyPrefs(runtime, root, config.id);
+  }
+
+  /** Sets the remembered choices again, as far as the agent still offers them. */
+  private async applyPrefs(runtime: AgentRuntime, root: string, agentId: string) {
+    const prefs = await this.deps.prefs.get(root, agentId);
+    for (const [optionId, value] of Object.entries(prefs)) {
+      if (!runtime.getStatus().options.some((option) => option.id === optionId)) continue;
+      await runtime.setOption(optionId, value).catch(() => undefined);
     }
-    const env = { ...childEnv(process.env), ...secrets };
-    return runtime.start(config, root, env, resumeSessionId);
+    return runtime.getStatus();
+  }
+
+  async setOption(
+    ownerId: number,
+    slotId: string,
+    root: string,
+    optionId: string,
+    value: AgentOptionValue,
+  ): Promise<AgentStatus> {
+    const runtime = this.existing(ownerId, slotId);
+    const status = await runtime.setOption(optionId, value);
+    if (status.agentId) await this.deps.prefs.set(root, status.agentId, optionId, value);
+    return status;
   }
 
   async prompt(ownerId: number, slotId: string, text: string): Promise<void> {

@@ -5,6 +5,8 @@ import type { AgentConfig } from '@kestrel/shared';
 import type { PermissionService } from '../permissions';
 import type { SecretStore } from '../secrets';
 import type { AgentConfigStore } from './configs';
+import type { AgentPrefsStore } from './prefs';
+import { MODE_OPTION_ID } from './options';
 import { AgentService } from './service';
 import type { AgentServiceDeps } from './service';
 import type { SessionHistory } from './sessions';
@@ -24,12 +26,23 @@ const config: AgentConfig = {
 function testAgent(sessionId: string) {
   return agent({ name: 'test-agent' })
     .onRequest('initialize', () => ({ protocolVersion: 1, agentCapabilities: {} }))
-    .onRequest('session/new', () => ({ sessionId }))
+    .onRequest('session/new', () => ({
+      sessionId,
+      modes: {
+        currentModeId: 'default',
+        availableModes: [
+          { id: 'default', name: 'Default' },
+          { id: 'plan', name: 'Plan' },
+        ],
+      },
+    }))
+    .onRequest('session/set_mode', () => ({}))
     .onRequest('session/prompt', () => ({ stopReason: 'end_turn' as const }));
 }
 
-function setup() {
+function setup(saved: Record<string, string> = {}) {
   let started = 0;
+  const savePref = vi.fn(() => Promise.resolve());
   const statuses: { slotId: string; state: string }[] = [];
   const cancel = vi.fn();
   const deps: AgentServiceDeps = {
@@ -39,6 +52,7 @@ function setup() {
     } as unknown as AgentConfigStore,
     secrets: { get: () => Promise.resolve(null) } as unknown as SecretStore,
     sessions: { remember: () => Promise.resolve() } as unknown as SessionHistory,
+    prefs: { get: () => Promise.resolve(saved), set: savePref } as unknown as AgentPrefsStore,
     permissions: { cancel } as unknown as PermissionService,
     startTransport: () => {
       started++;
@@ -60,7 +74,7 @@ function setup() {
     },
     clientVersion: '0.0.0',
   };
-  return { service: new AgentService(deps), statuses, cancel };
+  return { service: new AgentService(deps), statuses, cancel, savePref };
 }
 
 describe('AgentService – parallel slots', () => {
@@ -115,5 +129,24 @@ describe('AgentService – parallel slots', () => {
     });
     await service.release(1);
     expect(service.slotList(1)).toEqual([]);
+  });
+});
+
+describe('AgentService – session options', () => {
+  it('remembers a chosen option per project and agent', async () => {
+    const { service, savePref } = setup();
+    await service.start(1, 'a', '/project', 'test');
+    const status = await service.setOption(1, 'a', '/project', MODE_OPTION_ID, 'plan');
+    expect(status.options[0]?.value).toBe('plan');
+    expect(savePref).toHaveBeenCalledWith('/project', 'test', MODE_OPTION_ID, 'plan');
+    await service.release(1);
+  });
+
+  it('applies remembered choices on start and skips ones the agent no longer offers', async () => {
+    const { service } = setup({ [MODE_OPTION_ID]: 'plan', gone: 'x' });
+    const status = await service.start(1, 'a', '/project', 'test');
+    expect(status).toMatchObject({ state: 'ready' });
+    expect(status.options[0]?.value).toBe('plan');
+    await service.release(1);
   });
 });

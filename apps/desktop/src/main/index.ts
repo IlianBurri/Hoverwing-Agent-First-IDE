@@ -18,6 +18,7 @@ import type { Settings } from '@kestrel/shared';
 import { createAppHandlers } from './modules/app/handlers';
 import {
   AgentConfigStore,
+  AgentPrefsStore,
   AgentService,
   SessionHistory,
   createAgentHandlers,
@@ -547,6 +548,7 @@ void app.whenReady().then(async () => {
     sandbox,
     secrets,
     sessions: new SessionHistory(join(dataDir, 'agent-sessions')),
+    prefs: new AgentPrefsStore(join(dataDir, 'agent-sessions')),
     permissions,
     startTransport: spawnTransport,
     checkpoint: async (root, label, sessionId) =>

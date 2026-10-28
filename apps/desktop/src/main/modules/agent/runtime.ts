@@ -11,6 +11,7 @@ import { idleAgentStatus } from '@kestrel/shared';
 import type {
   AgentConfig,
   AgentEvent,
+  AgentOptionValue,
   AgentStatus,
   PermissionKind,
   ToolCallView,
@@ -20,6 +21,8 @@ import { redact } from '../../lib/redact';
 import type { PermissionService } from '../permissions';
 import type { ChangeAuthor } from '../review';
 import { resolveInWorkspace } from '../workspace/paths';
+import { isValidValue, replaceConfigOptions, sessionOptions, withValue } from './options';
+import type { SessionOption } from './options';
 import { actionForToolCall, outcomeFor } from './permissionMapping';
 import { displayPath, mergeToolCall, translateUpdate, unifiedDiff } from './translate';
 import type { AgentTransport, IsolatedStart, SpawnOptions } from './transport';
@@ -87,11 +90,17 @@ export class AgentRuntime {
   private cancelTimer: ReturnType<typeof setTimeout> | null = null;
   private turnTitle = '';
   private releaseMcp: (() => void) | null = null;
+  private options: SessionOption[] = [];
 
   constructor(private readonly deps: RuntimeDeps) {}
 
   getStatus(): AgentStatus {
     return this.status;
+  }
+
+  private setOptions(options: SessionOption[]): AgentStatus {
+    this.options = options;
+    return this.setStatus({ options: options.map((entry) => entry.option) });
   }
 
   private setStatus(patch: Partial<AgentStatus>): AgentStatus {
@@ -152,6 +161,20 @@ export class AgentRuntime {
     return client({ name: 'Kestrel' })
       .onNotification('session/update', ({ params }) => {
         if (params.sessionId !== sessionCheck()) return;
+        const update = params.update;
+        if (update.sessionUpdate === 'config_option_update') {
+          this.setOptions(replaceConfigOptions(this.options, update.configOptions));
+          return;
+        }
+        if (update.sessionUpdate === 'current_mode_update') {
+          const mode = this.options.find((entry) => entry.source === 'mode');
+          if (mode) this.setOptions(withValue(this.options, mode.option.id, update.currentModeId));
+          return;
+        }
+        if (update.sessionUpdate === 'usage_update') {
+          this.setStatus({ usage: { used: update.used, size: update.size } });
+          return;
+        }
         const event = translateUpdate(this.agentRoot, params.update, this.toolCalls);
         if (event) this.emit(event);
       })
@@ -246,6 +269,7 @@ export class AgentRuntime {
     this.agentRoot = root;
     this.toolCalls.clear();
     this.stderrTail.length = 0;
+    this.options = [];
     this.setStatus({
       ...idleAgentStatus,
       state: 'starting',
@@ -303,7 +327,11 @@ export class AgentRuntime {
       const init = await withTimeout(
         this.agent.request('initialize', {
           protocolVersion: PROTOCOL_VERSION,
-          clientCapabilities: { fs: { readTextFile: true, writeTextFile: true }, terminal: false },
+          clientCapabilities: {
+            fs: { readTextFile: true, writeTextFile: true },
+            terminal: false,
+            session: { configOptions: { boolean: {} } },
+          },
           clientInfo: { name: 'kestrel', title: 'Kestrel', version: this.deps.clientVersion },
         }),
         INIT_TIMEOUT_MS,
@@ -321,20 +349,27 @@ export class AgentRuntime {
         // Announce the session first, so the UI starts a fresh transcript
         // before the agent replays the history into it.
         this.setStatus({ sessionId });
-        await this.agent.request('session/load', {
+        const loaded = await this.agent.request('session/load', {
           sessionId: resumeSessionId,
           cwd: this.agentRoot,
           mcpServers,
         });
+        this.options = sessionOptions(loaded);
       } else {
         const session = await this.agent.request('session/new', {
           cwd: this.agentRoot,
           mcpServers,
         });
         sessionId = session.sessionId;
+        this.options = sessionOptions(session);
       }
       this.deps.onSessionStarted(root, config.id, sessionId, '');
-      return this.setStatus({ state: 'ready', sessionId, canLoadSession });
+      return this.setStatus({
+        state: 'ready',
+        sessionId,
+        canLoadSession,
+        options: this.options.map((entry) => entry.option),
+      });
     } catch (error) {
       const authRequired = error instanceof RequestError && error.code === -32000;
       const detail = authRequired ? null : redact(errorText(error, this.stderrTail));
@@ -390,6 +425,40 @@ export class AgentRuntime {
         this.cancelTimer = null;
         if (this.status.state === 'working') this.setStatus({ state: 'ready' });
       });
+  }
+
+  /**
+   * Changes a session setting the agent offered (model, effort, mode …).
+   * Only between turns, and only to values the agent listed.
+   */
+  async setOption(optionId: string, value: AgentOptionValue): Promise<AgentStatus> {
+    const sessionId = this.status.sessionId;
+    if (this.status.state !== 'ready' || !sessionId) {
+      throw new UserError('agent_not_running', 'The agent is not ready.');
+    }
+    const entry = this.options.find((candidate) => candidate.option.id === optionId);
+    if (!entry || !isValidValue(entry.option, value)) {
+      throw new UserError('not_found', 'The agent does not offer this setting.');
+    }
+    if (entry.option.value === value) return this.status;
+    switch (entry.source) {
+      case 'config': {
+        const response = await this.agent.request(
+          'session/set_config_option',
+          typeof value === 'boolean'
+            ? { sessionId, configId: optionId, type: 'boolean', value }
+            : { sessionId, configId: optionId, value },
+        );
+        return this.setOptions(replaceConfigOptions(this.options, response.configOptions));
+      }
+      case 'mode':
+        await this.agent.request('session/set_mode', { sessionId, modeId: String(value) });
+        return this.setOptions(withValue(this.options, optionId, value));
+      case 'model':
+        // Not part of the stable protocol (Gemini CLI): sent as a plain request.
+        await this.agent.request('session/set_model', { sessionId, modelId: String(value) });
+        return this.setOptions(withValue(this.options, optionId, value));
+    }
   }
 
   /** Stops the current turn; a stuck agent is killed after a grace period. */

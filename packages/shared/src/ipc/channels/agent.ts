@@ -35,6 +35,15 @@ export const agentChannels = {
     request: z.object({ slotId: agentSlotIdSchema, text: z.string().min(1).max(100_000) }),
     response: z.null(),
   },
+  /** Changes a session setting (model, effort, …); remembered per agent and project. */
+  'agent:setOption': {
+    request: z.object({
+      slotId: agentSlotIdSchema,
+      optionId: z.string().max(200),
+      value: z.union([z.string().max(500), z.boolean()]),
+    }),
+    response: agentStatusSchema,
+  },
   /** Asks the agent to stop the current turn (killed after a short grace period). */
   'agent:cancel': { request: z.object({ slotId: agentSlotIdSchema }), response: z.null() },
   /** Ends the agent process; the slot stays (it can be started again). */
