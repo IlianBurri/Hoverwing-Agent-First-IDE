@@ -16,6 +16,7 @@ export type ModalState =
   | { id: 'layout' }
   | { id: 'layoutAi' }
   | { id: 'gitDiff'; path: string; staged: boolean; diff: GitDiff }
+  | { id: 'github' }
   | null;
 
 export const useModalStore = create<{ open: ModalState }>()(() => ({ open: null }));

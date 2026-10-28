@@ -42,6 +42,8 @@ import {
 } from './features/lsp';
 import { appendLspLog, setDiagnostics, useLspStore } from './stores/lsp';
 import { GitDiffModal, refreshGit, registerGitCommands } from './features/git';
+import { GitHubDialog, loadGitHubStatus, registerGitHubCommands } from './features/github';
+import { setGitHubStatus } from './stores/github';
 import { appendGitLog } from './stores/git';
 import { ToolbarDialog, registerToolbarCommands } from './features/toolbar';
 import {
@@ -83,6 +85,7 @@ export function App() {
   useEffect(() => registerTrustCommands(), []);
   useEffect(() => registerLspCommands(), []);
   useEffect(() => registerGitCommands(), []);
+  useEffect(() => registerGitHubCommands(), []);
   useEffect(() => registerToolbarCommands(), []);
   useEffect(() => registerLayoutCommands(), []);
   const layoutProfiles = useSettingsStore((state) => state.settings.layoutProfiles);
@@ -93,7 +96,9 @@ export function App() {
         void refreshGit();
       }),
       window.kestrel.on('git:log', appendGitLog),
+      window.kestrel.on('github:changed', setGitHubStatus),
     ];
+    void loadGitHubStatus();
     return () => {
       for (const off of offs) off();
     };
@@ -298,6 +303,7 @@ export function App() {
       {modal?.id === 'toolbar' && <ToolbarDialog />}
       {modal?.id === 'layout' && <LayoutDialog />}
       {modal?.id === 'layoutAi' && <LayoutAiDialog />}
+      {modal?.id === 'github' && <GitHubDialog />}
       {modal?.id === 'gitDiff' && (
         <GitDiffModal key={modal.path} path={modal.path} staged={modal.staged} diff={modal.diff} />
       )}

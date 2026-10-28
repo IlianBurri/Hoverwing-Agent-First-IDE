@@ -3,6 +3,7 @@ import {
   ArrowDownToLine,
   ArrowUpFromLine,
   FileText,
+  FolderGit2,
   GitBranch,
   GitBranchPlus,
   Minus,
@@ -23,6 +24,7 @@ import { decorationOf, groupFiles, useGitStore } from '../../stores/git';
 import { useTrustStore } from '../../stores/trust';
 import { useWorkspaceStore } from '../../stores/workspace';
 import { openFile } from '../editor';
+import { showGitHub } from '../github';
 import { trustProject } from '../trust';
 import {
   checkout,
@@ -285,6 +287,7 @@ export function GitView() {
               />
             </>
           )}
+          <IconButton size="sm" icon={FolderGit2} label={t('github.open')} onClick={showGitHub} />
           <IconButton
             size="sm"
             icon={RefreshCw}

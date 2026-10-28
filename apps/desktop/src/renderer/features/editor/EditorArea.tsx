@@ -12,6 +12,7 @@ import { KestrelMark } from '../../components/KestrelMark';
 import { Button } from '../../components/Button';
 import { useWorkspaceStore } from '../../stores/workspace';
 import { useKeybindingLabel } from '../commands';
+import { showGitHub } from '../github';
 import { openFolder, RecentList } from '../workspace';
 import styles from './EditorArea.module.css';
 
@@ -45,6 +46,7 @@ function Welcome() {
             <Button variant="primary" onClick={() => void openFolder()}>
               {t('workspace.openFolder')}
             </Button>
+            <Button onClick={showGitHub}>{t('github.cloneFromGitHub')}</Button>
           </div>
         )}
         <dl className={styles['shortcuts']}>

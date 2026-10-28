@@ -17,7 +17,8 @@ import { closeAll, onPathDeleted, onPathRenamed } from '../editor';
 
 const t = i18next.t.bind(i18next);
 
-function opened(info: WorkspaceInfo | null): void {
+/** Shows a folder main opened (dialog, recent list, a fresh clone). */
+export function opened(info: WorkspaceInfo | null): void {
   if (!info) return;
   // The main process ended the shells of the previous folder.
   resetTerminals();
