@@ -49,4 +49,7 @@ nsis:
 linux:
   target: AppImage
   category: Development
+  # Otherwise derived from the package name "@kestrel/desktop", which is not a
+  # valid file name, and the AppImage build fails.
+  executableName: kestrel
   artifactName: Kestrel-${version}-${arch}.${ext}
