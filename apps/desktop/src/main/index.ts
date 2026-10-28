@@ -14,6 +14,7 @@ import {
   webContents,
 } from 'electron';
 import { spawn } from 'node:child_process';
+import { defaultModelOptions, modelRefKey } from '@kestrel/shared';
 import type { Settings } from '@kestrel/shared';
 import { createAppHandlers } from './modules/app/handlers';
 import {
@@ -391,6 +392,7 @@ void app.whenReady().then(async () => {
     providers,
     store: new ChatStore(join(dataDir, 'chats')),
     model: () => settings.get().chatModel,
+    options: (ref) => settings.get().chatModelOptions[modelRefKey(ref)] ?? defaultModelOptions,
     emit: (ownerId, chatId, event) => {
       const contents = webContents.fromId(ownerId);
       if (contents) sendEvent(contents, 'chat:event', { chatId, event });

@@ -121,3 +121,23 @@ export const modelRefSchema = z.object({
   model: modelNameSchema,
 });
 export type ModelRef = z.infer<typeof modelRefSchema>;
+
+/** Settings key of a model: "<providerId>/<model>". */
+export function modelRefKey(ref: ModelRef): string {
+  return `${ref.providerId}/${ref.model}`;
+}
+
+/** Request settings of a chat model; null = the provider's default (not sent). */
+export const modelOptionsSchema = z.object({
+  temperature: z.number().min(0).max(2).nullable(),
+  maxTokens: z.number().int().min(1).max(1_000_000).nullable(),
+  /** OpenAI's `reasoning_effort`, for models that think before answering. */
+  reasoningEffort: z.enum(['low', 'medium', 'high']).nullable(),
+});
+export type ModelOptions = z.infer<typeof modelOptionsSchema>;
+
+export const defaultModelOptions: ModelOptions = {
+  temperature: null,
+  maxTokens: null,
+  reasoningEffort: null,
+};

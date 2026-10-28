@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { completionSettingsSchema, defaultCompletionSettings } from './completion';
-import { modelRefSchema } from './providers';
+import { modelOptionsSchema, modelRefSchema } from './providers';
 import { DEFAULT_SANDBOX_BASE_IMAGE, imageReferenceSchema } from './sandbox';
 import {
   bottomViewSchema,
@@ -51,6 +51,8 @@ export const settingsSchema = z.object({
   sandboxBaseImage: imageReferenceSchema,
   /** Provider and model of the built-in chat (null = none chosen). */
   chatModel: modelRefSchema.nullable(),
+  /** Request settings per chat model, keyed by `modelRefKey`. */
+  chatModelOptions: z.record(z.string().max(400), modelOptionsSchema),
   completion: completionSettingsSchema,
   /** The setup assistant was finished or skipped (it opens on first start otherwise). */
   setupDone: z.boolean(),
@@ -78,6 +80,7 @@ export const defaultSettings: Settings = {
   recentWorkspaces: [],
   sandboxBaseImage: DEFAULT_SANDBOX_BASE_IMAGE,
   chatModel: null,
+  chatModelOptions: {},
   completion: defaultCompletionSettings,
   setupDone: false,
   checkForUpdates: true,

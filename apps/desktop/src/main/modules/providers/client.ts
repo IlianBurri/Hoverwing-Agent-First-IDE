@@ -10,6 +10,8 @@ interface RequestOptions {
   signal: AbortSignal;
   maxTokens?: number;
   temperature?: number;
+  /** OpenAI's `reasoning_effort` (also understood by Ollama for thinking models). */
+  reasoningEffort?: 'low' | 'medium' | 'high';
   stop?: string[];
   /** Ask for a JSON object (OpenAI "json_object" mode; Ollama supports it too). */
   json?: boolean;
@@ -58,7 +60,10 @@ export function openAiClient({ baseUrl, apiKey }: Endpoint): ModelClient {
       const page = await client.models.list({ signal });
       return page.data.map((model) => model.id);
     },
-    async streamChat({ model, messages, signal, maxTokens, temperature }, onDelta) {
+    async streamChat(
+      { model, messages, signal, maxTokens, temperature, reasoningEffort },
+      onDelta,
+    ) {
       const stream = await client.chat.completions.create(
         {
           model,
@@ -69,6 +74,7 @@ export function openAiClient({ baseUrl, apiKey }: Endpoint): ModelClient {
           // eslint-disable-next-line @typescript-eslint/no-deprecated
           ...(maxTokens === undefined ? {} : { max_tokens: maxTokens }),
           ...(temperature === undefined ? {} : { temperature }),
+          ...(reasoningEffort === undefined ? {} : { reasoning_effort: reasoningEffort }),
         },
         { signal },
       );

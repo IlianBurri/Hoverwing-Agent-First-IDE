@@ -1,5 +1,12 @@
 import { isSensitivePath } from '@kestrel/shared';
-import type { Chat, ChatAttachment, ChatEvent, ChatSummary, ModelRef } from '@kestrel/shared';
+import type {
+  Chat,
+  ChatAttachment,
+  ChatEvent,
+  ChatSummary,
+  ModelOptions,
+  ModelRef,
+} from '@kestrel/shared';
 import { UserError } from '../../ipc/errors';
 import type { ProviderService } from '../providers';
 import { classifyModelError, withFallback } from '../providers';
@@ -11,6 +18,8 @@ export interface ChatServiceDeps {
   store: Pick<ChatStore, 'get' | 'save' | 'delete' | 'list'>;
   /** The chat model from the settings. */
   model: () => ModelRef | null;
+  /** Request settings the user chose for a chat model. */
+  options?: (ref: ModelRef) => ModelOptions;
   emit: (ownerId: number, chatId: string, event: ChatEvent) => void;
   now?: () => number;
 }
@@ -40,6 +49,7 @@ export class ChatService {
     const ref = this.deps.model();
     if (!ref) throw new UserError('model_not_set', 'No chat model chosen.');
     const { client, models, template } = await this.deps.providers.resolve(ref);
+    const options = this.deps.options?.(ref);
     await this.stop(ownerId);
 
     const now = this.deps.now?.() ?? Date.now();
@@ -79,6 +89,7 @@ export class ChatService {
                 // Built per attempt: a fallback model must name itself.
                 messages: chatTurns(chat.messages, undefined, template === 'ollama' ? model : null),
                 signal: controller.signal,
+                ...requestOptions(options),
               },
               (text) => {
                 answer += text;
@@ -142,4 +153,13 @@ export class ChatService {
     if (this.running.get(ownerId)?.chatId === id) await this.stop(ownerId);
     await this.deps.store.delete(id);
   }
+}
+
+/** Only settings the user chose are sent; the rest stays the provider's default. */
+function requestOptions(options: ModelOptions | undefined) {
+  return {
+    ...(options?.temperature == null ? {} : { temperature: options.temperature }),
+    ...(options?.maxTokens == null ? {} : { maxTokens: options.maxTokens }),
+    ...(options?.reasoningEffort == null ? {} : { reasoningEffort: options.reasoningEffort }),
+  };
 }

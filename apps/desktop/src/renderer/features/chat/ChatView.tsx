@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react';
-import { ArrowUp, Cpu, Paperclip, Square, X } from 'lucide-react';
+import { ArrowUp, Cpu, Paperclip, SlidersHorizontal, Square, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { isFreeModel } from '@kestrel/shared';
 import { Button } from '../../components/Button';
@@ -13,6 +13,7 @@ import { useSettingsStore } from '../../stores/settings';
 import { ModelSelect, setChatModel, showModelsView } from '../providers';
 import { attachFromEditor, removeAttachment, sendChat, stopChat } from './actions';
 import { AttachmentLabel, ChatTranscript } from './ChatTranscript';
+import { ModelOptions } from './ModelOptions';
 import styles from './ChatView.module.css';
 
 /** Request to focus the chat input (e.g. from a command). */
@@ -120,6 +121,7 @@ export function ChatView() {
   const providers = useProvidersStore((state) => state.providers);
   const chatModel = useSettingsStore((state) => state.settings.chatModel);
   const { items, streaming } = useChatStore();
+  const [showOptions, setShowOptions] = useState(false);
 
   if (providers.length === 0) {
     return (
@@ -149,10 +151,23 @@ export function ChatView() {
           noneLabel={t('chat.chooseModel')}
           onChange={(ref) => void setChatModel(ref)}
         />
+        <IconButton
+          size="sm"
+          icon={SlidersHorizontal}
+          label={t('chat.options.toggle')}
+          pressed={showOptions}
+          disabled={!chatModel}
+          onClick={() => {
+            setShowOptions((shown) => !shown);
+          }}
+        />
         <Button variant="ghost" onClick={showModelsView}>
           {t('chat.manageModels')}
         </Button>
       </div>
+      {showOptions && chatModel && (
+        <ModelOptions key={`${chatModel.providerId}/${chatModel.model}`} model={chatModel} />
+      )}
       {chatModel && isFreeModel(chatModel.model) && (
         <div className={styles['note']}>
           <StatusMessage kind="warning">{t('providers.freeShort')}</StatusMessage>

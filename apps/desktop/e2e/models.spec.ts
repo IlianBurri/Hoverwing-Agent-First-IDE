@@ -101,6 +101,20 @@ test('attaches the open file as marked data, but never secret files', async () =
   expect(sent).toContain('const answer = 1;');
 });
 
+test('sends the request settings chosen for the chat model', async () => {
+  await page.getByRole('button', { name: 'Model settings' }).click();
+  const options = page.getByRole('group', { name: 'Settings for busy-model' });
+  await options.getByLabel('Temperature').fill('0.3');
+  await options.getByLabel('Temperature').press('Enter');
+  await options.getByLabel('Reasoning effort').selectOption('high');
+  await ask('tuned');
+  await expect(conversation()).toContainText('Echo: tuned');
+  const body = fake.requests.findLast((request) => request.body['model'] === 'busy-model')?.body;
+  expect(body).toMatchObject({ temperature: 0.3, reasoning_effort: 'high' });
+  expect(body).not.toHaveProperty('max_tokens');
+  await page.getByRole('button', { name: 'Model settings' }).click();
+});
+
 test('shows earlier chats', async () => {
   await page.getByRole('button', { name: 'New chat' }).click();
   await expect(conversation()).not.toContainText('Echo');

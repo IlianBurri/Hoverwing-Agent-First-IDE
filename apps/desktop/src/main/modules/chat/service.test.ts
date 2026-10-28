@@ -52,6 +52,34 @@ function setUp(
 }
 
 describe('ChatService', () => {
+  it('sends only the request settings the user chose for the model', async () => {
+    const client = fakeModelClient(() => 'ok');
+    const seen: unknown[] = [];
+    const service = new ChatService({
+      providers: {
+        resolve: () =>
+          Promise.resolve({
+            client: {
+              ...client,
+              streamChat: (options, onDelta) => {
+                seen.push([options.temperature, options.maxTokens, options.reasoningEffort]);
+                return client.streamChat(options, onDelta);
+              },
+            },
+            models: ['first'],
+          }),
+      },
+      store: new ChatStore(dir),
+      model: () => ({ providerId: 'p', model: 'first' }),
+      options: () => ({ temperature: 0.2, maxTokens: null, reasoningEffort: 'high' }),
+      emit: vi.fn(),
+    });
+    await service.send(1, { chatId: 'c-1', text: 'Hi', attachment: null });
+    await vi.waitFor(() => {
+      expect(seen).toEqual([[0.2, undefined, 'high']]);
+    });
+  });
+
   it('streams an answer and stores the conversation', async () => {
     const { service, finished, events } = setUp(() => 'Hello there friend');
     const { chatId } = await service.send(1, { chatId: 'c-1', text: 'Hi', attachment: null });
