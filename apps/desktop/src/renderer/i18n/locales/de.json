@@ -255,7 +255,16 @@
       "crashed": "{{agent}} wurde unerwartet beendet.",
       "protocol": "Fehler in der Kommunikation mit {{agent}}."
     },
-    "secretsNote": "Hinweis: Kestrel sperrt .env, Schlüssel & Co. für alles, was über Kestrel läuft. Agenten wie Claude Code lesen Projektdateien aber auch selbst. Vollständigen Schutz bietet erst die Agent-Sandbox (kommt in Phase 3)."
+    "secretsNote": "Hinweis: Kestrel sperrt .env, Schlüssel & Co. für alles, was über Kestrel läuft. Agenten wie Claude Code lesen Projektdateien aber auch selbst. Vollständigen Schutz bietet erst die Agent-Sandbox (kommt in Phase 3).",
+    "tabs": {
+      "label": "Agenten",
+      "new": "Neuer Agent-Tab",
+      "next": "Nächster Agent-Tab",
+      "closeActive": "Agent-Tab schließen",
+      "close": "„{{name}}“ schließen",
+      "untitled": "Agent {{number}}",
+      "waiting": "wartet auf dich"
+    }
   },
   "status": {
     "label": "Statusleiste",
@@ -276,7 +285,11 @@
     "modelHint": "Chat-Modell – klicken, um Modelle zu verwalten",
     "completionOn": "Autovervollständigung",
     "completionOff": "Autovervollständigung aus",
-    "completionError": "Autovervollständigung: {{reason}}"
+    "completionError": "Autovervollständigung: {{reason}}",
+    "agentsRunning_one": "{{count}} Agent läuft",
+    "agentsRunning_other": "{{count}} Agenten laufen",
+    "agentsWaiting_one": "{{count}} Frage an dich",
+    "agentsWaiting_other": "{{count}} Fragen an dich"
   },
   "theme": {
     "label": "Farbschema",
@@ -330,7 +343,9 @@
       "git_nothing_to_commit": "Nichts ist gestaged. Stage Änderungen vor dem Commit.",
       "git_no_remote": "Das Repository hat kein Remote zum Pushen.",
       "git_failed": "Git ist fehlgeschlagen (Details unter Logs › Git).",
-      "layout_invalid": "Das Modell hat kein brauchbares Layout geliefert. Versuche es nochmal oder formuliere es anders."
+      "layout_invalid": "Das Modell hat kein brauchbares Layout geliefert. Versuche es nochmal oder formuliere es anders.",
+      "agent_limit": "In diesem Fenster laufen schon so viele Agenten wie möglich. Schließe zuerst einen Agent-Tab.",
+      "agent_conflict": "Ein anderer Agent ändert diese Datei gerade."
     }
   },
   "palette": {
@@ -521,7 +536,9 @@
       "mcpTool": "MCP-Tool",
       "docker": "Docker",
       "browserControl": "Browser steuern"
-    }
+    },
+    "queued_one": "Danach wartet noch {{count}} Frage.",
+    "queued_other": "Danach warten noch {{count}} Fragen."
   },
   "checkpoints": {
     "title": "Checkpoints",
@@ -553,7 +570,10 @@
     "restoreFilesTitle_other": "{{count}} Dateien zurücksetzen?",
     "restoreMessage": "Der aktuelle Stand wird vorher als Checkpoint gesichert. Du kannst also auch das wieder rückgängig machen.",
     "restored_one": "{{count}} Datei zurückgesetzt.",
-    "restored_other": "{{count}} Dateien zurückgesetzt."
+    "restored_other": "{{count}} Dateien zurückgesetzt.",
+    "agentsWorking_one": "{{agents}} arbeitet noch und würde weiter Dateien ändern. Der Agent wird zuerst gestoppt.",
+    "agentsWorking_other": "{{agents}} arbeiten noch und würden weiter Dateien ändern. Sie werden zuerst gestoppt.",
+    "stopAndRestore": "Stoppen und wiederherstellen"
   },
   "logs": {
     "label": "Art des Protokolls",
@@ -623,7 +643,8 @@
     "acceptChange": "Annehmen",
     "applySelection": "{{count}} von {{total}} Abschnitten übernehmen",
     "hunks": "Abschnitte",
-    "hunkLabel": "Abschnitt {{index}} (Zeile {{from}}–{{to}})"
+    "hunkLabel": "Abschnitt {{index}} (Zeile {{from}}–{{to}})",
+    "byAgents": "Geändert von"
   },
   "sandbox": {
     "section": "Ausführung",

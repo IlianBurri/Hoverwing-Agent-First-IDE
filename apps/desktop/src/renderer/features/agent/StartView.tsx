@@ -3,7 +3,7 @@ import { Bot, Play, Settings2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../../components/Button';
 import { StatusMessage } from '../../components/StatusMessage';
-import { useAgentStore } from '../../stores/agent';
+import { useActiveSlot, useAgentStore } from '../../stores/agent';
 import { openModal } from '../../stores/modals';
 import { useSandboxStore } from '../../stores/sandbox';
 import { DockerHelp, SandboxBadge } from '../sandbox';
@@ -14,7 +14,9 @@ import styles from './StartView.module.css';
 export function StartView() {
   const { t } = useTranslation();
   const selectId = useId();
-  const { configs, selectedAgentId, status } = useAgentStore();
+  const configs = useAgentStore((state) => state.configs);
+  const selectedAgentId = useAgentStore((state) => state.selectedAgentId);
+  const { id: slotId, status } = useActiveSlot();
   const starting = status.state === 'starting';
   const docker = useSandboxStore((state) => state.status?.docker ?? null);
   const selected = configs.find((config) => config.id === selectedAgentId) ?? null;
@@ -48,7 +50,7 @@ export function StartView() {
         <Button
           variant="primary"
           disabled={!selectedAgentId || starting}
-          onClick={() => void startAgent()}
+          onClick={() => void startAgent(undefined, slotId)}
         >
           <Play size={14} aria-hidden="true" />
           {starting ? t('agent.starting') : t('agent.start')}

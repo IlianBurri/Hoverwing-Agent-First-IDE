@@ -49,7 +49,8 @@ AI you already use**.
       <h3>🤖 Agents with guard rails</h3>
       Start Claude Code, Gemini CLI or any ACP agent in your project. See its plan,
       tool calls and answers live; approve commands once or always for the project;
-      stop it at any time.
+      stop it at any time. Run up to four agents side by side in tabs – a file one
+      agent is changing stays locked for the others until you decide.
     </td>
     <td width="50%" valign="top">
       <h3>🧾 Diff review &amp; checkpoints</h3>

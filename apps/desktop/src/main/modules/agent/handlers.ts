@@ -17,21 +17,25 @@ export function createAgentHandlers(
       await agents.setEnv(agentId, name, value);
       return null;
     },
-    'agent:start': ({ agentId, resumeSessionId }, { sender }) =>
-      agents.start(sender.id, workspaces.requireRoot(sender.id), agentId, resumeSessionId),
-    'agent:prompt': async ({ text }, { sender }) => {
-      await agents.prompt(sender.id, text);
+    'agent:start': ({ slotId, agentId, resumeSessionId }, { sender }) =>
+      agents.start(sender.id, slotId, workspaces.requireRoot(sender.id), agentId, resumeSessionId),
+    'agent:prompt': async ({ slotId, text }, { sender }) => {
+      await agents.prompt(sender.id, slotId, text);
       return null;
     },
-    'agent:cancel': async (_request, { sender }) => {
-      await agents.cancel(sender.id);
+    'agent:cancel': async ({ slotId }, { sender }) => {
+      await agents.cancel(sender.id, slotId);
       return null;
     },
-    'agent:stop': async (_request, { sender }) => {
-      await agents.stop(sender.id);
+    'agent:stop': async ({ slotId }, { sender }) => {
+      await agents.stop(sender.id, slotId);
       return null;
     },
-    'agent:status': (_request, { sender }) => agents.status(sender.id),
+    'agent:close': async ({ slotId }, { sender }) => {
+      await agents.close(sender.id, slotId);
+      return null;
+    },
+    'agent:slots': (_request, { sender }) => agents.slotList(sender.id),
     'agent:listSessions': (_request, { sender }) => {
       const root = workspaces.get(sender.id)?.root;
       return root ? agents.listSessions(root) : Promise.resolve([]);

@@ -98,6 +98,13 @@ export const agentStatusSchema = z.object({
 });
 export type AgentStatus = z.infer<typeof agentStatusSchema>;
 
+/** Parallel agents of one window: each runs in a slot the renderer names. */
+export const agentSlotIdSchema = z.string().regex(/^[a-z0-9-]{1,40}$/);
+export const MAX_AGENT_SLOTS = 4;
+
+export const agentSlotSchema = z.object({ slotId: agentSlotIdSchema, status: agentStatusSchema });
+export type AgentSlot = z.infer<typeof agentSlotSchema>;
+
 export const sessionSummarySchema = z.object({
   id: z.string(),
   agentId: z.string(),

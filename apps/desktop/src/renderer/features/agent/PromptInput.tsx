@@ -2,7 +2,7 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { ArrowUp, Square } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { IconButton } from '../../components/IconButton';
-import { useAgentStore } from '../../stores/agent';
+import { useActiveSlot } from '../../stores/agent';
 import { cancelTurn, sendPrompt } from './actions';
 import styles from './PromptInput.module.css';
 
@@ -15,7 +15,8 @@ export function focusAgentInput(): void {
 export function PromptInput() {
   const { t } = useTranslation();
   const id = useId();
-  const state = useAgentStore((store) => store.status.state);
+  const slot = useActiveSlot();
+  const state = slot.status.state;
   const [text, setText] = useState('');
   const ref = useRef<HTMLTextAreaElement>(null);
   const working = state === 'working';
@@ -31,7 +32,7 @@ export function PromptInput() {
     const value = text.trim();
     if (!value || state !== 'ready') return;
     setText('');
-    if (!(await sendPrompt(value))) setText(value);
+    if (!(await sendPrompt(value, slot.id))) setText(value);
   }
 
   return (
@@ -62,7 +63,7 @@ export function PromptInput() {
           }
           if (event.key === 'Escape' && working) {
             event.preventDefault();
-            void cancelTurn();
+            void cancelTurn(slot.id);
           }
         }}
       />
@@ -73,7 +74,7 @@ export function PromptInput() {
             icon={Square}
             label={t('agent.stop')}
             className={styles['stop']}
-            onClick={() => void cancelTurn()}
+            onClick={() => void cancelTurn(slot.id)}
           />
         ) : (
           <IconButton

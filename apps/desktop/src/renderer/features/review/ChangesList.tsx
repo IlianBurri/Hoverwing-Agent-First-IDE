@@ -2,6 +2,7 @@ import { Check, FileDiff, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../../components/Button';
 import { IconButton } from '../../components/IconButton';
+import { useAgentStore } from '../../stores/agent';
 import { useReviewStore } from '../../stores/review';
 import { openReview, resolveAllChanges, resolveChange } from './actions';
 import styles from './ChangesList.module.css';
@@ -10,6 +11,7 @@ import styles from './ChangesList.module.css';
 export function ChangesList() {
   const { t } = useTranslation();
   const files = useReviewStore((state) => state.files);
+  const parallel = useAgentStore((state) => state.slots.length > 1);
   if (files.length === 0) return null;
 
   return (
@@ -42,6 +44,12 @@ export function ChangesList() {
               <span className={styles['added']}>+{file.additions}</span>
               <span className={styles['deleted']}>−{file.deletions}</span>
               <span className={styles['badge']}>{t(`review.source.${file.source}`)}</span>
+              {/* With parallel agents, say whose change it is. */}
+              {(parallel || file.agents.length > 1) && file.agents.length > 0 && (
+                <span className={styles['badge']} title={t('review.byAgents')}>
+                  {file.agents.join(', ')}
+                </span>
+              )}
             </button>
             <IconButton
               size="sm"

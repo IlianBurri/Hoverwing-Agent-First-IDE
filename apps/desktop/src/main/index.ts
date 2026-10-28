@@ -564,17 +564,17 @@ void app.whenReady().then(async () => {
       });
     },
     events: {
-      status: (ownerId, status) => {
+      status: (ownerId, slotId, status) => {
         const contents = webContents.fromId(ownerId);
-        if (contents) sendEvent(contents, 'agent:status', status);
+        if (contents) sendEvent(contents, 'agent:status', { slotId, status });
       },
-      event: (ownerId, sessionId, event) => {
+      event: (ownerId, slotId, sessionId, event) => {
         const contents = webContents.fromId(ownerId);
-        if (contents) sendEvent(contents, 'agent:event', { sessionId, event });
+        if (contents) sendEvent(contents, 'agent:event', { slotId, sessionId, event });
       },
-      log: (ownerId, line) => {
+      log: (ownerId, slotId, line) => {
         const contents = webContents.fromId(ownerId);
-        if (contents) sendEvent(contents, 'agent:log', { line, time: Date.now() });
+        if (contents) sendEvent(contents, 'agent:log', { slotId, line, time: Date.now() });
       },
     },
     clientVersion: app.getVersion(),
@@ -642,7 +642,7 @@ void app.whenReady().then(async () => {
       ...createSettingsHandlers(settings),
       ...createWorkspaceHandlers(workspaces, settings, (ownerId) => {
         terminals.killAll(ownerId);
-        void agents.stop(ownerId);
+        void agents.stopAll(ownerId);
         lsp.release(ownerId);
         git.release(ownerId);
       }),

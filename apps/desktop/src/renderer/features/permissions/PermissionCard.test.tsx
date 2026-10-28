@@ -22,6 +22,7 @@ const request: PermissionRequest = {
   diff: '--- src/app.ts\n+++ src/app.ts\n@@ -1 +1 @@\n-old\n+new',
   agentName: 'Test agent',
   sessionId: 's1',
+  slotId: null,
   createdAt: 0,
 };
 

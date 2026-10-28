@@ -17,6 +17,8 @@ export type IpcErrorCode =
   | 'checkpoints_unavailable'
   | 'agent_not_running'
   | 'agent_not_approved'
+  | 'agent_limit'
+  | 'agent_conflict'
   | 'review_conflict'
   | 'sandbox_unavailable'
   | 'sandbox_build_failed'

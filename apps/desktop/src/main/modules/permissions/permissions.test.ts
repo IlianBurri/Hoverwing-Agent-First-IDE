@@ -30,7 +30,13 @@ function setup() {
   return { service, events, requests };
 }
 
-const context = { ownerId: 1, root: '/projects/demo', agentName: 'Test agent', sessionId: 's1' };
+const context = {
+  ownerId: 1,
+  root: '/projects/demo',
+  agentName: 'Test agent',
+  sessionId: 's1',
+  slotId: 'slot-a',
+};
 const write = { kind: 'file.write' as const, target: 'src/a.ts', title: 'Edit src/a.ts' };
 
 describe('PermissionService', () => {
@@ -92,7 +98,7 @@ describe('PermissionService', () => {
     await vi.waitFor(() => {
       expect(requests).toHaveLength(1);
     });
-    service.cancel(1, 's1');
+    service.cancel(1, 'slot-a');
     await expect(decision).resolves.toBe(false);
     expect(events.resolved).toHaveBeenCalledWith(1, requests[0]?.id);
     expect(service.pendingFor(1)).toEqual([]);

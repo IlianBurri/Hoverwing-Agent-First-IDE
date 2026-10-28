@@ -255,7 +255,16 @@
       "crashed": "{{agent}} stopped unexpectedly.",
       "protocol": "Communication error with {{agent}}."
     },
-    "secretsNote": "Note: Kestrel blocks .env, keys and similar files for everything that goes through Kestrel. Agents like Claude Code also read project files themselves, though. Full protection comes with the agent sandbox (phase 3)."
+    "secretsNote": "Note: Kestrel blocks .env, keys and similar files for everything that goes through Kestrel. Agents like Claude Code also read project files themselves, though. Full protection comes with the agent sandbox (phase 3).",
+    "tabs": {
+      "label": "Agents",
+      "new": "New agent tab",
+      "next": "Next agent tab",
+      "closeActive": "Close agent tab",
+      "close": "Close “{{name}}”",
+      "untitled": "Agent {{number}}",
+      "waiting": "waiting for you"
+    }
   },
   "status": {
     "label": "Status bar",
@@ -276,7 +285,11 @@
     "modelHint": "Chat model – click to manage models",
     "completionOn": "Autocompletion",
     "completionOff": "Autocompletion off",
-    "completionError": "Autocompletion: {{reason}}"
+    "completionError": "Autocompletion: {{reason}}",
+    "agentsRunning_one": "{{count}} agent running",
+    "agentsRunning_other": "{{count}} agents running",
+    "agentsWaiting_one": "{{count}} question for you",
+    "agentsWaiting_other": "{{count}} questions for you"
   },
   "theme": {
     "label": "Color theme",
@@ -330,7 +343,9 @@
       "git_nothing_to_commit": "Nothing is staged. Stage changes before committing.",
       "git_no_remote": "The repository has no remote to push to.",
       "git_failed": "Git failed (details in Logs › Git).",
-      "layout_invalid": "The model did not return a usable layout. Try again or phrase it differently."
+      "layout_invalid": "The model did not return a usable layout. Try again or phrase it differently.",
+      "agent_limit": "This window already runs the maximum number of agents. Close an agent tab first.",
+      "agent_conflict": "Another agent is changing this file."
     }
   },
   "palette": {
@@ -521,7 +536,9 @@
       "mcpTool": "MCP tool",
       "docker": "Docker",
       "browserControl": "Browser control"
-    }
+    },
+    "queued_one": "{{count}} more question waits after this one.",
+    "queued_other": "{{count}} more questions wait after this one."
   },
   "checkpoints": {
     "title": "Checkpoints",
@@ -553,7 +570,10 @@
     "restoreFilesTitle_other": "Restore {{count}} files?",
     "restoreMessage": "The current state is saved as a checkpoint first, so you can undo this too.",
     "restored_one": "Restored {{count}} file.",
-    "restored_other": "Restored {{count}} files."
+    "restored_other": "Restored {{count}} files.",
+    "agentsWorking_one": "{{agents}} is still working and would keep changing files. It will be stopped first.",
+    "agentsWorking_other": "{{agents}} are still working and would keep changing files. They will be stopped first.",
+    "stopAndRestore": "Stop and restore"
   },
   "logs": {
     "label": "Log type",
@@ -623,7 +643,8 @@
     "acceptChange": "Accept",
     "applySelection": "Apply {{count}} of {{total}} sections",
     "hunks": "Sections",
-    "hunkLabel": "Section {{index}} (lines {{from}}–{{to}})"
+    "hunkLabel": "Section {{index}} (lines {{from}}–{{to}})",
+    "byAgents": "Changed by"
   },
   "sandbox": {
     "section": "Where it runs",

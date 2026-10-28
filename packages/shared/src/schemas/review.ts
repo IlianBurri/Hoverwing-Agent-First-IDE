@@ -11,6 +11,8 @@ export const reviewFileSchema = z.object({
   additions: z.number().int(),
   deletions: z.number().int(),
   hunks: z.number().int(),
+  /** Names of the agents that changed the file (several in parallel sessions). */
+  agents: z.array(z.string()),
 });
 export type ReviewFile = z.infer<typeof reviewFileSchema>;
 

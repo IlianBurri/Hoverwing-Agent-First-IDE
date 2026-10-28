@@ -12,6 +12,21 @@ interface Change {
   /** Content the agent wants (null = file deleted). */
   proposed: string | null;
   source: 'held' | 'applied';
+  /** Agent (tab) that holds the change; a held write locks the file for it. */
+  agentKey: string | null;
+  /** Names of the agents that changed the file. */
+  agents: string[];
+}
+
+/** Which agent a change comes from. */
+export interface ChangeAuthor {
+  /** Unique per running agent tab (window + tab), not the agent's session id. */
+  key: string;
+  agentName: string;
+}
+
+function withAgent(agents: readonly string[], author: ChangeAuthor | undefined): string[] {
+  return author && !agents.includes(author.agentName) ? [...agents, author.agentName] : [...agents];
 }
 
 /** Where "applied" changes come from: the checkpoint taken before a turn. */
@@ -52,25 +67,49 @@ export class ReviewService {
     return readFile(await resolveInWorkspace(root, path), 'utf8').catch(() => null);
   }
 
+  /**
+   * The agent (other than `agentKey`) whose held change locks the file, or
+   * null. Parallel agents must not overwrite each other's pending work.
+   */
+  lockedBy(root: string, path: string, agentKey: string): string | null {
+    const change = this.projects.get(root)?.get(path);
+    if (change?.source !== 'held' || change.agentKey === null || change.agentKey === agentKey)
+      return null;
+    return change.agents.at(-1) ?? 'Agent';
+  }
+
   /** Path A: keeps an agent write back instead of writing it to disk. */
-  async hold(root: string, path: string, content: string): Promise<void> {
+  async hold(root: string, path: string, content: string, author?: ChangeAuthor): Promise<void> {
     const changes = this.changes(root);
     const existing = changes.get(path);
+    if (author && this.lockedBy(root, path, author.key) !== null) {
+      throw new UserError('agent_conflict', 'Another agent is changing this file.');
+    }
     const original = existing ? existing.original : await this.readDisk(root, path);
     if (original === content) changes.delete(path);
     else
-      changes.set(path, { path, original, proposed: content, source: existing?.source ?? 'held' });
+      changes.set(path, {
+        path,
+        original,
+        proposed: content,
+        source: existing?.source ?? 'held',
+        agentKey: author?.key ?? null,
+        agents: withAgent(existing?.agents ?? [], author),
+      });
     this.onChanged(root);
   }
 
   /** What the agent should see when it reads a file it wrote (if held). */
-  heldContent(root: string, path: string): string | undefined {
+  heldContent(root: string, path: string, agentKey?: string): string | undefined {
     const change = this.projects.get(root)?.get(path);
+    // Another agent's pending change is not visible: it reads the disk.
+    if (agentKey !== undefined && change?.agentKey != null && change.agentKey !== agentKey)
+      return undefined;
     return change?.source === 'held' && change.proposed !== null ? change.proposed : undefined;
   }
 
   /** Path B: after a turn, picks up files the agent changed on disk itself. */
-  async collectApplied(root: string, checkpointId: string): Promise<void> {
+  async collectApplied(root: string, checkpointId: string, author?: ChangeAuthor): Promise<void> {
     const changes = this.changes(root);
     let found = false;
     for (const { path } of await this.checkpoints.changesSince(root, checkpointId)) {
@@ -82,7 +121,15 @@ export class ReviewService {
       const proposed = await this.readDisk(root, path);
       if (!reviewable(original) || !reviewable(proposed)) continue;
       if (original === proposed) changes.delete(path);
-      else changes.set(path, { path, original, proposed, source: 'applied' });
+      else
+        changes.set(path, {
+          path,
+          original,
+          proposed,
+          source: 'applied',
+          agentKey: existing?.agentKey ?? null,
+          agents: withAgent(existing?.agents ?? [], author),
+        });
       found = true;
     }
     if (found) this.onChanged(root);
@@ -100,6 +147,7 @@ export class ReviewService {
           source: change.source,
           ...countLines(hunks),
           hunks: hunks.length,
+          agents: change.agents,
         };
       });
   }

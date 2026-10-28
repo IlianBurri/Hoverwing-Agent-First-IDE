@@ -7,7 +7,7 @@ import { EmptyState } from '../../components/EmptyState';
 import { IconButton } from '../../components/IconButton';
 import { SegmentedControl } from '../../components/SegmentedControl';
 import { PanelHeader } from '../../layout/PanelHeader';
-import { useAgentStore } from '../../stores/agent';
+import { useActiveSlot, useAgentStore } from '../../stores/agent';
 import { useChatStore } from '../../stores/chat';
 import { openModal } from '../../stores/modals';
 import { usePermissionStore } from '../../stores/permissions';
@@ -18,6 +18,7 @@ import { PermissionCard } from '../permissions';
 import { ChangesList } from '../review';
 import { SandboxBadge } from '../sandbox';
 import { loadAgentConfigs, startAgent, stopAgent } from './actions';
+import { AGENT_TAB_PANEL_ID, AgentTabs, isForSlot } from './AgentTabs';
 import { PlanView } from './PlanView';
 import { PromptInput } from './PromptInput';
 import { StartView } from './StartView';
@@ -30,8 +31,13 @@ type Mode = 'agent' | 'chat';
 export function AgentPanel() {
   const { t } = useTranslation();
   const workspace = useWorkspaceStore((state) => state.info);
-  const pending = usePermissionStore((state) => state.pending);
-  const { status, items, plan } = useAgentStore();
+  const allPending = usePermissionStore((state) => state.pending);
+  const slots = useAgentStore((state) => state.slots);
+  const slot = useActiveSlot();
+  const { status, items, plan } = slot;
+  // This tab's questions; other agents' questions wait in their tabs.
+  const pending = allPending.filter((request) => isForSlot(request, slot, slots, true));
+  const [first, ...queued] = pending;
   const mode = useChatStore((state) => state.mode);
   const chatStreaming = useChatStore((state) => state.streaming);
   const [history, setHistory] = useState<{
@@ -62,7 +68,7 @@ export function AgentPanel() {
               label: session.title || t('agent.untitledSession'),
               onSelect: () => {
                 useAgentStore.setState({ selectedAgentId: session.agentId });
-                void startAgent(session.id);
+                void startAgent(session.id, slot.id);
               },
             })),
     });
@@ -100,7 +106,7 @@ export function AgentPanel() {
           icon={Plus}
           label={t('agent.newSession')}
           disabled={status.state === 'working'}
-          onClick={() => void startAgent()}
+          onClick={() => void startAgent(undefined, slot.id)}
         />
       )}
       <IconButton
@@ -125,7 +131,7 @@ export function AgentPanel() {
           size="sm"
           icon={Power}
           label={t('agent.end')}
-          onClick={() => void stopAgent()}
+          onClick={() => void stopAgent(slot.id)}
         />
       )}
     </>
@@ -180,33 +186,49 @@ export function AgentPanel() {
           title={t('agent.noWorkspaceTitle')}
           description={t('agent.noWorkspaceText')}
         />
-      ) : inSession ? (
-        <div className={styles['session']}>
-          <div className={styles['where']}>
-            <SandboxBadge sandboxed={status.sandboxed} />
-          </div>
-          {plan.length > 0 && (
-            <div className={styles['plan']}>
-              <PlanView entries={plan} />
-            </div>
-          )}
-          <Transcript items={items} />
-          <ChangesList />
-          {pending.length > 0 && (
-            <div
-              className={styles['permissions']}
-              role="region"
-              aria-label={t('permissions.pendingLabel')}
-            >
-              {pending.map((request) => (
-                <PermissionCard key={request.id} request={request} />
-              ))}
-            </div>
-          )}
-          <PromptInput />
-        </div>
       ) : (
-        <StartView />
+        <>
+          <AgentTabs />
+          <div
+            id={AGENT_TAB_PANEL_ID}
+            role="tabpanel"
+            aria-label={status.agentName ?? t('agent.title')}
+            className={styles['session']}
+          >
+            {inSession ? (
+              <>
+                <div className={styles['where']}>
+                  <SandboxBadge sandboxed={status.sandboxed} />
+                </div>
+                {plan.length > 0 && (
+                  <div className={styles['plan']}>
+                    <PlanView entries={plan} />
+                  </div>
+                )}
+                <Transcript items={items} />
+                <ChangesList />
+                {first && (
+                  <div
+                    className={styles['permissions']}
+                    role="region"
+                    aria-label={t('permissions.pendingLabel')}
+                  >
+                    {/* One question at a time; the others wait in line. */}
+                    <PermissionCard key={first.id} request={first} />
+                    {queued.length > 0 && (
+                      <p className={styles['queued']}>
+                        {t('permissions.queued', { count: queued.length })}
+                      </p>
+                    )}
+                  </div>
+                )}
+                <PromptInput key={slot.id} />
+              </>
+            ) : (
+              <StartView />
+            )}
+          </div>
+        </>
       )}
       {mode === 'agent' && workspace && <CheckpointTimeline />}
       {history && (

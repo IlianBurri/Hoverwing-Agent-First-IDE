@@ -10,9 +10,11 @@ Docker), 4 (Docker panel), 5 (integrated browser + agent browser tools), 6
 (MCP manager), 7 (model providers, simple chat, autocompletion), 8 (setup
 assistant: hardware detection, model catalog, Ollama install) and 9 (project
 trust, language servers, Git panel) are done, plus installers for
-Windows/macOS/Linux with auto-update. All phases of SPEC.md are done; new work
-follows the same flow: present a plan, wait for OK, implement in small
-commits, keep lint/typecheck/tests green, update this file.
+Windows/macOS/Linux with auto-update, and parallel agents (stage A: up to 4
+agent tabs per window in the same folder; stage B, isolated copies, is open).
+All phases of SPEC.md are done; new work follows the same flow: present a
+plan, wait for OK, implement in small commits, keep lint/typecheck/tests
+green, update this file.
 
 Windows: unit and E2E tests run on Windows too (PowerShell is the default
 shell, so terminal tests pick commands per platform; E2E uses 2 workers and a
@@ -135,6 +137,14 @@ so use `KESTREL_SANDBOX_BASE_IMAGE` / `KESTREL_E2E_SANDBOX_BASE_IMAGE` =
   dialog (fingerprint stored), so a compromised renderer cannot start arbitrary
   programs. Secret env values: `SecretStore` (safeStorage; memory-only without a
   keychain). Kestrel never handles Claude credentials.
+  Parallel agents: `AgentService` keeps up to `MAX_AGENT_SLOTS` (4) runtimes
+  per window, keyed by a renderer-chosen `slotId` (every agent channel and
+  event carries it; `agent:slots` lists them, `agent:close` forgets one). The
+  renderer shows one tab per slot (`AgentTabs`). Session ids of different
+  agents may collide, so permission questions (`slotId` in the request,
+  `cancel(ownerId, slotId)`) and review locks (`ChangeAuthor.key` =
+  `<ownerId>:<slotId>`) are keyed by slot. All agents share the project folder
+  (no isolated copies yet).
 - **Checkpoints:** `modules/checkpoints` uses a shadow git dir in app data with
   the project as work tree and an isolated git config; the project's own `.git`
   is never touched. Heavy folders and secret files are excluded. One checkpoint
@@ -143,7 +153,12 @@ so use `KESTREL_SANDBOX_BASE_IMAGE` / `KESTREL_E2E_SANDBOX_BASE_IMAGE` =
   (disk unchanged, agent reads the held version); after each turn, files the
   agent changed itself are collected from the turn checkpoint ("applied").
   Resolving keeps selected hunks (`hunks.ts`, `diff` package) and refuses to
-  overwrite files that changed meanwhile (`review_conflict`).
+  overwrite files that changed meanwhile (`review_conflict`). A held change
+  locks its file for other agents (`lockedBy`; their write fails with a
+  message to the agent, `agent_conflict`), and each change lists the agents
+  that made it. Changes collected from a turn checkpoint can include files a
+  parallel agent wrote directly in the same period. Restoring a checkpoint
+  while agents work asks first and stops them.
 - **Sandbox:** `modules/docker` wraps dockerode behind the small `DockerApi`
   interface (no Docker CLI needed; socket auto-detection incl. Docker Desktop,
   Colima, Rancher). `modules/sandbox`: `plan.ts` (pure) builds the

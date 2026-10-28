@@ -32,7 +32,8 @@ function useAvailabilityInputs(): void {
   useGitStore((state) => state.status);
   useGitStore((state) => state.busy);
   useTrustStore((state) => state.trusted);
-  useAgentStore((state) => state.status);
+  useAgentStore((state) => state.slots);
+  useAgentStore((state) => state.activeSlotId);
   useEditorStore((state) => state.active);
 }
 

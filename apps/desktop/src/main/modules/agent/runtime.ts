@@ -18,6 +18,7 @@ import type {
 import { UserError } from '../../ipc/errors';
 import { redact } from '../../lib/redact';
 import type { PermissionService } from '../permissions';
+import type { ChangeAuthor } from '../review';
 import { resolveInWorkspace } from '../workspace/paths';
 import { actionForToolCall, outcomeFor } from './permissionMapping';
 import { displayPath, mergeToolCall, translateUpdate, unifiedDiff } from './translate';
@@ -46,15 +47,19 @@ export type SessionMcp = (options: {
 
 export interface RuntimeDeps {
   ownerId: number;
+  /** The agent tab this runtime belongs to (unique within the window). */
+  slotId: string;
   startTransport: (options: SpawnOptions) => Promise<AgentTransport>;
   permissions: PermissionService;
   /** Creates a checkpoint before each turn; returns its id (or null). */
   checkpoint: (root: string, label: string, sessionId: string) => Promise<string | null>;
   /** Diff review: held writes and changes the agent applied itself. */
   review: {
-    hold(root: string, path: string, content: string): Promise<void>;
-    heldContent(root: string, path: string): string | undefined;
-    collectApplied(root: string, checkpointId: string): Promise<void>;
+    hold(root: string, path: string, content: string, author: ChangeAuthor): Promise<void>;
+    heldContent(root: string, path: string, agentKey: string): string | undefined;
+    collectApplied(root: string, checkpointId: string, author: ChangeAuthor): Promise<void>;
+    /** Another agent whose held change locks the file, or null. */
+    lockedBy(root: string, path: string, agentKey: string): string | null;
   };
   /** Called when a session starts, e.g. to remember it for "resume". */
   onSessionStarted: (root: string, agentId: string, sessionId: string, title: string) => void;
@@ -65,7 +70,7 @@ export interface RuntimeDeps {
 }
 
 /**
- * One running agent for one window: owns the process, the ACP connection
+ * One running agent (one slot of a window): owns the process, the ACP connection
  * and the active session. All agent requests (permissions, file access) go
  * through Kestrel's permission service.
  */
@@ -110,6 +115,7 @@ export class AgentRuntime {
       root: this.root,
       agentName: this.config?.name ?? 'Agent',
       sessionId,
+      slotId: this.deps.slotId,
     };
   }
 
@@ -168,19 +174,22 @@ export class AgentRuntime {
         if (!allowed) throw denied();
         // The agent sees its own held (not yet accepted) version of the file.
         const content =
-          this.deps.review.heldContent(this.root, relativePath) ??
+          this.deps.review.heldContent(this.root, relativePath, this.author().key) ??
           (await readFile(await resolveInWorkspace(this.root, relativePath), 'utf8'));
         return { content: sliceLines(content, params.line ?? null, params.limit ?? null) };
       })
       .onRequest('fs/write_text_file', async ({ params }) => {
         const relativePath = this.projectPath(params.path);
         const absolute = await resolveInWorkspace(this.root, relativePath);
+        const author = this.author();
+        const owner = this.deps.review.lockedBy(this.root, relativePath, author.key);
+        if (owner !== null) throw lockedByAgent(owner);
         if (this.config?.reviewChanges) {
           // Held back for the diff review: nothing reaches the disk yet, so
           // only rules (and the secret guard) apply, without asking.
           const action = { kind: 'file.write' as const, target: relativePath, title: relativePath };
           if (await this.deps.permissions.denies(context(), action)) throw denied();
-          await this.deps.review.hold(this.root, relativePath, params.content);
+          await this.deps.review.hold(this.root, relativePath, params.content, author);
           return {};
         }
         const previous = await readFile(absolute, 'utf8').catch(() => null);
@@ -194,6 +203,19 @@ export class AgentRuntime {
         await writeFile(absolute, params.content, 'utf8');
         return {};
       });
+  }
+
+  /** Session ids of different agents may collide, so changes are keyed by tab. */
+  private author(): ChangeAuthor {
+    return {
+      key: `${String(this.deps.ownerId)}:${this.deps.slotId}`,
+      agentName: this.config?.name ?? 'Agent',
+    };
+  }
+
+  /** Denies the open permission questions of this agent only (not of parallel ones). */
+  private cancelPermissions(): void {
+    this.deps.permissions.cancel(this.deps.ownerId, this.deps.slotId);
   }
 
   private rememberToolCall(update: ToolCallUpdate): ToolCallView {
@@ -266,7 +288,7 @@ export class AgentRuntime {
       this.releaseMcp = null;
       this.transport = null;
       this.connection = null;
-      this.deps.permissions.cancel(this.deps.ownerId);
+      this.cancelPermissions();
       if (this.status.state === 'stopped') return;
       this.setStatus({
         state: 'error',
@@ -338,8 +360,9 @@ export class AgentRuntime {
       if (this.config)
         this.deps.onSessionStarted(this.root, this.config.id, sessionId, this.turnTitle);
     }
+    const agentName = this.config?.name ?? 'Agent';
     const checkpointId = await this.deps
-      .checkpoint(this.root, text.replace(/\s+/g, ' ').slice(0, 80), sessionId)
+      .checkpoint(this.root, `${agentName}: ${text.replace(/\s+/g, ' ')}`.slice(0, 80), sessionId)
       .catch(() => null);
     this.emit({ type: 'turnStarted', checkpointId });
 
@@ -352,7 +375,9 @@ export class AgentRuntime {
         async (response) => {
           // Changes the agent wrote itself become reviewable too.
           if (review && checkpointId)
-            await this.deps.review.collectApplied(root, checkpointId).catch(() => undefined);
+            await this.deps.review
+              .collectApplied(root, checkpointId, this.author())
+              .catch(() => undefined);
           this.emit({ type: 'turnEnded', stopReason: response.stopReason });
         },
         (error: unknown) => {
@@ -371,7 +396,7 @@ export class AgentRuntime {
   async cancel(): Promise<void> {
     const sessionId = this.status.sessionId;
     if (this.status.state !== 'working' || !sessionId) return;
-    this.deps.permissions.cancel(this.deps.ownerId, sessionId);
+    this.cancelPermissions();
     await this.agent.notify('session/cancel', { sessionId }).catch(() => undefined);
     this.cancelTimer ??= setTimeout(() => {
       if (this.status.state !== 'working') return;
@@ -394,7 +419,7 @@ export class AgentRuntime {
   async stop(): Promise<void> {
     if (this.cancelTimer) clearTimeout(this.cancelTimer);
     this.cancelTimer = null;
-    this.deps.permissions.cancel(this.deps.ownerId);
+    this.cancelPermissions();
     const wasRunning = this.transport !== null;
     this.disconnect();
     this.turnTitle = '';
@@ -415,6 +440,13 @@ function withTimeout<T>(promise: Promise<T>, ms: number, message: string): Promi
   return Promise.race([promise, timeout]).finally(() => {
     clearTimeout(timer);
   });
+}
+
+function lockedByAgent(agentName: string): RequestError {
+  return RequestError.invalidRequest(
+    undefined,
+    `${agentName} is changing this file in parallel and its change waits for review. Try again later or work on another file.`,
+  );
 }
 
 function denied(): RequestError {

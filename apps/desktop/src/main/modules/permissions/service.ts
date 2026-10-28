@@ -19,6 +19,8 @@ export interface PermissionContext {
   root: string | null;
   agentName: string;
   sessionId: string;
+  /** Agent tab the action comes from (parallel agents of a window). */
+  slotId?: string;
 }
 
 export interface PermissionAction {
@@ -71,6 +73,7 @@ export class PermissionService {
       diff: action.diff ?? null,
       agentName: context.agentName,
       sessionId: context.sessionId,
+      slotId: context.slotId ?? null,
       createdAt: Date.now(),
     };
     const allowed = await new Promise<boolean>((resolve) => {
@@ -116,11 +119,11 @@ export class PermissionService {
     entry.resolve(allowed);
   }
 
-  /** Denies all open questions of a window or of one session (e.g. on stop). */
-  cancel(ownerId: number, sessionId?: string): void {
+  /** Denies all open questions of a window or of one agent tab (e.g. on stop). */
+  cancel(ownerId: number, slotId?: string): void {
     for (const [id, entry] of this.pending) {
       if (entry.context.ownerId !== ownerId) continue;
-      if (sessionId !== undefined && entry.context.sessionId !== sessionId) continue;
+      if (slotId !== undefined && entry.context.slotId !== slotId) continue;
       this.pending.delete(id);
       void this.log(entry.context, entry.request, false, 'cancelled');
       this.events.resolved(ownerId, id);

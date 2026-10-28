@@ -11,7 +11,8 @@ import {
 import { useTranslation } from 'react-i18next';
 import { StatusMessage } from '../components/StatusMessage';
 import { useSettingsStore } from '../stores/settings';
-import { useAgentStore } from '../stores/agent';
+import { isRunning, useActiveSlot, useAgentStore } from '../stores/agent';
+import { usePermissionStore } from '../stores/permissions';
 import { useEditorStore } from '../stores/editor';
 import { useWorkspaceStore } from '../stores/workspace';
 import { showDockerView } from '../features/docker';
@@ -33,7 +34,9 @@ export function StatusBar() {
   const saveError = useSettingsStore((state) => state.saveError);
   const workspace = useWorkspaceStore((state) => state.info);
   const cursor = useEditorStore((state) => state.cursor);
-  const agent = useAgentStore((state) => state.status);
+  const agent = useActiveSlot().status;
+  const slots = useAgentStore((state) => state.slots);
+  const waiting = usePermissionStore((state) => state.pending.length);
   const docker = useDockerStore((state) => state.overview);
   const chatModel = useSettingsStore((state) => state.settings.chatModel);
   const completion = useSettingsStore((state) => state.settings.completion);
@@ -41,10 +44,16 @@ export function StatusBar() {
   const update = useUpdateStore((state) => state.status);
   const statusBar = useSettingsStore((state) => state.settings.workbench.statusBar);
   const show = (item: StatusItem) => !statusBar.hidden.includes(item);
+  const running = slots.filter((slot) => isRunning(slot.status));
+  // One agent: its name and state. Several in parallel: how many.
+  const single = running.length === 1 ? (running[0]?.status ?? agent) : agent;
   const agentText =
-    agent.agentName && agent.state !== 'idle' && agent.state !== 'stopped'
-      ? `${agent.agentName} · ${t(`status.agentState.${agent.state}`)}`
-      : t('status.agentNone');
+    running.length > 1
+      ? t('status.agentsRunning', { count: running.length })
+      : single.agentName && single.state !== 'idle' && single.state !== 'stopped'
+        ? `${single.agentName} · ${t(`status.agentState.${single.state}`)}`
+        : t('status.agentNone');
+  const waitingText = waiting > 0 ? ` · ${t('status.agentsWaiting', { count: waiting })}` : '';
 
   const trustBadge = (
     <TrustBadge className={`${styles['button'] ?? ''} ${styles['warning'] ?? ''}`} />
@@ -69,6 +78,7 @@ export function StatusBar() {
           <span className={styles['item']}>
             <Bot size={14} aria-hidden="true" />
             {agentText}
+            {waitingText}
           </span>
         )}
         {agent.agentName && (agent.state === 'ready' || agent.state === 'working') && (

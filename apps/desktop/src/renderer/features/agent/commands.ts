@@ -1,19 +1,32 @@
-import { CheckCheck, MessageSquare, Undo2, Play, Power, Settings2, Square } from 'lucide-react';
+import {
+  ArrowRightLeft,
+  CheckCheck,
+  MessageSquare,
+  Undo2,
+  Play,
+  Plus,
+  Power,
+  Settings2,
+  Square,
+  X,
+} from 'lucide-react';
+import { MAX_AGENT_SLOTS } from '@kestrel/shared';
 import { i18next } from '../../i18n';
-import { useAgentStore } from '../../stores/agent';
+import { activeSlot, addSlot, setActiveSlot, useAgentStore } from '../../stores/agent';
 import { useChatStore } from '../../stores/chat';
 import { setPanelOpen } from '../../stores/layout';
 import { openModal } from '../../stores/modals';
 import { useWorkspaceStore } from '../../stores/workspace';
 import { registerCommands } from '../commands';
-import { cancelTurn, startAgent, stopAgent } from './actions';
+import { cancelTurn, closeAgentTab, startAgent, stopAgent } from './actions';
 import { focusAgentInput } from './PromptInput';
 import { resolveAllChanges } from '../review';
 import { useReviewStore } from '../../stores/review';
 
 export function registerAgentCommands(): () => void {
   const category = () => i18next.t('commands.category.agent');
-  const state = () => useAgentStore.getState().status.state;
+  const state = () => activeSlot(useAgentStore.getState()).status.state;
+  const slots = () => useAgentStore.getState().slots;
   const hasWorkspace = () => useWorkspaceStore.getState().info !== null;
   return registerCommands([
     {
@@ -23,6 +36,39 @@ export function registerAgentCommands(): () => void {
       icon: Play,
       when: () => hasWorkspace() && state() !== 'working' && state() !== 'starting',
       run: () => startAgent(),
+    },
+    {
+      id: 'agent.newTab',
+      category,
+      title: () => i18next.t('agent.tabs.new'),
+      icon: Plus,
+      when: () => hasWorkspace() && slots().length < MAX_AGENT_SLOTS,
+      run: () => {
+        setPanelOpen('agent', true);
+        useChatStore.setState({ mode: 'agent' });
+        addSlot();
+      },
+    },
+    {
+      id: 'agent.nextTab',
+      category,
+      title: () => i18next.t('agent.tabs.next'),
+      icon: ArrowRightLeft,
+      when: () => slots().length > 1,
+      run: () => {
+        const { slots: all, activeSlotId } = useAgentStore.getState();
+        const index = all.findIndex((slot) => slot.id === activeSlotId);
+        const next = all[(index + 1) % all.length];
+        if (next) setActiveSlot(next.id);
+      },
+    },
+    {
+      id: 'agent.closeTab',
+      category,
+      title: () => i18next.t('agent.tabs.closeActive'),
+      icon: X,
+      when: () => slots().length > 1 || state() !== 'idle',
+      run: () => closeAgentTab(),
     },
     {
       id: 'agent.focus',
@@ -44,7 +90,7 @@ export function registerAgentCommands(): () => void {
       icon: Square,
       keybinding: 'Mod+Shift+Escape',
       when: () => state() === 'working',
-      run: cancelTurn,
+      run: () => cancelTurn(),
     },
     {
       id: 'agent.end',
@@ -52,7 +98,7 @@ export function registerAgentCommands(): () => void {
       title: () => i18next.t('agent.end'),
       icon: Power,
       when: () => state() === 'ready' || state() === 'working',
-      run: stopAgent,
+      run: () => stopAgent(),
     },
     {
       id: 'review.acceptAll',

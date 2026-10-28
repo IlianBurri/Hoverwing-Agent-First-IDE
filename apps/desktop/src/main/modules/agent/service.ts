@@ -2,10 +2,11 @@ import type {
   AgentConfig,
   AgentConfigView,
   AgentEvent,
+  AgentSlot,
   AgentStatus,
   SessionSummary,
 } from '@kestrel/shared';
-import { idleAgentStatus } from '@kestrel/shared';
+import { MAX_AGENT_SLOTS } from '@kestrel/shared';
 import { UserError } from '../../ipc/errors';
 import { childEnv } from '../../lib/env';
 import type { PermissionService } from '../permissions';
@@ -35,9 +36,9 @@ export interface AgentServiceDeps {
   /** Asks the user (natively) whether this command line may be started. */
   confirmStart: (ownerId: number, config: AgentConfig) => Promise<boolean>;
   events: {
-    status(ownerId: number, status: AgentStatus): void;
-    event(ownerId: number, sessionId: string, event: AgentEvent): void;
-    log(ownerId: number, line: string): void;
+    status(ownerId: number, slotId: string, status: AgentStatus): void;
+    event(ownerId: number, slotId: string, sessionId: string, event: AgentEvent): void;
+    log(ownerId: number, slotId: string, line: string): void;
   };
   clientVersion: string;
   /** Kestrel's MCP tools (browser) for agents of a window. */
@@ -46,17 +47,37 @@ export interface AgentServiceDeps {
 
 const secretKey = (agentId: string, name: string) => `agent:${agentId}:${name}`;
 
-/** Agent configurations plus one running agent per window. */
+/** Agent configurations plus up to MAX_AGENT_SLOTS parallel agents per window. */
 export class AgentService {
-  private readonly runtimes = new Map<number, AgentRuntime>();
+  private readonly windows = new Map<number, Map<string, AgentRuntime>>();
 
   constructor(private readonly deps: AgentServiceDeps) {}
 
-  private runtime(ownerId: number): AgentRuntime {
-    let runtime = this.runtimes.get(ownerId);
+  private slots(ownerId: number): Map<string, AgentRuntime> {
+    let slots = this.windows.get(ownerId);
+    if (!slots) {
+      slots = new Map();
+      this.windows.set(ownerId, slots);
+    }
+    return slots;
+  }
+
+  private existing(ownerId: number, slotId: string): AgentRuntime {
+    const runtime = this.windows.get(ownerId)?.get(slotId);
+    if (!runtime) throw new UserError('agent_not_running', 'No agent is running.');
+    return runtime;
+  }
+
+  private runtime(ownerId: number, slotId: string): AgentRuntime {
+    const slots = this.slots(ownerId);
+    let runtime = slots.get(slotId);
     if (!runtime) {
+      if (slots.size >= MAX_AGENT_SLOTS) {
+        throw new UserError('agent_limit', 'Too many agents in this window.');
+      }
       runtime = new AgentRuntime({
         ownerId,
+        slotId,
         startTransport: this.deps.startTransport,
         permissions: this.deps.permissions,
         checkpoint: this.deps.checkpoint,
@@ -66,19 +87,19 @@ export class AgentService {
         },
         events: {
           status: (status) => {
-            this.deps.events.status(ownerId, status);
+            this.deps.events.status(ownerId, slotId, status);
           },
           event: (sessionId, event) => {
-            this.deps.events.event(ownerId, sessionId, event);
+            this.deps.events.event(ownerId, slotId, sessionId, event);
           },
           log: (line) => {
-            this.deps.events.log(ownerId, line);
+            this.deps.events.log(ownerId, slotId, line);
           },
         },
         clientVersion: this.deps.clientVersion,
         ...(this.deps.mcp ? { mcp: this.deps.mcp(ownerId) } : {}),
       });
-      this.runtimes.set(ownerId, runtime);
+      slots.set(slotId, runtime);
     }
     return runtime;
   }
@@ -113,12 +134,15 @@ export class AgentService {
 
   async start(
     ownerId: number,
+    slotId: string,
     root: string,
     agentId: string,
     resumeSessionId?: string,
   ): Promise<AgentStatus> {
     const config = await this.deps.configs.get(agentId);
     if (!config) throw new UserError('not_found', 'Unknown agent.');
+    // Checks the limit before asking anything.
+    const runtime = this.runtime(ownerId, slotId);
     if (!(await this.deps.configs.isApproved(config))) {
       if (!(await this.deps.confirmStart(ownerId, config))) {
         throw new UserError('agent_not_approved', 'The user did not allow this agent.');
@@ -132,34 +156,48 @@ export class AgentService {
     }
     if (config.sandbox.enabled) {
       // The container gets only the agent's own variables, not the host's.
-      return this.runtime(ownerId).start(config, root, secrets, resumeSessionId, {
+      return runtime.start(config, root, secrets, resumeSessionId, {
         start: () => this.deps.sandbox.startAgent(config, root, secrets),
       });
     }
     const env = { ...childEnv(process.env), ...secrets };
-    return this.runtime(ownerId).start(config, root, env, resumeSessionId);
+    return runtime.start(config, root, env, resumeSessionId);
   }
 
-  prompt(ownerId: number, text: string): Promise<void> {
-    return this.runtime(ownerId).prompt(text);
+  async prompt(ownerId: number, slotId: string, text: string): Promise<void> {
+    await this.existing(ownerId, slotId).prompt(text);
   }
 
-  cancel(ownerId: number): Promise<void> {
-    return this.runtime(ownerId).cancel();
+  async cancel(ownerId: number, slotId: string): Promise<void> {
+    await this.windows.get(ownerId)?.get(slotId)?.cancel();
   }
 
-  async stop(ownerId: number): Promise<void> {
-    await this.runtimes.get(ownerId)?.stop();
+  async stop(ownerId: number, slotId: string): Promise<void> {
+    await this.windows.get(ownerId)?.get(slotId)?.stop();
   }
 
-  /** Stops the agent and forgets the window (closed or reloaded). */
+  /** Stops the agent of a slot and forgets the slot (tab closed). */
+  async close(ownerId: number, slotId: string): Promise<void> {
+    await this.stop(ownerId, slotId);
+    this.windows.get(ownerId)?.delete(slotId);
+  }
+
+  /** Stops every agent of a window (e.g. another folder was opened). */
+  async stopAll(ownerId: number): Promise<void> {
+    await Promise.all([...(this.windows.get(ownerId)?.values() ?? [])].map((r) => r.stop()));
+  }
+
+  /** Stops all agents and forgets the window (closed or reloaded). */
   async release(ownerId: number): Promise<void> {
-    await this.stop(ownerId);
-    this.runtimes.delete(ownerId);
+    await this.stopAll(ownerId);
+    this.windows.delete(ownerId);
   }
 
-  status(ownerId: number): AgentStatus {
-    return this.runtimes.get(ownerId)?.getStatus() ?? idleAgentStatus;
+  slotList(ownerId: number): AgentSlot[] {
+    return [...(this.windows.get(ownerId)?.entries() ?? [])].map(([slotId, runtime]) => ({
+      slotId,
+      status: runtime.getStatus(),
+    }));
   }
 
   listSessions(root: string): Promise<SessionSummary[]> {

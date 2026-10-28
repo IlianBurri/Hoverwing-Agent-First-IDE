@@ -43,6 +43,8 @@ export const permissionRequestSchema = z.object({
   diff: z.string().nullable(),
   agentName: z.string(),
   sessionId: z.string(),
+  /** Agent tab (parallel agents of a window) the question belongs to. */
+  slotId: z.string().nullable(),
   createdAt: z.number(),
 });
 export type PermissionRequest = z.infer<typeof permissionRequestSchema>;

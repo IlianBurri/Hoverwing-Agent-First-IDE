@@ -11,7 +11,7 @@ import { Toasts } from './components/Toasts';
 import { handleExternalChanges, registerEditorCommands } from './features/editor';
 import { AgentsDialog, registerAgentCommands } from './features/agent';
 import { ChangesModal, registerCheckpointCommands } from './features/checkpoints';
-import { appendLog, applyEvent, setStatus as setAgentStatus } from './stores/agent';
+import { appendLog, applyEvent, loadSlots, setSlotStatus } from './stores/agent';
 import { RulesDialog, registerPermissionCommands } from './features/permissions';
 import { refreshSandboxStatus, registerSandboxCommands } from './features/sandbox';
 import { appendSandboxLog, setSandboxStatus } from './stores/sandbox';
@@ -187,13 +187,15 @@ export function App() {
     };
   }, []);
   useEffect(() => {
-    void window.kestrel.invoke('agent:status').then((result) => {
-      if (result.ok) setAgentStatus(result.data);
+    void window.kestrel.invoke('agent:slots').then((result) => {
+      if (result.ok) loadSlots(result.data);
     });
     const offs = [
-      window.kestrel.on('agent:status', setAgentStatus),
-      window.kestrel.on('agent:event', ({ sessionId, event }) => {
-        applyEvent(sessionId, event);
+      window.kestrel.on('agent:status', ({ slotId, status }) => {
+        setSlotStatus(slotId, status);
+      }),
+      window.kestrel.on('agent:event', ({ slotId, sessionId, event }) => {
+        applyEvent(slotId, sessionId, event);
       }),
       window.kestrel.on('agent:log', appendLog),
     ];

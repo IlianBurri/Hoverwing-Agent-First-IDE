@@ -77,10 +77,16 @@ function setup(script: PromptScript, options: { allow?: boolean; authRequired?: 
   } as unknown as PermissionService;
   const runtime = new AgentRuntime({
     ownerId: 1,
+    slotId: 'slot-1',
     startTransport: () => Promise.resolve(inProcessTransport(scriptedAgent(script, options))),
     permissions,
     checkpoint: () => Promise.resolve('c'.repeat(40)),
-    review: { hold: vi.fn(), heldContent: () => undefined, collectApplied: vi.fn() },
+    review: {
+      hold: vi.fn(),
+      heldContent: () => undefined,
+      lockedBy: () => null,
+      collectApplied: vi.fn(),
+    },
     onSessionStarted: vi.fn(),
     events: {
       status: (status) => statuses.push(status),
@@ -230,10 +236,16 @@ describe('AgentRuntime', () => {
   it('reports a failing start', async () => {
     const runtime = new AgentRuntime({
       ownerId: 1,
+      slotId: 'slot-1',
       startTransport: () => Promise.reject(new Error('spawn npx ENOENT')),
       permissions: { check: vi.fn(), cancel: vi.fn() } as unknown as PermissionService,
       checkpoint: () => Promise.resolve(null),
-      review: { hold: vi.fn(), heldContent: () => undefined, collectApplied: vi.fn() },
+      review: {
+        hold: vi.fn(),
+        heldContent: () => undefined,
+        lockedBy: () => null,
+        collectApplied: vi.fn(),
+      },
       onSessionStarted: vi.fn(),
       events: { status: vi.fn(), event: vi.fn(), log: vi.fn() },
       clientVersion: '0.0.0',
@@ -258,6 +270,7 @@ describe('AgentRuntime with diff review', () => {
     const events: AgentEvent[] = [];
     const runtime = new AgentRuntime({
       ownerId: 1,
+      slotId: 'slot-1',
       startTransport: () =>
         Promise.resolve(
           inProcessTransport(
@@ -279,6 +292,7 @@ describe('AgentRuntime with diff review', () => {
       review: {
         hold,
         heldContent: () => undefined,
+        lockedBy: () => null,
         collectApplied: vi.fn(() => Promise.resolve()),
       },
       onSessionStarted: vi.fn(),
@@ -290,7 +304,10 @@ describe('AgentRuntime with diff review', () => {
     await vi.waitFor(() => {
       expect(events.some((event) => event.type === 'turnEnded')).toBe(true);
     });
-    expect(hold).toHaveBeenCalledWith(root, 'a.ts', 'new\n');
+    expect(hold).toHaveBeenCalledWith(root, 'a.ts', 'new\n', {
+      key: '1:slot-1',
+      agentName: 'Test agent',
+    });
     expect(await readFile(join(root, 'a.ts'), 'utf8')).toBe('old\n');
   });
 });
