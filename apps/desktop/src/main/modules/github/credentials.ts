@@ -7,11 +7,11 @@ import { z } from 'zod';
 
 /**
  * A git credential helper (dependency-free Node script). git runs it with
- * `get`; it asks Kestrel's broker over a local socket, proving it belongs to
+ * `get`; it asks Hoverwing's broker over a local socket, proving it belongs to
  * a running git command with the key from KESTREL_GIT_CREDENTIALS. `store`
- * and `erase` do nothing: the token lives in Kestrel's secret store only.
+ * and `erase` do nothing: the token lives in Hoverwing's secret store only.
  */
-export const HELPER_SCRIPT = `// Kestrel git credential helper: answers for the GitHub account signed in to Kestrel.
+export const HELPER_SCRIPT = `// Hoverwing git credential helper: answers for the GitHub account signed in to Hoverwing.
 import { connect } from 'node:net';
 
 if (process.argv[2] !== 'get') process.exit(0);

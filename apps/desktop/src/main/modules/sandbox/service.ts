@@ -23,11 +23,11 @@ export interface SandboxServiceDeps {
   classifyError: (error: unknown, installed: boolean) => SandboxStatus['docker'];
   baseImage: () => string;
   packages: readonly string[];
-  /** Label value that marks containers of this Kestrel installation. */
+  /** Label value that marks containers of this Hoverwing installation. */
   instance: string;
   onLog: (line: string) => void;
   onStatus: (status: SandboxStatus) => void;
-  /** Host path of Kestrel's MCP bridge script (mounted into agent containers). */
+  /** Host path of Hoverwing's MCP bridge script (mounted into agent containers). */
   mcpBridge: () => string | null;
 }
 

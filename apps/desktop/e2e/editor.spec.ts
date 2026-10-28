@@ -79,7 +79,7 @@ test('warns instead of overwriting unsaved edits when the file changes on disk',
   ).toBeVisible();
   await expect.poll(editorText).toContain('// my edit');
 
-  // Saving now would overwrite the other change: Kestrel asks first.
+  // Saving now would overwrite the other change: Hoverwing asks first.
   await page.getByRole('button', { name: 'Keep my version' }).click();
   await page.keyboard.press('Control+S');
   await expect(tab('index.ts')).toBeVisible();

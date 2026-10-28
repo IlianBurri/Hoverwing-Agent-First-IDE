@@ -8,9 +8,9 @@ const NPM_CACHE = '/cache/npm';
 /** Where the project is mounted on Windows (other systems keep the host path). */
 const WINDOWS_WORKSPACE = '/workspace';
 const PIDS_LIMIT = 1024;
-/** Where Kestrel's MCP bridge script is mounted (read-only) in agent containers. */
+/** Where Hoverwing's MCP bridge script is mounted (read-only) in agent containers. */
 export const CONTAINER_MCP_BRIDGE = '/opt/kestrel/kestrel-mcp-bridge.mjs';
-/** Lets containers reach Kestrel's MCP endpoint on the host (Linux needs it explicitly). */
+/** Lets containers reach Hoverwing's MCP endpoint on the host (Linux needs it explicitly). */
 const HOST_GATEWAY = 'host.docker.internal:host-gateway';
 
 /** Proxy settings are passed on, so agents work behind corporate proxies. */
@@ -53,7 +53,7 @@ export interface AgentContainerInput {
   /** An empty, read-only host file used to cover secret files. */
   emptyFile: string;
   limits: Pick<AgentSandbox, 'memoryMb' | 'cpus'>;
-  /** Labels that identify this Kestrel installation (orphan cleanup). */
+  /** Labels that identify this Hoverwing installation (orphan cleanup). */
   labels: Readonly<Record<string, string>>;
   /** Host path of the MCP bridge script, mounted read-only (null: none). */
   mcpBridge: string | null;

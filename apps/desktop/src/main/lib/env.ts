@@ -1,4 +1,4 @@
-/** Variables that belong to Kestrel/Electron and must not leak into child processes. */
+/** Variables that belong to Hoverwing/Electron and must not leak into child processes. */
 const internalVariables = [
   'ELECTRON_RUN_AS_NODE',
   'ELECTRON_NO_ATTACH_CONSOLE',
@@ -8,7 +8,7 @@ const internalVariables = [
   'CHROME_DESKTOP',
 ];
 
-/** A copy of the environment without Kestrel-internal variables. */
+/** A copy of the environment without Hoverwing-internal variables. */
 export function childEnv(
   base: Readonly<Record<string, string | undefined>>,
 ): Record<string, string> {

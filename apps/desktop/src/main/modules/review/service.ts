@@ -43,7 +43,7 @@ function reviewable(text: string | null): boolean {
 
 /**
  * Agent changes that wait for the user's decision, per project.
- * - "held": Kestrel kept the write back; the file on disk is unchanged.
+ * - "held": Hoverwing kept the write back; the file on disk is unchanged.
  * - "applied": the agent wrote the file itself; rejecting restores it.
  */
 export class ReviewService {

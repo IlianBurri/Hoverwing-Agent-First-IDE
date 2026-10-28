@@ -3,10 +3,10 @@ import { join } from 'node:path';
 
 /**
  * A dependency-free Node script for agents that only start MCP servers as
- * processes (stdio): it relays newline-delimited JSON-RPC to Kestrel's HTTP
+ * processes (stdio): it relays newline-delimited JSON-RPC to Hoverwing's HTTP
  * endpoint. URL and token come from the environment the agent passes on.
  */
-export const BRIDGE_SCRIPT = `// Kestrel MCP bridge: stdio <-> Kestrel's local MCP endpoint.
+export const BRIDGE_SCRIPT = `// Hoverwing MCP bridge: stdio <-> Hoverwing's local MCP endpoint.
 import { createInterface } from 'node:readline';
 
 const url = process.env.KESTREL_MCP_URL;
@@ -41,7 +41,7 @@ createInterface({ input: process.stdin })
         write({
           jsonrpc: '2.0',
           id: message.id,
-          error: { code: -32603, message: 'Kestrel is not reachable.' },
+          error: { code: -32603, message: 'Hoverwing is not reachable.' },
         });
       }
     }

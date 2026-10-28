@@ -23,7 +23,7 @@ export function TitleBar() {
     <header className={styles['root']}>
       <div className={styles['brand']}>
         <KestrelMark className={styles['mark']} />
-        <span className={styles['name']}>Kestrel</span>
+        <span className={styles['name']}>Hoverwing</span>
       </div>
       <div className={styles['center']}>
         <button

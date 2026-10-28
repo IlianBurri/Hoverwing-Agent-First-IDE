@@ -57,7 +57,7 @@ jobs:
           CSC_LINK: ${{ secrets.WIN_CSC_LINK }}
           CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
 
-      # SignPath: sign Kestrel.exe first, build the installer around the signed
+      # SignPath: sign Hoverwing.exe first, build the installer around the signed
       # app (--prepackaged leaves the exe untouched), sign the installer, then
       # recompute the update feed, which signing invalidated.
       - name: Build the app (unsigned)
@@ -109,7 +109,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: unsigned-installer
-          path: apps/desktop/release/Kestrel-Setup-${{ steps.version.outputs.version }}.exe
+          path: apps/desktop/release/Hoverwing-Setup-${{ steps.version.outputs.version }}.exe
           retention-days: 1
       - name: Sign the installer
         if: env.SIGNPATH == 'true'
@@ -130,14 +130,14 @@ jobs:
         if: env.SIGNPATH == 'true'
         shell: bash
         run: |
-          file="Kestrel-Setup-${{ steps.version.outputs.version }}.exe"
+          file="Hoverwing-Setup-${{ steps.version.outputs.version }}.exe"
           mv -f "release/signed/$file" "release/$file"
           node scripts/update-win-feed.mjs "release/$file"
       - name: Check the signatures
         if: env.SIGNPATH == 'true'
         shell: pwsh
         run: |
-          foreach ($file in @('release/win-unpacked/Kestrel.exe', "release/Kestrel-Setup-${{ steps.version.outputs.version }}.exe")) {
+          foreach ($file in @('release/win-unpacked/Hoverwing.exe', "release/Hoverwing-Setup-${{ steps.version.outputs.version }}.exe")) {
             $signature = Get-AuthenticodeSignature $file
             Write-Host "$file : $($signature.Status) $($signature.SignerCertificate.Subject)"
             if ($signature.Status -ne 'Valid') { throw "$file is not signed" }
@@ -147,7 +147,7 @@ jobs:
         run: pnpm exec playwright test e2e/packaged.spec.ts
       - uses: actions/upload-artifact@v4
         with:
-          name: Kestrel-Windows
+          name: Hoverwing-Windows
           path: |
             apps/desktop/release/*.exe
             apps/desktop/release/*.exe.blockmap
@@ -215,7 +215,7 @@ jobs:
           [ "$(printf '%s\n%s\n' "$need" "$max" | sort -V | tail -1)" = "$max" ]
       - uses: actions/upload-artifact@v4
         with:
-          name: Kestrel-${{ runner.os }}
+          name: Hoverwing-${{ runner.os }}
           path: ${{ matrix.files }}
           if-no-files-found: error
           retention-days: 30
@@ -229,7 +229,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
-          pattern: Kestrel-*
+          pattern: Hoverwing-*
           path: dist
           merge-multiple: true
       - name: Attach the installers to the release
@@ -254,21 +254,21 @@ jobs:
 
           | System | File |
           | --- | --- |
-          | Windows 10/11 (x64) | `Kestrel-Setup-<version>.exe` |
-          | macOS (Apple Silicon) | `Kestrel-<version>-arm64.dmg` |
-          | Linux (x64) | `Kestrel-<version>-x86_64.AppImage` |
+          | Windows 10/11 (x64) | `Hoverwing-Setup-<version>.exe` |
+          | macOS (Apple Silicon) | `Hoverwing-<version>-arm64.dmg` |
+          | Linux (x64) | `Hoverwing-<version>-x86_64.AppImage` |
 
           First start:
           NOTES
             echo "- **Windows:** $windows"
             cat <<'NOTES'
           - **macOS** (not notarized): open the app once, then *System Settings → Privacy & Security → Open Anyway* (on macOS 14 and older: right-click the app → *Open*).
-          - **Linux:** `chmod +x Kestrel-*.AppImage`, then start it.
+          - **Linux:** `chmod +x Hoverwing-*.AppImage`, then start it.
 
           Installed apps (Windows, Linux) find new versions here and offer to update.
 
           [Code signing policy](https://github.com/IlianBurri/Kestrel-Agen-Harness-IDE#code-signing-policy) · [Privacy](https://github.com/IlianBurri/Kestrel-Agen-Harness-IDE/blob/HEAD/PRIVACY.md)
           NOTES
           } > notes.md
-          gh release create "$GITHUB_REF_NAME" dist/* --title "Kestrel $GITHUB_REF_NAME" --notes-file notes.md \
+          gh release create "$GITHUB_REF_NAME" dist/* --title "Hoverwing $GITHUB_REF_NAME" --notes-file notes.md \
             || gh release upload "$GITHUB_REF_NAME" dist/* --clobber

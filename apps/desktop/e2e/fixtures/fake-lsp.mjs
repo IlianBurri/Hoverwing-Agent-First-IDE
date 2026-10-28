@@ -5,7 +5,7 @@
  * - completion offers "fakeCompletion",
  * - hover shows "**fake hover** for `<word>`",
  * - definition points at the first occurrence of the word in the same file
- *   (plus a location outside the project, which Kestrel must drop),
+ *   (plus a location outside the project, which Hoverwing must drop),
  * - signature help for "fake(a: number, b: string)",
  * - a change containing "CRASH" ends the process (restart tests).
  */

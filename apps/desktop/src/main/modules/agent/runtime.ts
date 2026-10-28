@@ -39,7 +39,7 @@ export interface RuntimeEvents {
   log(line: string): void;
 }
 
-/** Kestrel's own MCP servers for one agent session (browser tools). */
+/** Hoverwing's own MCP servers for one agent session (browser tools). */
 export type SessionMcp = (options: {
   sandboxed: boolean;
   /** The agent can connect to MCP servers over HTTP. */
@@ -68,14 +68,14 @@ export interface RuntimeDeps {
   onSessionStarted: (root: string, agentId: string, sessionId: string, title: string) => void;
   events: RuntimeEvents;
   clientVersion: string;
-  /** Optional: Kestrel's MCP tools for the agent (e.g. the browser). */
+  /** Optional: Hoverwing's MCP tools for the agent (e.g. the browser). */
   mcp?: SessionMcp;
 }
 
 /**
  * One running agent (one slot of a window): owns the process, the ACP connection
  * and the active session. All agent requests (permissions, file access) go
- * through Kestrel's permission service.
+ * through Hoverwing's permission service.
  */
 export class AgentRuntime {
   private status: AgentStatus = idleAgentStatus;
@@ -128,7 +128,7 @@ export class AgentRuntime {
     };
   }
 
-  /** Kestrel's MCP servers for this session (none if unavailable). */
+  /** Hoverwing's MCP servers for this session (none if unavailable). */
   private async sessionMcpServers(
     http: boolean,
     sandboxed: boolean,
@@ -149,7 +149,7 @@ export class AgentRuntime {
       this.releaseMcp = mcp.release;
       return mcp.servers;
     } catch (error) {
-      this.deps.events.log(redact(`Kestrel tools unavailable: ${String(error)}`));
+      this.deps.events.log(redact(`Hoverwing tools unavailable: ${String(error)}`));
       return [];
     }
   }
@@ -158,7 +158,7 @@ export class AgentRuntime {
   private clientApp(sessionCheck: () => string | null) {
     const context = () => this.permissionContext(sessionCheck() ?? '');
 
-    return client({ name: 'Kestrel' })
+    return client({ name: 'Hoverwing' })
       .onNotification('session/update', ({ params }) => {
         if (params.sessionId !== sessionCheck()) return;
         const update = params.update;
@@ -332,7 +332,7 @@ export class AgentRuntime {
             terminal: false,
             session: { configOptions: { boolean: {} } },
           },
-          clientInfo: { name: 'kestrel', title: 'Kestrel', version: this.deps.clientVersion },
+          clientInfo: { name: 'hoverwing', title: 'Hoverwing', version: this.deps.clientVersion },
         }),
         INIT_TIMEOUT_MS,
         'The agent did not answer in time.',

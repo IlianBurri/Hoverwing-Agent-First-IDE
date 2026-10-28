@@ -32,7 +32,7 @@ describe('terminalEnv', () => {
     expect(env).toMatchObject({
       PATH: '/bin',
       TERM: 'xterm-256color',
-      TERM_PROGRAM: 'Kestrel',
+      TERM_PROGRAM: 'Hoverwing',
       LANG: 'de_CH.UTF-8',
     });
     expect(env).not.toHaveProperty('ELECTRON_RUN_AS_NODE');

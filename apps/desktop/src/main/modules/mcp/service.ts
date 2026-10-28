@@ -28,7 +28,7 @@ export interface McpServiceDeps {
   connect: ConnectMcp;
   /** Asks the user (natively) whether this local server may be started. */
   confirmStart: (ownerId: number, config: McpServerConfig) => Promise<boolean>;
-  /** Environment for local servers (host environment without Kestrel internals). */
+  /** Environment for local servers (host environment without Hoverwing internals). */
   baseEnv: () => Record<string, string>;
   /** Working folder of global local servers (no project open). */
   homeDir: string;
@@ -362,7 +362,7 @@ export class McpService {
   }
 
   /**
-   * Tools of the enabled servers for an agent session, ready for Kestrel's
+   * Tools of the enabled servers for an agent session, ready for Hoverwing's
    * MCP host. Each call is permission-checked; results are untrusted data.
    */
   async agentTools(

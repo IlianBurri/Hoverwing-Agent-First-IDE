@@ -26,7 +26,7 @@ test.beforeAll(async () => {
   site = await startTestSite();
   app = await launchApp();
   page = await app.firstWindow();
-  await page.getByRole('heading', { name: 'Welcome to Kestrel' }).waitFor();
+  await page.getByRole('heading', { name: 'Welcome to Hoverwing' }).waitFor();
 });
 
 test.afterAll(async () => {

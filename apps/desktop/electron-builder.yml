@@ -1,6 +1,8 @@
+# Kept from the Kestrel days: the same id lets the installer replace the
+# old installation and the auto-update reach it.
 appId: dev.kestrel.app
-productName: Kestrel
-copyright: Copyright © 2026 Kestrel contributors
+productName: Hoverwing
+copyright: Copyright © 2026 Hoverwing contributors
 directories:
   output: release
   buildResources: build
@@ -26,7 +28,7 @@ publish:
 mac:
   category: public.app-category.developer-tools
   target: dmg
-  artifactName: Kestrel-${version}-${arch}.${ext}
+  artifactName: Hoverwing-${version}-${arch}.${ext}
 win:
   target:
     - target: nsis
@@ -42,8 +44,8 @@ nsis:
   allowToChangeInstallationDirectory: true
   createDesktopShortcut: always
   createStartMenuShortcut: true
-  shortcutName: Kestrel
-  artifactName: Kestrel-Setup-${version}.${ext}
+  shortcutName: Hoverwing
+  artifactName: Hoverwing-Setup-${version}.${ext}
   # Keep settings, keys and checkpoints when uninstalling.
   deleteAppDataOnUninstall: false
 linux:
@@ -51,5 +53,5 @@ linux:
   category: Development
   # Otherwise derived from the package name "@kestrel/desktop", which is not a
   # valid file name, and the AppImage build fails.
-  executableName: kestrel
-  artifactName: Kestrel-${version}-${arch}.${ext}
+  executableName: hoverwing
+  artifactName: Hoverwing-${version}-${arch}.${ext}

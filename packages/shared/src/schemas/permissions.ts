@@ -66,7 +66,7 @@ export type AuditEntry = z.infer<typeof auditEntrySchema>;
 
 /**
  * Files that hold secrets. Agents may neither read nor write them through
- * Kestrel, whatever the rules say.
+ * Hoverwing, whatever the rules say.
  */
 export const SENSITIVE_FILE_PATTERNS: readonly string[] = [
   '**/.env',

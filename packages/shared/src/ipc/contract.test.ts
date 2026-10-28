@@ -19,9 +19,9 @@ describe('ipcContract', () => {
 
   it('rejects malformed app:getInfo responses', () => {
     const schema = ipcContract['app:getInfo'].response;
-    expect(schema.safeParse({ name: 'Kestrel' }).success).toBe(false);
+    expect(schema.safeParse({ name: 'Hoverwing' }).success).toBe(false);
     expect(
-      schema.safeParse({ name: 'Kestrel', version: '0.0.0', platform: 'linux', locale: 'de' })
+      schema.safeParse({ name: 'Hoverwing', version: '0.0.0', platform: 'linux', locale: 'de' })
         .success,
     ).toBe(true);
   });

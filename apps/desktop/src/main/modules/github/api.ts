@@ -30,7 +30,7 @@ async function get(fetchFn: FetchFn, url: string, token: string): Promise<unknow
       accept: 'application/vnd.github+json',
       authorization: `Bearer ${token}`,
       'x-github-api-version': '2022-11-28',
-      'user-agent': 'Kestrel',
+      'user-agent': 'Hoverwing',
     },
   });
   if (response.status === 401) throw new TokenRejectedError();

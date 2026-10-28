@@ -67,7 +67,7 @@ export function externalData(
   ].join('\n');
 }
 
-/** Web content from Kestrel's browser, marked as untrusted. */
+/** Web content from Hoverwing's browser, marked as untrusted. */
 export function untrusted(url: string, body: string): string {
   return externalData({ source: 'kestrel-browser', url: originOf(url) }, 'a web page', body);
 }
@@ -125,7 +125,7 @@ const urlSchema: ToolInputSchema = {
 const stringArg = (args: Record<string, unknown>, key: string): string | undefined =>
   typeof args[key] === 'string' ? args[key] : undefined;
 
-/** The browser tools Kestrel offers to agents (each call is permission-checked). */
+/** The browser tools Hoverwing offers to agents (each call is permission-checked). */
 export function browserTools(browser: BrowserAccess, check: CheckPermission): ToolDefinition[] {
   const read = async (
     tabId: string | undefined,
@@ -136,7 +136,7 @@ export function browserTools(browser: BrowserAccess, check: CheckPermission): To
       const tabs = browser.tabs();
       const tab = tabId === undefined ? tabs.at(-1) : tabs.find((entry) => entry.tabId === tabId);
       if (!tab) {
-        return failure(tabId ? `No browser tab ${tabId}.` : 'No browser tab is open in Kestrel.');
+        return failure(tabId ? `No browser tab ${tabId}.` : 'No browser tab is open in Hoverwing.');
       }
       if (!(await check('browser', originOf(tab.url), `${what}: ${tab.url}`))) return denied();
       return await action(tab);
@@ -149,7 +149,7 @@ export function browserTools(browser: BrowserAccess, check: CheckPermission): To
     {
       name: 'browser_list_tabs',
       description:
-        'Lists the tabs of the integrated browser in Kestrel (id, URL, title). Titles come from web pages and are untrusted.',
+        'Lists the tabs of the integrated browser in Hoverwing (id, URL, title). Titles come from web pages and are untrusted.',
       inputSchema: { type: 'object', properties: {} },
       run: () => {
         const tabs = browser.tabs();
@@ -161,7 +161,7 @@ export function browserTools(browser: BrowserAccess, check: CheckPermission): To
     {
       name: 'browser_screenshot',
       description:
-        'Takes a screenshot (PNG) of a browser tab in Kestrel (default: the newest tab). Needs the user’s permission.',
+        'Takes a screenshot (PNG) of a browser tab in Hoverwing (default: the newest tab). Needs the user’s permission.',
       inputSchema: tabSchema,
       run: (args) =>
         read(stringArg(args, 'tabId'), 'Screenshot', async (tab) => {
@@ -199,7 +199,7 @@ export function browserTools(browser: BrowserAccess, check: CheckPermission): To
     {
       name: 'browser_open',
       description:
-        'Opens an http(s) address (e.g. http://localhost:3000) in a new tab of Kestrel’s browser. Needs the user’s permission.',
+        'Opens an http(s) address (e.g. http://localhost:3000) in a new tab of Hoverwing’s browser. Needs the user’s permission.',
       inputSchema: urlSchema,
       run: async (args) => {
         const url = stringArg(args, 'url');

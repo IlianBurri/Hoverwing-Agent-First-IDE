@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { relativePathSchema } from './workspace';
 
-/** "held": not on disk yet (Kestrel held the write). "applied": the agent wrote it itself. */
+/** "held": not on disk yet (Hoverwing held the write). "applied": the agent wrote it itself. */
 export const reviewSourceSchema = z.enum(['held', 'applied']);
 
 export const reviewFileSchema = z.object({

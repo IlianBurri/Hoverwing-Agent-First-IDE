@@ -35,7 +35,7 @@ export function diagnosticsTools(
     {
       name: 'get_diagnostics',
       description:
-        'Returns the current errors and warnings that language servers report in Kestrel (for files open in the editor), as "path:line:column severity message". Optionally for one project-relative path.',
+        'Returns the current errors and warnings that language servers report in Hoverwing (for files open in the editor), as "path:line:column severity message". Optionally for one project-relative path.',
       inputSchema: {
         type: 'object',
         properties: {

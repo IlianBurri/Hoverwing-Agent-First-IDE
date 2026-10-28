@@ -1,15 +1,15 @@
 // A scripted ACP agent for E2E tests. It speaks the real protocol over
 // stdin/stdout. Behaviour depends on the prompt text:
 //   hello                  -> plan + streamed answer
-//   edit <path> <text>     -> asks permission, then writes via Kestrel (fs/write_text_file)
+//   edit <path> <text>     -> asks permission, then writes via Hoverwing (fs/write_text_file)
 //   direct <path> <text>   -> writes the file itself, like Claude Code does
 //   twohunks <path>        -> changes lines 2 and 25 itself (two separate hunks)
-//   secret                 -> tries to read .env through Kestrel
+//   secret                 -> tries to read .env through Hoverwing
 //   run <command>          -> asks permission to run a command (does not run it)
 //   slow                   -> waits until cancelled
 //   peek <path>            -> reads a file itself and reports its content (sandbox tests)
 //   whoami                 -> reports HOME and whether it runs in the sandbox
-//   mcp <tool> [arg|json]  -> calls a tool of Kestrel's MCP server and reports the result
+//   mcp <tool> [arg|json]  -> calls a tool of Hoverwing's MCP server and reports the result
 //                             (HTTP; with MOCK_MCP_STDIO=1 via the stdio bridge)
 //   settings               -> reports model, effort and mode and sends a context usage update
 // Sessions offer the config options "model" and "effort" and the modes
@@ -250,9 +250,9 @@ const app = agent({ name: 'mock-agent' })
       );
       await say(client, sessionId, `Content of ${path}: [${content.trim()}]`);
     } else if (command === 'mcp') {
-      const server = session.mcpServers.find((entry) => entry.name === 'kestrel');
+      const server = session.mcpServers.find((entry) => entry.name === 'hoverwing');
       if (!server) {
-        await say(client, sessionId, 'No Kestrel MCP server.');
+        await say(client, sessionId, 'No Hoverwing MCP server.');
       } else {
         const raw = rest.join(' ');
         const args =

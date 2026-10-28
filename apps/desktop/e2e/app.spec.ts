@@ -15,8 +15,8 @@ test.afterAll(async () => {
 });
 
 test('shows the workbench with welcome screen and agent panel', async () => {
-  await expect(page).toHaveTitle('Kestrel');
-  await expect(page.getByRole('heading', { level: 1, name: 'Welcome to Kestrel' })).toBeVisible();
+  await expect(page).toHaveTitle('Hoverwing');
+  await expect(page.getByRole('heading', { level: 1, name: 'Welcome to Hoverwing' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Agent' })).toBeVisible();
   await expect(page.getByRole('tab', { name: 'Terminal' })).toHaveAttribute(
     'aria-selected',

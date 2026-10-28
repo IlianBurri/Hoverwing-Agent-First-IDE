@@ -15,7 +15,7 @@ const components: Components = {
     <a
       href={href}
       onClick={(event) => {
-        // Links open in the system browser, never inside Kestrel.
+        // Links open in the system browser, never inside Hoverwing.
         event.preventDefault();
         if (href && /^https?:/i.test(href))
           void window.kestrel.invoke('app:openExternalUrl', { url: href });

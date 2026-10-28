@@ -9,7 +9,7 @@ import { createProject, stubOpenDialog } from './workspace-helpers';
  * `pnpm package`): native modules and ripgrep must work outside the asar.
  * Skipped when no packaged build exists.
  */
-const executable = join(import.meta.dirname, '..', 'release', 'win-unpacked', 'Kestrel.exe');
+const executable = join(import.meta.dirname, '..', 'release', 'win-unpacked', 'Hoverwing.exe');
 
 test.skip(process.platform !== 'win32' || !existsSync(executable), 'no packaged Windows build');
 

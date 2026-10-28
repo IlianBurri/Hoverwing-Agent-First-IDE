@@ -17,7 +17,7 @@ interface RequestOptions {
   json?: boolean;
 }
 
-/** The few things Kestrel asks a model endpoint (injectable for tests). */
+/** The few things Hoverwing asks a model endpoint (injectable for tests). */
 export interface ModelClient {
   listModels(signal: AbortSignal): Promise<string[]>;
   /** Streams a chat answer; resolves when it is complete. */

@@ -41,7 +41,7 @@ export const containerSummarySchema = z.object({
   status: z.string(),
   created: z.number(),
   ports: z.array(portMappingSchema),
-  /** A container of Kestrel's agent sandbox. */
+  /** A container of Hoverwing's agent sandbox. */
   sandbox: z.boolean(),
   /** Docker Compose project name, if any. */
   composeProject: z.string().nullable(),

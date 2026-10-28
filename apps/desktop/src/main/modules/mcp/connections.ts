@@ -42,7 +42,7 @@ export interface ConnectTarget {
   secrets: Readonly<Record<string, string>>;
   /** Working folder of a local server. */
   cwd: string;
-  /** Base environment of a local server (without Kestrel internals). */
+  /** Base environment of a local server (without Hoverwing internals). */
   env: Readonly<Record<string, string>>;
 }
 
@@ -140,7 +140,7 @@ export const connectMcp: ConnectMcp = async (target, onLog) => {
     });
   }
 
-  const client = new Client({ name: 'kestrel', version: '1' });
+  const client = new Client({ name: 'hoverwing', version: '1' });
   const closeListeners: (() => void)[] = [];
   let closed = false;
   client.onclose = () => {

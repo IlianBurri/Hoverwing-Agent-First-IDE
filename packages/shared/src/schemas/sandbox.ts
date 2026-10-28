@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-/** What Kestrel found out about the local Docker installation. */
+/** What Hoverwing found out about the local Docker installation. */
 export const dockerStateSchema = z.enum([
   'available',
   /** No Docker installation found. */

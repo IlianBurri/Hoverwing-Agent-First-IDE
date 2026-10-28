@@ -65,14 +65,14 @@ test('switches the language from the palette', async () => {
   await page.keyboard.type('Deutsch');
   await page.keyboard.press('Enter');
   await expect(
-    page.getByRole('heading', { level: 1, name: 'Willkommen bei Kestrel' }),
+    page.getByRole('heading', { level: 1, name: 'Willkommen bei Hoverwing' }),
   ).toBeVisible();
   await expect(page.locator('html')).toHaveAttribute('lang', 'de');
 
   await page.keyboard.press('Control+K');
   await page.keyboard.type('English');
   await page.keyboard.press('Enter');
-  await expect(page.getByRole('heading', { level: 1, name: 'Welcome to Kestrel' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Welcome to Hoverwing' })).toBeVisible();
 });
 
 test('logs no errors or warnings', () => {

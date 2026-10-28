@@ -482,7 +482,7 @@ void app.whenReady().then(async () => {
   }, 10_000);
   const githubJson = async (url: string): Promise<unknown> => {
     const response = await fetch(url, {
-      headers: { accept: 'application/vnd.github+json', 'user-agent': 'Kestrel' },
+      headers: { accept: 'application/vnd.github+json', 'user-agent': 'Hoverwing' },
       signal: AbortSignal.timeout(15_000),
     });
     if (!response.ok) throw new Error(`HTTP ${String(response.status)}`);
@@ -537,7 +537,7 @@ void app.whenReady().then(async () => {
     },
   });
   const dockerApi = createDockerApi({ socketPath: await findDockerSocket() });
-  // Kestrel's MCP server for agents (browser tools), plus the stdio bridge.
+  // Hoverwing's MCP server for agents (browser tools), plus the stdio bridge.
   const mcpBridge = await writeBridge(join(dataDir, 'mcp')).catch(() => null);
   const mcpHost = new McpHost(app.getVersion(), async () => {
     // Docker Desktop forwards host.docker.internal to the host's loopback;
@@ -644,7 +644,7 @@ void app.whenReady().then(async () => {
           sandboxed,
         );
         const url = sandboxed ? endpoint.containerUrl : endpoint.url;
-        if (!url) throw new Error('Kestrel tools are not reachable from the sandbox.');
+        if (!url) throw new Error('Hoverwing tools are not reachable from the sandbox.');
         const release = () => {
           mcpHost.revoke(endpoint.id);
         };
@@ -654,7 +654,7 @@ void app.whenReady().then(async () => {
             servers: [
               {
                 type: 'http' as const,
-                name: 'kestrel',
+                name: 'hoverwing',
                 url,
                 headers: [{ name: 'Authorization', value: `Bearer ${endpoint.token}` }],
               },
@@ -670,10 +670,10 @@ void app.whenReady().then(async () => {
           release,
           servers: [
             sandboxed
-              ? { name: 'kestrel', command: 'node', args: [CONTAINER_MCP_BRIDGE], env }
+              ? { name: 'hoverwing', command: 'node', args: [CONTAINER_MCP_BRIDGE], env }
               : {
-                  name: 'kestrel',
-                  // Kestrel's own runtime runs the bridge as plain Node.
+                  name: 'hoverwing',
+                  // Hoverwing's own runtime runs the bridge as plain Node.
                   command: process.execPath,
                   args: [mcpBridge],
                   env: [...env, { name: 'ELECTRON_RUN_AS_NODE', value: '1' }],

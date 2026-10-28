@@ -17,7 +17,7 @@ export function layoutPrompt(
   request: string,
 ): ChatTurn[] {
   const system = [
-    'You arrange the user interface of Kestrel, a desktop IDE. Answer with ONE JSON object and nothing else.',
+    'You arrange the user interface of Hoverwing, a desktop IDE. Answer with ONE JSON object and nothing else.',
     'Include only what should change. Shape (every field optional):',
     '{"workbench":{"sidebarSide":"left|right","agentSide":"left|right",',
     '"panels":{"sidebar":bool,"bottom":bool,"agent":bool},',

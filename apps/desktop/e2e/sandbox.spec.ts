@@ -158,7 +158,7 @@ test.describe('in a Docker container', () => {
     await expect(rows).toContainText('home is /home/kestrel');
   });
 
-  test("reaches Kestrel's browser tools from the container", async () => {
+  test("reaches Hoverwing's browser tools from the container", async () => {
     const site = await startTestSite();
     try {
       await page.keyboard.press('Control+Shift+O');

@@ -10,7 +10,7 @@ export const FAKE_USER_CODE = 'WDJB-MJHT';
 
 export interface FakeGitHub {
   url: string;
-  /** Environment that points Kestrel at this fake GitHub. */
+  /** Environment that points Hoverwing at this fake GitHub. */
   env: Record<string, string>;
   /** The bare repository behind `octo/demo`. */
   repo: string;

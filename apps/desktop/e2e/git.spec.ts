@@ -12,9 +12,9 @@ let root: string;
 let remote: string;
 
 const env = {
-  GIT_AUTHOR_NAME: 'Kestrel Test',
+  GIT_AUTHOR_NAME: 'Hoverwing Test',
   GIT_AUTHOR_EMAIL: 'test@example.com',
-  GIT_COMMITTER_NAME: 'Kestrel Test',
+  GIT_COMMITTER_NAME: 'Hoverwing Test',
   GIT_COMMITTER_EMAIL: 'test@example.com',
 };
 const git = (cwd: string, ...args: string[]) =>

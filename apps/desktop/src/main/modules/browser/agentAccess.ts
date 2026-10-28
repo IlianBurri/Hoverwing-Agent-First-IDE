@@ -35,7 +35,9 @@ export function agentBrowser(
       const tab = manager.agentTab(ownerId, tabId);
       const png = await manager.screenshot(tab, SCREENSHOT_WIDTH);
       if (png.length === 0) {
-        throw new Error('The tab is not visible. Ask the user to show it in Kestrel, then retry.');
+        throw new Error(
+          'The tab is not visible. Ask the user to show it in Hoverwing, then retry.',
+        );
       }
       return { tab: info(tab.id), png };
     },

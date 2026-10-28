@@ -38,7 +38,7 @@ test('opens a folder and shows its files', async () => {
   await expect(page.getByRole('button', { name: 'Search commands' })).toContainText(name);
   expect(
     await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]?.getTitle()),
-  ).toBe(`${name} — Kestrel`);
+  ).toBe(`${name} — Hoverwing`);
 });
 
 test('navigates the tree with the keyboard', async () => {

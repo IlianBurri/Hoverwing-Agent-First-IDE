@@ -95,7 +95,7 @@ test('switches tools off and sets their permission level', async () => {
   ).toHaveAttribute('aria-checked', 'true');
 });
 
-test('agents use the tools through Kestrel, with permissions and markers', async () => {
+test('agents use the tools through Hoverwing, with permissions and markers', async () => {
   await stubMessageBox(app, 1);
   await page.getByRole('button', { name: 'Start', exact: true }).click();
   await expect(page.getByRole('textbox', { name: 'Message to the agent' })).toBeVisible();

@@ -7,7 +7,7 @@ import { ipcChannels } from '@kestrel/shared';
 // Handlers under test never touch the sender.
 const context = { sender: {} } as IpcContext;
 
-const info = { name: 'Kestrel', version: '0.0.0', platform: 'linux', locale: 'de' } as const;
+const info = { name: 'Hoverwing', version: '0.0.0', platform: 'linux', locale: 'de' } as const;
 
 function makeHandlers(overrides: Partial<IpcHandlers> = {}): IpcHandlers {
   const unused = Object.fromEntries(

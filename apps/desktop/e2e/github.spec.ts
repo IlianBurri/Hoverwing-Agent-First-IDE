@@ -17,9 +17,9 @@ let clone: string;
 
 const gitEnv = {
   ...process.env,
-  GIT_AUTHOR_NAME: 'Kestrel Test',
+  GIT_AUTHOR_NAME: 'Hoverwing Test',
   GIT_AUTHOR_EMAIL: 'test@example.com',
-  GIT_COMMITTER_NAME: 'Kestrel Test',
+  GIT_COMMITTER_NAME: 'Hoverwing Test',
   GIT_COMMITTER_EMAIL: 'test@example.com',
 };
 const git = (cwd: string, ...args: string[]) =>
@@ -35,7 +35,7 @@ async function pushFromGitPanel(): Promise<void> {
   await page.getByRole('dialog').getByRole('button', { name: 'Push' }).click();
 }
 
-/** URLs Kestrel asked the system to open (the browser is not started in tests). */
+/** URLs Hoverwing asked the system to open (the browser is not started in tests). */
 async function openedUrls(): Promise<string[]> {
   return app.evaluate(() => (globalThis as { openedUrls?: string[] }).openedUrls ?? []);
 }
@@ -101,13 +101,13 @@ test('filters and clones a repository and opens it', async () => {
 });
 
 test('pushes with the account from the Git panel', async () => {
-  writeFileSync(join(clone, 'notes.md'), 'from Kestrel\n');
+  writeFileSync(join(clone, 'notes.md'), 'from Hoverwing\n');
   git(clone, 'add', '.');
-  git(clone, 'commit', '-qm', 'notes from Kestrel');
+  git(clone, 'commit', '-qm', 'notes from Hoverwing');
   await page.keyboard.press('Control+Shift+G');
   await pushFromGitPanel();
   await expect(page.getByText('Pushed.')).toBeVisible();
-  expect(git(fake.repo, 'log', '--oneline', 'main')).toContain('notes from Kestrel');
+  expect(git(fake.repo, 'log', '--oneline', 'main')).toContain('notes from Hoverwing');
 });
 
 test('signing out removes the account from git as well', async () => {

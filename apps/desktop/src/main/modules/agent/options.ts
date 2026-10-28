@@ -2,7 +2,7 @@ import { z } from 'zod';
 import type { SessionConfigOption, SessionModeState } from '@agentclientprotocol/sdk';
 import type { AgentOption, AgentOptionChoice, AgentOptionValue } from '@kestrel/shared';
 
-/** How a Kestrel option is changed on the agent's side. */
+/** How a Hoverwing option is changed on the agent's side. */
 export type OptionSource = 'config' | 'mode' | 'model';
 
 export interface SessionOption {
@@ -10,13 +10,13 @@ export interface SessionOption {
   source: OptionSource;
 }
 
-/** Ids of options Kestrel builds from `modes` / `models` (no ACP config option). */
+/** Ids of options Hoverwing builds from `modes` / `models` (no ACP config option). */
 export const MODE_OPTION_ID = 'kestrel-mode';
 export const MODEL_OPTION_ID = 'kestrel-model';
 
 /**
  * Modes in which the agent acts without asking first (Claude Code's
- * "Bypass permissions" and "Auto", Gemini's "yolo"). Kestrel never offers
+ * "Bypass permissions" and "Auto", Gemini's "yolo"). Hoverwing never offers
  * them: every risky action has to reach the permission service.
  */
 const UNSAFE_MODES = new Set(['bypassPermissions', 'auto', 'dontAsk', 'yolo']);
@@ -103,7 +103,7 @@ function fromConfigOption(option: SessionConfigOption): AgentOption {
   };
 }
 
-/** Kestrel's options from a session/new or session/load response. */
+/** Hoverwing's options from a session/new or session/load response. */
 export function sessionOptions(response: {
   configOptions?: SessionConfigOption[] | null;
   modes?: SessionModeState | null;
@@ -159,7 +159,7 @@ export function sessionOptions(response: {
   return options;
 }
 
-/** Replaces the config options (after an update) and keeps Kestrel's own ones. */
+/** Replaces the config options (after an update) and keeps Hoverwing's own ones. */
 export function replaceConfigOptions(
   current: readonly SessionOption[],
   configOptions: SessionConfigOption[],

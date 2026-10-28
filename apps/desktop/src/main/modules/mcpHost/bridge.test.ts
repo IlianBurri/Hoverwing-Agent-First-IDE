@@ -54,7 +54,7 @@ describe('stdio bridge', () => {
         },
       })}\n`,
     );
-    expect(await next()).toMatchObject({ id: 1, result: { serverInfo: { name: 'kestrel' } } });
+    expect(await next()).toMatchObject({ id: 1, result: { serverInfo: { name: 'hoverwing' } } });
     child.stdin.write(
       `${JSON.stringify({ jsonrpc: '2.0', method: 'notifications/initialized' })}\n`,
     );

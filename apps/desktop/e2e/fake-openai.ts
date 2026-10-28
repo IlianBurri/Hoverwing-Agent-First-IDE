@@ -43,7 +43,7 @@ const sleep = (ms: number) =>
   });
 
 /** The layout prompt starts with this sentence (see layoutAssistant/prompt.ts). */
-const LAYOUT_PROMPT = 'You arrange the user interface of Kestrel';
+const LAYOUT_PROMPT = 'You arrange the user interface of Hoverwing';
 
 /**
  * Layout assistant: a fixed proposal. A wish containing "broken" first gets

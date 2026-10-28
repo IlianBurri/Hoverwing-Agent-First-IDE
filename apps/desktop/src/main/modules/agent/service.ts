@@ -45,7 +45,7 @@ export interface AgentServiceDeps {
     log(ownerId: number, slotId: string, line: string): void;
   };
   clientVersion: string;
-  /** Kestrel's MCP tools (browser) for agents of a window. */
+  /** Hoverwing's MCP tools (browser) for agents of a window. */
   mcp?: (ownerId: number) => SessionMcp;
 }
 

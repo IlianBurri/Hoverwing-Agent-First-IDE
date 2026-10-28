@@ -24,7 +24,7 @@ function commandOf(rawInput: unknown): string | null {
   return null;
 }
 
-/** Describes the agent's permission request as a Kestrel permission action. */
+/** Describes the agent's permission request as a Hoverwing permission action. */
 export function actionForToolCall(toolCall: ToolCallView, rawInput: unknown): PermissionAction {
   const kind = kindByTool[toolCall.kind];
   let target = toolCall.title;
@@ -39,7 +39,7 @@ export function actionForToolCall(toolCall: ToolCallView, rawInput: unknown): Pe
 }
 
 /**
- * The answer for the agent. "Always" is remembered by Kestrel's own rules,
+ * The answer for the agent. "Always" is remembered by Hoverwing's own rules,
  * so the agent only ever gets a one-time allow or reject where possible.
  */
 export function outcomeFor(

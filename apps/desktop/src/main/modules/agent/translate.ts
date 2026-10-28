@@ -73,7 +73,7 @@ export function mergeToolCall(
   };
 }
 
-/** Translates one ACP session update into Kestrel events (or none). */
+/** Translates one ACP session update into Hoverwing events (or none). */
 export function translateUpdate(
   root: string,
   update: SessionUpdate,

@@ -36,7 +36,7 @@ function withTimeout<T>(promise: Promise<T>, ms: number, what: string): Promise<
   });
 }
 
-/** What Kestrel can do with a server's answers. */
+/** What Hoverwing can do with a server's answers. */
 export const CLIENT_CAPABILITIES: Lsp.ClientCapabilities = {
   general: { positionEncodings: ['utf-16'] },
   workspace: {
@@ -72,7 +72,7 @@ export const CLIENT_CAPABILITIES: Lsp.ClientCapabilities = {
 };
 
 /**
- * One connection to one language server process. Kestrel only reads from
+ * One connection to one language server process. Hoverwing only reads from
  * servers: requests to change files (`workspace/applyEdit`) or show
  * documents are refused.
  */
@@ -101,7 +101,7 @@ export class LspClient {
     this.connection.onRequest('window/showDocument', () => ({ success: false }));
     this.connection.onRequest('workspace/applyEdit', () => ({
       applied: false,
-      failureReason: 'Kestrel does not apply edits from language servers.',
+      failureReason: 'Hoverwing does not apply edits from language servers.',
     }));
     this.connection.onNotification(
       'textDocument/publishDiagnostics',
@@ -152,7 +152,7 @@ export class LspClient {
     const result = await withTimeout(
       this.connection.sendRequest<Lsp.InitializeResult>('initialize', {
         processId: process.pid,
-        clientInfo: { name: 'Kestrel' },
+        clientInfo: { name: 'Hoverwing' },
         // Deprecated in favour of workspaceFolders, but older servers still need it.
         // eslint-disable-next-line @typescript-eslint/no-deprecated
         rootUri,

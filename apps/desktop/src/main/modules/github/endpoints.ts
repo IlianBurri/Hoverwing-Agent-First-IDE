@@ -1,5 +1,5 @@
 /**
- * Client id of Kestrel's GitHub OAuth App (device flow enabled). It is public
+ * Client id of Hoverwing's GitHub OAuth App (device flow enabled). It is public
  * by design: the device flow needs no client secret. Empty = sign-in is off.
  * How to register the app: docs/github-sign-in.md.
  */

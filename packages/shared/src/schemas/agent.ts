@@ -56,7 +56,7 @@ export const planEntrySchema = z.object({
 });
 export type PlanEntry = z.infer<typeof planEntrySchema>;
 
-/** Kestrel's own, small event model; main translates ACP into it. */
+/** Hoverwing's own, small event model; main translates ACP into it. */
 export const agentEventSchema = z.discriminatedUnion('type', [
   z.object({
     type: z.literal('message'),

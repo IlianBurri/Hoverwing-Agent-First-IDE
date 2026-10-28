@@ -134,7 +134,7 @@ describe('AgentRuntime', () => {
     expect(runtime.getStatus().state).toBe('ready');
   });
 
-  it('answers permission requests through Kestrel and picks a one-time option', async () => {
+  it('answers permission requests through Hoverwing and picks a one-time option', async () => {
     const answers: unknown[] = [];
     const { runtime, check, turnEnded } = setup(async (client, sessionId) => {
       const response = await client.request('session/request_permission', {

@@ -24,7 +24,7 @@ export function createMainWindow({ appUrl, theme, language }: MainWindowOptions)
     minWidth: 800,
     minHeight: 500,
     show: false,
-    title: 'Kestrel',
+    title: 'Hoverwing',
     backgroundColor: backgrounds[theme],
     ...titleBarOptions(process.platform, theme),
     webPreferences: hardenedWebPreferences(join(import.meta.dirname, '../preload/index.cjs')),

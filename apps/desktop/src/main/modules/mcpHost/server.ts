@@ -58,7 +58,7 @@ function reply(response: ServerResponse, status: number, message: string): void 
 
 /** An MCP server for this session's tools, used for exactly one HTTP request. */
 function mcpServerFor(tools: ToolDefinition[], version: string): McpServer {
-  const mcp = new McpServer({ name: 'kestrel', version }, { capabilities: { tools: {} } });
+  const mcp = new McpServer({ name: 'hoverwing', version }, { capabilities: { tools: {} } });
   // Low-level handlers: proxied tools bring their own JSON Schema (no zod).
   const server = mcp.server;
   server.setRequestHandler(ListToolsRequestSchema, () => ({
@@ -79,7 +79,7 @@ function mcpServerFor(tools: ToolDefinition[], version: string): McpServer {
 }
 
 /**
- * Kestrel's own MCP server for agents ("kestrel"), over streamable HTTP in
+ * Hoverwing's own MCP server for agents ("hoverwing"), over streamable HTTP in
  * stateless JSON mode. Every request needs the bearer token of a running
  * agent session; the token decides which window's tools are used.
  */

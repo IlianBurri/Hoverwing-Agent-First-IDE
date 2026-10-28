@@ -25,7 +25,7 @@ export function terminalEnv(
   const env = childEnv(base);
   env['TERM'] = 'xterm-256color';
   env['COLORTERM'] = 'truecolor';
-  env['TERM_PROGRAM'] = 'Kestrel';
+  env['TERM_PROGRAM'] = 'Hoverwing';
   env['TERM_PROGRAM_VERSION'] = version;
   // Without a locale many tools fall back to ASCII and break umlauts.
   env['LANG'] ??= 'en_US.UTF-8';

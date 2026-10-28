@@ -38,7 +38,7 @@ export function TerminalInstance({ id, visible }: { id: string; visible: boolean
     terminal.loadAddon(fit);
     terminal.loadAddon(
       new WebLinksAddon((_event, url) => {
-        // Local dev servers open in Kestrel's browser, everything else outside.
+        // Local dev servers open in Hoverwing's browser, everything else outside.
         if (isLocalUrl(url)) void openBrowser(url);
         else void window.kestrel.invoke('app:openExternalUrl', { url });
       }),

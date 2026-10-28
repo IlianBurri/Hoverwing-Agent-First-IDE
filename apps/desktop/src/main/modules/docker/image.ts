@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 
-/** Label on every image and container Kestrel creates. */
+/** Label on every image and container Hoverwing creates. */
 export const SANDBOX_LABEL = 'dev.kestrel.sandbox';
 
 /** Tools agents expect besides Node (git for diffs/commits, rg for search). */

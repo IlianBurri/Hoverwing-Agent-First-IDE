@@ -54,7 +54,7 @@ export const gitBranchSchema = z.object({
 });
 export type GitBranch = z.infer<typeof gitBranchSchema>;
 
-/** Branch names Kestrel accepts (a safe subset of git's rules, never an option). */
+/** Branch names Hoverwing accepts (a safe subset of git's rules, never an option). */
 export const gitBranchNameSchema = z
   .string()
   .min(1)

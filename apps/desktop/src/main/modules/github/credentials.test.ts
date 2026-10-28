@@ -114,8 +114,8 @@ describe('GitCredentialBroker', () => {
 describe('shellQuote', () => {
   it('quotes for sh and uses forward slashes on Windows', () => {
     expect(shellQuote("/opt/it's here/node", 'linux')).toBe(`'/opt/it'\\''s here/node'`);
-    expect(shellQuote('C:\\Program Files\\Kestrel\\Kestrel.exe', 'win32')).toBe(
-      `'C:/Program Files/Kestrel/Kestrel.exe'`,
+    expect(shellQuote('C:\\Program Files\\Hoverwing\\Hoverwing.exe', 'win32')).toBe(
+      `'C:/Program Files/Hoverwing/Hoverwing.exe'`,
     );
   });
 });

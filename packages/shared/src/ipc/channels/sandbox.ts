@@ -9,7 +9,7 @@ export const sandboxChannels = {
   /**
    * Opens a terminal in a sandbox container of this agent, without the
    * project, so the user can log in to the agent there. The login stays in
-   * the agent's Docker volume; Kestrel never reads it.
+   * the agent's Docker volume; Hoverwing never reads it.
    */
   'sandbox:loginTerminal': {
     request: z.object({

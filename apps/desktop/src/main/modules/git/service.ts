@@ -24,7 +24,7 @@ export interface GitServiceDeps {
   isTrusted: (root: string) => Promise<boolean>;
   /** Moves an absolute path to the system trash. */
   trash: (absolute: string) => Promise<void>;
-  /** Environment for git (without Kestrel's internal variables). */
+  /** Environment for git (without Hoverwing's internal variables). */
   env: () => Record<string, string>;
   log: (line: string) => void;
   /** Status, index or refs of a window's repository changed. */

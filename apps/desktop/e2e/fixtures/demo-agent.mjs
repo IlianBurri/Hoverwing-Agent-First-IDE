@@ -1,6 +1,6 @@
 // A scripted ACP agent for the README screenshots (e2e/screenshots.spec.ts).
 // Whatever the prompt, it plans, reads src/forecast.ts, explains, and asks
-// to write an improved version through Kestrel (so the permission card and
+// to write an improved version through Hoverwing (so the permission card and
 // the diff are visible).
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';

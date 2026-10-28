@@ -1,5 +1,5 @@
 /**
- * Renders the app icon (build/icon.png, 512×512) from the Kestrel mark.
+ * Renders the app icon (build/icon.png, 512×512) from the Hoverwing mark.
  * electron-builder turns it into .ico/.icns. Run it again after changing
  * the mark: `npx electron scripts/make-icon.mjs`
  */

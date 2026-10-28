@@ -4,7 +4,7 @@
  * .blockmap (differential updates) no longer match; electron-updater would
  * reject the update. Rebuilds both with electron-builder's own blockmap code.
  *
- *   node scripts/update-win-feed.mjs release/Kestrel-Setup-<version>.exe
+ *   node scripts/update-win-feed.mjs release/Hoverwing-Setup-<version>.exe
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';

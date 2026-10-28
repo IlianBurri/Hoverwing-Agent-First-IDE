@@ -17,7 +17,7 @@ import { addRecent } from './manager';
 import type { WorkspaceManager } from './manager';
 
 function setWindowTitle(sender: IpcContext['sender'], name: string | null): void {
-  BrowserWindow.fromWebContents(sender)?.setTitle(name ? `${name} — Kestrel` : 'Kestrel');
+  BrowserWindow.fromWebContents(sender)?.setTitle(name ? `${name} — Hoverwing` : 'Hoverwing');
 }
 
 export type OpenWorkspaceFolder = (

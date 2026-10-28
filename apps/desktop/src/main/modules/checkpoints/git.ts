@@ -44,9 +44,9 @@ export function runGit(
     GIT_CONFIG_NOSYSTEM: '1',
     GIT_CONFIG_GLOBAL: emptyGitConfig(),
     GIT_TERMINAL_PROMPT: '0',
-    GIT_AUTHOR_NAME: 'Kestrel',
+    GIT_AUTHOR_NAME: 'Hoverwing',
     GIT_AUTHOR_EMAIL: 'checkpoints@kestrel.local',
-    GIT_COMMITTER_NAME: 'Kestrel',
+    GIT_COMMITTER_NAME: 'Hoverwing',
     GIT_COMMITTER_EMAIL: 'checkpoints@kestrel.local',
     ...(options.indexFile ? { GIT_INDEX_FILE: options.indexFile } : {}),
   };

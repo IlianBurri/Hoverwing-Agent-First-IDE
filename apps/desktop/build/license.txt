@@ -1,7 +1,7 @@
-Kestrel – license and privacy
+Hoverwing – license and privacy
 
 PRIVACY
-Kestrel has no telemetry, no analytics and no account. It only connects to
+Hoverwing has no telemetry, no analytics and no account. It only connects to
 other systems when you use a feature that needs it (your model provider, an
 agent, an MCP server, the integrated browser, Docker, git fetch/pull/push,
 GitHub sign-in, the setup assistant). Two connections happen without such a click:
@@ -10,14 +10,14 @@ GitHub sign-in, the setup assistant). Two connections happen without such a clic
   newer version exists. Nothing is downloaded without your click. Turn it off
   with "Turn off automatic update check" in the command palette (Ctrl+K).
 - TypeScript language server: the first time you open a TypeScript or
-  JavaScript file in a project you trusted, Kestrel downloads the language
+  JavaScript file in a project you trusted, Hoverwing downloads the language
   server from the npm registry (registry.npmjs.org). Turn it off in the
   command palette under "Language servers".
 
 Full privacy statement: https://github.com/IlianBurri/Kestrel-Agen-Harness-IDE/blob/HEAD/PRIVACY.md
 
-Uninstall: Windows Settings > Apps > Installed apps > Kestrel > Uninstall.
-Your settings stay in %APPDATA%\Kestrel; delete that folder to remove them.
+Uninstall: Windows Settings > Apps > Installed apps > Hoverwing > Uninstall.
+Your settings stay in %APPDATA%\Hoverwing; delete that folder to remove them.
 
 Code signing: free code signing provided by SignPath.io, certificate by
 SignPath Foundation.
@@ -25,7 +25,7 @@ SignPath Foundation.
 LICENSE (MIT)
 MIT License
 
-Copyright (c) 2026 Kestrel contributors
+Copyright (c) 2026 Hoverwing contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

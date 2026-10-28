@@ -21,7 +21,7 @@ test.beforeAll(async () => {
   });
   const userData = createUserDataDir();
   mkdirSync(join(userData, 'lsp'));
-  // The fake server, not yet confirmed: Kestrel must ask before starting it.
+  // The fake server, not yet confirmed: Hoverwing must ask before starting it.
   writeFileSync(
     join(userData, 'lsp', 'servers.json'),
     JSON.stringify({

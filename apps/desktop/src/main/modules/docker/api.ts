@@ -6,7 +6,7 @@ export type ContainerMount =
   | { type: 'volume'; source: string; target: string }
   | { type: 'tmpfs'; target: string; sizeMb: number; mode: number };
 
-/** Everything Kestrel sets on a container, independent of the Docker library. */
+/** Everything Hoverwing sets on a container, independent of the Docker library. */
 export interface ContainerSpec {
   image: string;
   command: string[];
@@ -78,7 +78,7 @@ export interface ImageBuildOptions {
 /** Stops a running stream (events, logs). */
 export type StopStream = () => void;
 
-/** The small part of Docker that Kestrel uses (injectable for tests). */
+/** The small part of Docker that Hoverwing uses (injectable for tests). */
 export interface DockerApi {
   /** Throws when the daemon cannot be reached; the error code tells why. */
   ping(): Promise<void>;

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   SignPath artifact configuration "installer": the NSIS installer
-  Kestrel-Setup-<version>.exe (uploaded as a GitHub artifact = ZIP).
+  Hoverwing-Setup-<version>.exe (uploaded as a GitHub artifact = ZIP).
   Copy this into the SignPath project (Artifact configurations → "installer").
 -->
 <artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">
@@ -9,7 +9,7 @@
     <parameter name="version" required="true" />
   </parameters>
   <zip-file>
-    <pe-file path="Kestrel-Setup-${version}.exe" product-name="Kestrel" product-version="${version}">
+    <pe-file path="Hoverwing-Setup-${version}.exe" product-name="Hoverwing" product-version="${version}">
       <authenticode-sign />
     </pe-file>
   </zip-file>
