@@ -203,6 +203,8 @@ jobs:
     needs: [windows, build]
     runs-on: ubuntu-latest
     steps:
+      # Only for docs/releases/<tag>.md (the release notes).
+      - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
           pattern: Kestrel-*
@@ -221,6 +223,10 @@ jobs:
             windows='Not code-signed: SmartScreen may say “Windows protected your PC” → *More info* → *Run anyway*.'
           fi
           {
+            # What's new, written by hand per release (optional).
+            if [ -f "docs/releases/$GITHUB_REF_NAME.md" ]; then
+              cat "docs/releases/$GITHUB_REF_NAME.md"
+            fi
             cat <<'NOTES'
           ## Download
 
