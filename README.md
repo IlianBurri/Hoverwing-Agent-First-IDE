@@ -151,15 +151,15 @@ them too.
 
 ### Code signing policy
 
-Free code signing provided by [SignPath.io](https://about.signpath.io), certificate
-by [SignPath Foundation](https://signpath.org). (Application in progress; until it
-is approved, the Windows installers are unsigned.)
+The Windows installers are not code-signed yet, so SmartScreen shows "unknown
+publisher" on the first start (_More info → Run anyway_). The rules below apply
+as soon as releases are signed.
 
 - Only binaries built by GitHub Actions from this repository
-  ([Release workflow](.github/workflows/release.yml)) are signed. Upstream
+  ([Release workflow](.github/workflows/release.yml)) will be signed. Upstream
   binaries (Electron's libraries, ripgrep, node-pty) are included as published by
   their projects.
-- Every release signing request is approved by hand.
+- Every release signing request will be approved by hand.
 - **Committers and reviewers:** [IlianBurri](https://github.com/IlianBurri)
   (changes from other contributors are reviewed before they are merged)
 - **Approvers:** [IlianBurri](https://github.com/IlianBurri)

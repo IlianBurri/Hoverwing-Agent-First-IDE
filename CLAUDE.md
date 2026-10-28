@@ -58,8 +58,9 @@ Programs are looked up with `lib/which.ts` (`findProgram`, PATHEXT-aware).
   (`unpackedPath()` in `modules/search/search.ts`).
 - Icon: `apps/desktop/build/icon.png`, rendered from the mark by
   `npx electron scripts/make-icon.mjs`.
-- Open: SignPath application (until then SmartScreen warns "unknown
-  publisher"); macOS notarization needs the paid Apple Developer Program
+- Open: Windows signing (SignPath Foundation declined 2026-10-28 for lack
+  of public adoption, reapply later; until then SmartScreen warns "unknown
+  publisher"; the README and site say the installers are unsigned); macOS notarization needs the paid Apple Developer Program
   (until then: _System Settings → Privacy & Security → Open Anyway_).
 
 ## Commands

@@ -2,7 +2,7 @@
 
 | System  | How                                                       | Cost            |
 | ------- | --------------------------------------------------------- | --------------- |
-| Windows | [SignPath Foundation](https://signpath.org) (open source) | free            |
+| Windows | [SignPath Foundation](https://signpath.org) (open source) | free (declined) |
 | macOS   | Apple Developer Program (Developer ID + notarization)     | 99 USD per year |
 | Linux   | not needed (AppImage)                                     | –               |
 
@@ -11,6 +11,13 @@ first start (_System Settings → Privacy & Security → Open Anyway_) and
 auto-update does not work there.
 
 ## Windows with the SignPath Foundation
+
+**Status (2026-10-28):** the application was declined for now. The Foundation
+wants visible public adoption first (stars, forks, contributors, outside
+articles or discussions); reapplying later is welcome. Until then the Windows
+builds are unsigned; the workflow below stays ready. Paid alternatives: a
+SignPath subscription, an open-source code signing certificate (e.g. Certum,
+via `WIN_CSC_*`), or Azure Trusted Signing.
 
 The certificate belongs to the SignPath Foundation, so Windows shows
 "SignPath Foundation" as the publisher. SmartScreen can still warn for the
