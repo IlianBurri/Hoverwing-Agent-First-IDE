@@ -45,4 +45,23 @@ describe('SecretStore', () => {
     await store.set('key', null);
     expect(await store.has('key')).toBe(false);
   });
+
+  it('drops values another keychain key encrypted (after a rename)', async () => {
+    const file = join(dir, 'secrets.json');
+    await new SecretStore(file, fakeEncryption(true)).set('provider:a', 'sk-old');
+    const otherKey: Encryption = {
+      ...fakeEncryption(true),
+      decryptString: (buffer) => {
+        if (buffer.toString('utf8') !== 'wen') throw new Error('bad key');
+        return 'new';
+      },
+      encryptString: () => Buffer.from('wen', 'utf8'),
+    };
+    const store = new SecretStore(file, otherKey);
+    await store.set('provider:b', 'new');
+    expect(await store.dropUnreadable()).toBe(1);
+    expect(await store.has('provider:a')).toBe(false);
+    expect(await store.get('provider:b')).toBe('new');
+    expect(await new SecretStore(file, otherKey).dropUnreadable()).toBe(0);
+  });
 });

@@ -64,6 +64,31 @@ export class SecretStore {
     }
   }
 
+  /**
+   * Removes stored values the keychain can no longer decrypt (its key is tied
+   * to the app name on macOS and Linux, e.g. after a rename). Returns how many.
+   */
+  async dropUnreadable(): Promise<number> {
+    if (!this.persistent) return 0;
+    const stored = await this.load();
+    const readable = Object.fromEntries(
+      Object.entries(stored).filter(([, value]) => {
+        try {
+          this.encryption.decryptString(Buffer.from(value, 'base64'));
+          return true;
+        } catch {
+          return false;
+        }
+      }),
+    );
+    const dropped = Object.keys(stored).length - Object.keys(readable).length;
+    if (dropped > 0) {
+      this.encrypted = readable;
+      await writeJsonFile(this.file, readable);
+    }
+    return dropped;
+  }
+
   async has(key: string): Promise<boolean> {
     return (await this.get(key)) !== null;
   }

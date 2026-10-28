@@ -65,6 +65,7 @@ import {
   dockerSocketCandidates,
   isValidPackageName,
 } from './modules/docker';
+import { migrateUserData } from './lib/migrateUserData';
 import { nativeTexts } from './nativeTexts';
 import {
   AuditLog,
@@ -121,6 +122,10 @@ if (!app.commandLine.hasSwitch('no-sandbox')) app.enableSandbox();
 // E2E tests point this at a temp dir so they never touch real user data.
 const userDataOverride = process.env['KESTREL_USER_DATA_DIR'];
 if (userDataOverride) app.setPath('userData', userDataOverride);
+// Kestrel was renamed to Hoverwing: its app data is taken over once.
+const migratedFromKestrel =
+  !userDataOverride &&
+  migrateUserData(join(app.getPath('appData'), 'Kestrel'), app.getPath('userData'));
 
 async function anyExists(paths: readonly string[]): Promise<boolean> {
   for (const path of paths) {
@@ -740,11 +745,26 @@ void app.whenReady().then(async () => {
     (url) => isAppUrl(url, appUrl),
   );
 
-  createMainWindow({
+  const firstWindow = createMainWindow({
     appUrl,
     theme: initialTheme(settings.get()),
     language: () => dialogLanguage(settings.get()),
   });
+  if (migratedFromKestrel) void announceRename(firstWindow);
+
+  /** Once after the rename: what was taken over, and which keys must be entered again. */
+  async function announceRename(window: BrowserWindow): Promise<void> {
+    // The keychain key belongs to the app name on macOS and Linux.
+    const dropped = await secrets.dropUnreadable().catch(() => 0);
+    const text = nativeTexts[dialogLanguage(settings.get())];
+    await dialog.showMessageBox(window, {
+      type: 'info',
+      message: text.renamedMessage,
+      detail: dropped > 0 ? `${text.renamedDetail}\n\n${text.renamedKeys}` : text.renamedDetail,
+      buttons: ['OK'],
+      noLink: true,
+    });
+  }
 
   app.on('activate', () => {
     // macOS: recreate a window when the dock icon is clicked.

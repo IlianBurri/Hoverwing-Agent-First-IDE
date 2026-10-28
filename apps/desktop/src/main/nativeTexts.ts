@@ -27,6 +27,11 @@ export const nativeTexts = {
     lspDetail:
       'Kestrel startet dieses Programm in deinem Projektordner, mit deinen Rechten. Es liest den Code und kann Werkzeuge aus dem Projekt laden.\n\n{command}',
     lspStart: 'Starten',
+    renamedMessage: 'Kestrel heisst jetzt Hoverwing',
+    renamedDetail:
+      'Deine Einstellungen, Chats, Checkpoints, Agenten und Regeln wurden übernommen. Der alte Kestrel-Ordner bleibt unverändert, du kannst ihn später löschen.',
+    renamedKeys:
+      'Gespeicherte API-Schlüssel, Agent-Variablen und Anmeldungen musst du einmal neu eingeben: Der Schlüsselbund deines Systems bindet sie an den App-Namen.',
   },
   en: {
     unsavedMessage: 'Discard unsaved changes?',
@@ -55,6 +60,11 @@ export const nativeTexts = {
     lspDetail:
       'Kestrel will start this program in your project folder, with your rights. It reads the code and can load tools from the project.\n\n{command}',
     lspStart: 'Start',
+    renamedMessage: 'Kestrel is now called Hoverwing',
+    renamedDetail:
+      'Your settings, chats, checkpoints, agents and rules were taken over. The old Kestrel folder stays as it was; you can delete it later.',
+    renamedKeys:
+      'Saved API keys, agent variables and sign-ins have to be entered once more: your system keychain ties them to the app name.',
   },
 } as const;
 
