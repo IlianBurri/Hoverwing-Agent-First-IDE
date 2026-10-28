@@ -31,7 +31,10 @@ Programs are looked up with `lib/which.ts` (`findProgram`, PATHEXT-aware).
 - Release: push a tag `v<version>` → the Release workflow builds all three on
   their runners (Windows also runs `e2e/packaged.spec.ts` against
   `release/win-unpacked`) and attaches installers + `latest*.yml` to the GitHub
-  release ("Run workflow" = artifacts only). macOS signing is used when the
+  release ("Run workflow" = artifacts only). Linux builds on `ubuntu-22.04`:
+  node-pty is compiled there and needs the build machine's glibc (0.9.0 from
+  `ubuntu-latest` needed 2.42 and crashed on Ubuntu 24.04); a workflow step
+  fails if a native module needs more than glibc 2.35. macOS signing is used when the
   `MAC_CSC_*` / `APPLE_*` secrets exist.
 - Windows signing (`docs/code-signing.md`): SignPath Foundation (free for
   OSS) once the variable `SIGNPATH_ORGANIZATION_ID` + secret

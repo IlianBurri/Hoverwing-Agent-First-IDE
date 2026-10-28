@@ -166,7 +166,11 @@ jobs:
               apps/desktop/release/*.dmg
               apps/desktop/release/*.dmg.blockmap
               apps/desktop/release/latest-mac.yml
-          - os: ubuntu-latest
+          # node-pty is compiled during install and needs at least the glibc
+          # of the build machine: build on the oldest supported Ubuntu, so the
+          # AppImage also starts on older systems (ubuntu-latest made 0.9.0
+          # need glibc 2.42, which crashed on Ubuntu 24.04).
+          - os: ubuntu-22.04
             script: package:linux
             files: |
               apps/desktop/release/*.AppImage
@@ -195,6 +199,15 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      - name: Check the glibc the native modules need
+        if: runner.os == 'Linux'
+        working-directory: apps/desktop/release/linux-unpacked
+        run: |
+          max=2.35
+          need=$(find . -name '*.node' -path '*linux*' -o -name '*.node' -path '*build/Release*' \
+            | xargs -r objdump -T | grep -o 'GLIBC_[0-9.]*' | sed 's/GLIBC_//' | sort -Vu | tail -1)
+          echo "native modules need glibc $need (allowed: $max)"
+          [ "$(printf '%s\n%s\n' "$need" "$max" | sort -V | tail -1)" = "$max" ]
       - uses: actions/upload-artifact@v4
         with:
           name: Kestrel-${{ runner.os }}
