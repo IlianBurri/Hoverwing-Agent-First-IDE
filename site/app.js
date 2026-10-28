@@ -1,7 +1,7 @@
 // Fills the download buttons with the files of the newest GitHub release and
 // marks the visitor's system. Without JavaScript (or if the GitHub API is
 // unavailable) every button still leads to the releases page.
-const REPO = 'IlianBurri/Kestrel-Agen-Harness-IDE';
+const REPO = 'IlianBurri/hoverwing';
 
 const patterns = {
   windows: /Setup-.*\.exe$/i,

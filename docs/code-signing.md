@@ -35,7 +35,7 @@ first releases until the certificate has gained reputation.
 ### 2. Apply
 
 Form: <https://signpath.org/apply>. Repository
-`https://github.com/IlianBurri/Kestrel-Agen-Harness-IDE`, license MIT, build
+`https://github.com/IlianBurri/hoverwing`, license MIT, build
 system GitHub Actions (`.github/workflows/release.yml`), artifacts: the NSIS
 installer and the app executable.
 
@@ -63,7 +63,7 @@ _Settings → Secrets and variables → Actions:_
 As soon as `SIGNPATH_ORGANIZATION_ID` exists, the Windows job of the Release
 workflow:
 
-1. builds `release/win-unpacked` and has `Kestrel.exe` signed,
+1. builds `release/win-unpacked` and has `Hoverwing.exe` signed,
 2. builds the installer around the signed app (`--prepackaged`, the exe stays
    untouched),
 3. has the installer signed,

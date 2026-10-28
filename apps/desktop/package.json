@@ -5,7 +5,7 @@
   "productName": "Hoverwing",
   "description": "Hoverwing desktop app",
   "author": "Ilian",
-  "homepage": "https://github.com/IlianBurri/Kestrel-Agen-Harness-IDE",
+  "homepage": "https://github.com/IlianBurri/hoverwing",
   "type": "module",
   "main": "./out/main/index.js",
   "scripts": {

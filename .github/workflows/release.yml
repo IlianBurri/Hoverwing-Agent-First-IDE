@@ -267,7 +267,7 @@ jobs:
 
           Installed apps (Windows, Linux) find new versions here and offer to update.
 
-          [Code signing policy](https://github.com/IlianBurri/Kestrel-Agen-Harness-IDE#code-signing-policy) · [Privacy](https://github.com/IlianBurri/Kestrel-Agen-Harness-IDE/blob/HEAD/PRIVACY.md)
+          [Code signing policy](https://github.com/IlianBurri/hoverwing#code-signing-policy) · [Privacy](https://github.com/IlianBurri/hoverwing/blob/HEAD/PRIVACY.md)
           NOTES
           } > notes.md
           gh release create "$GITHUB_REF_NAME" dist/* --title "Hoverwing $GITHUB_REF_NAME" --notes-file notes.md \

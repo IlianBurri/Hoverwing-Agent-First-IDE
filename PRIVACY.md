@@ -1,6 +1,6 @@
 # Privacy
 
-Kestrel has no telemetry, no analytics and no account. It does not collect,
+Hoverwing has no telemetry, no analytics and no account. It does not collect,
 store or sell any data about you, and it has no server of its own.
 
 The app only connects to other systems in these cases:
@@ -12,12 +12,12 @@ The app only connects to other systems in these cases:
 | You install Ollama in the setup assistant                               | GitHub (`api.github.com`, `github.com`, release asset hosts)                         | Download requests for the official Ollama release                   | Do not start the installation                                                    |
 | You use "Customize layout with AI"                                      | Your chat model's address (as configured)                                            | Your wish, the current layout and the names of commands (no files)  | Do not use the feature                                                           |
 | You use the chat, autocompletion or a model provider                    | The address you configured (e.g. OpenRouter, OpenAI, your local Ollama or llama.cpp) | Your messages, attached files, or the code around the cursor        | Remove the provider; autocompletion can be switched off per language or entirely |
-| You start an agent (Claude Code, Gemini CLI, …)                         | Whatever the agent itself contacts (its own vendor; `npx` downloads it from npm)     | Decided by the agent and its vendor, not by Kestrel                 | Do not start the agent                                                           |
+| You start an agent (Claude Code, Gemini CLI, …)                         | Whatever the agent itself contacts (its own vendor; `npx` downloads it from npm)     | Decided by the agent and its vendor, not by Hoverwing               | Do not start the agent                                                           |
 | You connect an MCP server                                               | The server you configured                                                            | Tool calls you or an agent make                                     | Disable or remove the server                                                     |
 | You open a page in the integrated browser                               | The website                                                                          | What any browser sends                                              | Do not open pages                                                                |
 | You open a TypeScript/JavaScript file in a trusted project (first time) | npm registry (`registry.npmjs.org`) via `npx`                                        | Download requests for `typescript-language-server` and `typescript` | Disable the TypeScript language server (command palette → _Language servers_)    |
 | You fetch, pull or push in the Git panel                                | The remote of your repository (e.g. GitHub)                                          | What git sends: your commits and branch names (push)                | Do not use these buttons                                                         |
-| You sign in to GitHub, list your repositories or clone one              | GitHub (`github.com`, `api.github.com`)                                              | Kestrel's public app id, then your access token with each request   | Do not sign in; _Sign out of GitHub_ forgets the token                           |
+| You sign in to GitHub, list your repositories or clone one              | GitHub (`github.com`, `api.github.com`)                                              | Hoverwing's public app id, then your access token with each request | Do not sign in; _Sign out of GitHub_ forgets the token                           |
 | You pull images or start containers in the Docker panel                 | Your Docker daemon and its registries                                                | Decided by Docker                                                   | Do not use the Docker features                                                   |
 
 Secret files (`.env`, keys, `.ssh`, …) are never sent to models or agents.
@@ -26,9 +26,9 @@ belong to. The GitHub access token stays there too and is only given to git for
 `https://github.com`, never written into a project or a remote URL.
 
 The data of the services above is handled under their own privacy policies.
-Kestrel keeps your settings, chats, checkpoints and logs only on your computer
+Hoverwing keeps your settings, chats, checkpoints and logs only on your computer
 (in the app data folder); uninstalling leaves them there so you can delete
 them yourself.
 
 Questions: open an issue at
-<https://github.com/IlianBurri/Kestrel-Agen-Harness-IDE/issues>.
+<https://github.com/IlianBurri/hoverwing/issues>.

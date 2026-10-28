@@ -1,5 +1,5 @@
 name: Idea or feature wish
-description: Something Kestrel should do.
+description: Something Hoverwing should do.
 labels: ['enhancement']
 body:
   - type: textarea
@@ -12,4 +12,4 @@ body:
   - type: textarea
     id: idea
     attributes:
-      label: How could Kestrel help?
+      label: How could Hoverwing help?

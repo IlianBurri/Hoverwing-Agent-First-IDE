@@ -23,7 +23,7 @@ asarUnpack:
 publish:
   provider: github
   owner: IlianBurri
-  repo: Kestrel-Agen-Harness-IDE
+  repo: hoverwing
   releaseType: release
 mac:
   category: public.app-category.developer-tools

@@ -1,6 +1,19 @@
 # CLAUDE.md
 
-Guidance for working on Kestrel. Read `SPEC.md` for the product spec and phases.
+Guidance for working on Hoverwing. Read `SPEC.md` for the product spec and phases.
+
+**Name:** the product is **Hoverwing** (renamed from Kestrel in October 2026; repo
+`IlianBurri/hoverwing`, site `ilianburri.github.io/hoverwing`). `SPEC.md` and the
+release notes of 0.9.x keep the old name. Internal identifiers keep the `kestrel`
+prefix on purpose and must not be renamed casually: `@kestrel/*` packages,
+`window.kestrel`, the `kestrel:` editor URI scheme, `KESTREL_*` variables, Docker
+labels `dev.kestrel.sandbox*` and volumes `kestrel-home-*` (agents' sandbox logins),
+the browser session `persist:kestrel-browser` and the app id `dev.kestrel.app` (the
+installer and auto-update depend on it). The first start of Hoverwing copies the
+old `Kestrel` app data folder (`lib/migrateUserData.ts`, Chromium caches left out);
+on macOS and Linux the keychain key belongs to the app name, so unreadable secrets
+are dropped (`SecretStore.dropUnreadable`) and a native notice asks to enter them
+again.
 
 ## Current phase
 
@@ -27,7 +40,7 @@ Programs are looked up with `lib/which.ts` (`findProgram`, PATHEXT-aware).
 ## Packaging (installable app)
 
 - `pnpm --filter @kestrel/desktop package:win|package:mac|package:linux` →
-  `apps/desktop/release/` (`Kestrel-Setup-<version>.exe`, `.dmg`, `.AppImage`).
+  `apps/desktop/release/` (`Hoverwing-Setup-<version>.exe`, `.dmg`, `.AppImage`).
   NSIS is not one-click: folder choice, desktop + start-menu shortcut, app data
   kept on uninstall. Version = `apps/desktop/package.json` `version`.
 - Release: push a tag `v<version>` → the Release workflow builds all three on
@@ -40,7 +53,7 @@ Programs are looked up with `lib/which.ts` (`findProgram`, PATHEXT-aware).
   `MAC_CSC_*` / `APPLE_*` secrets exist.
 - Windows signing (`docs/code-signing.md`): SignPath Foundation (free for
   OSS) once the variable `SIGNPATH_ORGANIZATION_ID` + secret
-  `SIGNPATH_API_TOKEN` exist: sign `win-unpacked/Kestrel.exe` → NSIS via
+  `SIGNPATH_API_TOKEN` exist: sign `win-unpacked/Hoverwing.exe` → NSIS via
   `--prepackaged` (leaves the exe untouched) → sign installer →
   `scripts/update-win-feed.mjs` recomputes sha512/size/blockmap in
   `latest.yml`. Artifact configs in `.signpath/`. Otherwise `WIN_CSC_*`.
@@ -136,13 +149,13 @@ so use `KESTREL_SANDBOX_BASE_IMAGE` / `KESTREL_E2E_SANDBOX_BASE_IMAGE` =
 - **Agents (ACP):** `modules/agent`. `AgentRuntime` is the ACP _client_ (stable
   v1 of `@agentclientprotocol/sdk`): it answers `session/request_permission`,
   `fs/read_text_file`, `fs/write_text_file` (no `terminal/*`), translates
-  `session/update` into Kestrel's own `AgentEvent`s (`translate.ts`) – the
+  `session/update` into Hoverwing's own `AgentEvent`s (`translate.ts`) – the
   renderer never sees ACP. Transport is injected: `spawnTransport` (child
   process) or `inProcessTransport` (unit tests). Agent configs live in
   `agents.json`; a new command line must be confirmed in a native main-process
   dialog (fingerprint stored), so a compromised renderer cannot start arbitrary
   programs. Secret env values: `SecretStore` (safeStorage; memory-only without a
-  keychain). Kestrel never handles Claude credentials.
+  keychain). Hoverwing never handles Claude credentials.
   Parallel agents: `AgentService` keeps up to `MAX_AGENT_SLOTS` (4) runtimes
   per window, keyed by a renderer-chosen `slotId` (every agent channel and
   event carries it; `agent:slots` lists them, `agent:close` forgets one). The
@@ -209,8 +222,8 @@ so use `KESTREL_SANDBOX_BASE_IMAGE` / `KESTREL_E2E_SANDBOX_BASE_IMAGE` =
   (`isAllowedBrowserUrl`), popups become `browser:openTab`. `PageCollector`
   gathers console + network errors via `webContents.debugger` (CDP). Browser
   web contents are skipped by the per-window release in `index.ts`.
-- **Agent tools (MCP host):** `modules/mcpHost`. `McpHost` serves Kestrel's MCP
-  server "kestrel" (`@modelcontextprotocol/sdk`, streamable HTTP, stateless
+- **Agent tools (MCP host):** `modules/mcpHost`. `McpHost` serves Hoverwing's MCP
+  server "hoverwing" (`@modelcontextprotocol/sdk`, streamable HTTP, stateless
   JSON mode, a new `McpServer` per request) on 127.0.0.1 with a per-session
   bearer token; `AgentRuntime` passes it in `session/new` (`deps.mcp`), as
   `http` if the agent supports it, else via the stdio bridge script
@@ -383,7 +396,7 @@ so use `KESTREL_SANDBOX_BASE_IMAGE` / `KESTREL_E2E_SANDBOX_BASE_IMAGE` =
   `direct <path> <text>`, `twohunks <path>`, `secret`, `run <cmd>`, `slow`,
   `peek <path>`, `whoami`, `settings` (reports model/effort/mode, sends a
   usage update; sessions offer config options `model`/`effort` and modes incl.
-  `bypassPermissions`), `mcp <tool> [arg]` (calls Kestrel's MCP server;
+  `bypassPermissions`), `mcp <tool> [arg]` (calls Hoverwing's MCP server;
   `MOCK_MCP_STDIO=1` uses the stdio bridge; a JSON argument is passed as tool
   arguments) trigger fixed behaviour. `e2e/fixtures/test-mcp-server.mjs` is a
   test MCP server (stdio, or `--http` with a bearer token) with `echo`,
