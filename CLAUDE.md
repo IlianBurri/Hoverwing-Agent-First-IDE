@@ -3,7 +3,7 @@
 Guidance for working on Hoverwing. Read `SPEC.md` for the product spec and phases.
 
 **Name:** the product is **Hoverwing** (renamed from Kestrel in October 2026; repo
-`IlianBurri/hoverwing`, site `ilianburri.github.io/hoverwing`). `SPEC.md` and the
+`IlianBurri/Hoverwing-Agent-First-IDE`, site `ilianburri.github.io/Hoverwing-Agent-First-IDE`). `SPEC.md` and the
 release notes of 0.9.x keep the old name. Internal identifiers keep the `kestrel`
 prefix on purpose and must not be renamed casually: `@kestrel/*` packages,
 `window.kestrel`, the `kestrel:` editor URI scheme, `KESTREL_*` variables, Docker

@@ -10,16 +10,16 @@ Run Claude Code, Gemini CLI, your own API key or a local model in your project.
 Hoverwing shows what the agent plans, asks before it runs anything risky, keeps its
 file changes until you accept them and saves a checkpoint before every turn.
 
-[![CI](https://github.com/IlianBurri/hoverwing/actions/workflows/ci.yml/badge.svg)](https://github.com/IlianBurri/hoverwing/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/IlianBurri/hoverwing)](https://github.com/IlianBurri/hoverwing/releases)
+[![CI](https://github.com/IlianBurri/Hoverwing-Agent-First-IDE/actions/workflows/ci.yml/badge.svg)](https://github.com/IlianBurri/Hoverwing-Agent-First-IDE/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/IlianBurri/Hoverwing-Agent-First-IDE)](https://github.com/IlianBurri/Hoverwing-Agent-First-IDE/releases)
 ![Platforms](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-3b5bdb)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-[**Website**](https://ilianburri.github.io/hoverwing/) · [**Download**](#download) · [Quick start](#quick-start) · [Features](#features) ·
+[**Website**](https://ilianburri.github.io/Hoverwing-Agent-First-IDE/) · [**Download**](#download) · [Quick start](#quick-start) · [Features](#features) ·
 [Limitations](#limitations) · [Security](#security-by-default) · [Development](#development) · [Contributing](#contributing)
 
 **Early (version 0.9) and looking for testers:** try it on a real project and
-[tell us what was unclear](https://github.com/IlianBurri/hoverwing/issues/new?template=feedback.yml).
+[tell us what was unclear](https://github.com/IlianBurri/Hoverwing-Agent-First-IDE/issues/new?template=feedback.yml).
 
 <br />
 
@@ -27,9 +27,9 @@ file changes until you accept them and saves a checkpoint before every turn.
 
 <br />
 
-<a href="https://ilianburri.github.io/hoverwing/#video"><img src="site/video/hoverwing-short-poster.jpg" alt="Play: Hoverwing in 34 seconds" width="220" /></a>
+<a href="https://ilianburri.github.io/Hoverwing-Agent-First-IDE/#video"><img src="site/video/hoverwing-short-poster.jpg" alt="Play: Hoverwing in 34 seconds" width="220" /></a>
 
-▶ [**Hoverwing in 34 seconds**](https://ilianburri.github.io/hoverwing/#video) · <sub>made with AI (Claude Code and a video skill); the screens are the real app</sub>
+▶ [**Hoverwing in 34 seconds**](https://ilianburri.github.io/Hoverwing-Agent-First-IDE/#video) · <sub>made with AI (Claude Code and a video skill); the screens are the real app</sub>
 
 <sub>Formerly called Kestrel (renamed in October 2026). Not related to other projects named Kestrel.</sub>
 
@@ -158,7 +158,7 @@ hardware and installs Ollama.
 
 ## Download
 
-Get the newest version from **[Releases](https://github.com/IlianBurri/hoverwing/releases)**:
+Get the newest version from **[Releases](https://github.com/IlianBurri/Hoverwing-Agent-First-IDE/releases)**:
 
 | System                | File                                  | First start                                                                         |
 | --------------------- | ------------------------------------- | ----------------------------------------------------------------------------------- |
@@ -362,11 +362,11 @@ the app data folder: `"keybindings": { "view.toggleSidebar": "Mod+Shift+B" }`.
 Hoverwing is built in the open, and help of any size is welcome:
 
 - **Try it** on a real project and share your
-  [first impressions](https://github.com/IlianBurri/hoverwing/issues/new?template=feedback.yml).
+  [first impressions](https://github.com/IlianBurri/Hoverwing-Agent-First-IDE/issues/new?template=feedback.yml).
 - **Report bugs** or wish for features with the
-  [issue templates](https://github.com/IlianBurri/hoverwing/issues/new/choose).
+  [issue templates](https://github.com/IlianBurri/Hoverwing-Agent-First-IDE/issues/new/choose).
 - **Fix something small:** look for
-  [`good first issue`](https://github.com/IlianBurri/hoverwing/labels/good%20first%20issue)
+  [`good first issue`](https://github.com/IlianBurri/Hoverwing-Agent-First-IDE/labels/good%20first%20issue)
   and read [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Roadmap

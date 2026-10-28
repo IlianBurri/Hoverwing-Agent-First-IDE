@@ -5,15 +5,15 @@ small fix makes a real difference.
 
 ## Ways to help
 
-- **Try it and tell us what happened.** Install a [release](https://github.com/IlianBurri/hoverwing/releases),
+- **Try it and tell us what happened.** Install a [release](https://github.com/IlianBurri/Hoverwing-Agent-First-IDE/releases),
   open a real project, start your agent and work with it for a while. Then
-  open a [first-impressions issue](https://github.com/IlianBurri/hoverwing/issues/new?template=feedback.yml).
+  open a [first-impressions issue](https://github.com/IlianBurri/Hoverwing-Agent-First-IDE/issues/new?template=feedback.yml).
   "I did not understand X" is as valuable as a crash report.
-- **Report bugs** with the [bug template](https://github.com/IlianBurri/hoverwing/issues/new?template=bug.yml).
+- **Report bugs** with the [bug template](https://github.com/IlianBurri/Hoverwing-Agent-First-IDE/issues/new?template=bug.yml).
   _Logs_ in the bottom panel (Agent, Git, MCP, Docker …) usually show what went
   wrong; please remove anything private before pasting.
 - **Fix something small.** Issues labelled
-  [`good first issue`](https://github.com/IlianBurri/hoverwing/labels/good%20first%20issue)
+  [`good first issue`](https://github.com/IlianBurri/Hoverwing-Agent-First-IDE/labels/good%20first%20issue)
   are scoped and explained. Comment on the issue before you start, so nobody
   works on the same thing twice.
 - **Translate.** UI texts live in `apps/desktop/src/renderer/i18n/locales/`
@@ -21,7 +21,7 @@ small fix makes a real difference.
   keys.
 
 Security problems: please do not open a public issue; use
-[GitHub's private vulnerability reporting](https://github.com/IlianBurri/hoverwing/security/advisories/new).
+[GitHub's private vulnerability reporting](https://github.com/IlianBurri/Hoverwing-Agent-First-IDE/security/advisories/new).
 
 ## Set up
 

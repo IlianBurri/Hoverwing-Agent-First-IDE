@@ -35,7 +35,7 @@ first releases until the certificate has gained reputation.
 ### 2. Apply
 
 Form: <https://signpath.org/apply>. Repository
-`https://github.com/IlianBurri/hoverwing`, license MIT, build
+`https://github.com/IlianBurri/Hoverwing-Agent-First-IDE`, license MIT, build
 system GitHub Actions (`.github/workflows/release.yml`), artifacts: the NSIS
 installer and the app executable.
 

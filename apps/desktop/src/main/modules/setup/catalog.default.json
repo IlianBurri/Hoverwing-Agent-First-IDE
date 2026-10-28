@@ -1,7 +1,7 @@
 {
   "version": 1,
   "checked": "2026-10-26",
-  "updateUrl": "https://raw.githubusercontent.com/IlianBurri/hoverwing/HEAD/apps/desktop/src/main/modules/setup/catalog.default.json",
+  "updateUrl": "https://raw.githubusercontent.com/IlianBurri/Hoverwing-Agent-First-IDE/HEAD/apps/desktop/src/main/modules/setup/catalog.default.json",
   "models": [
     {
       "id": "qwen2.5-coder:0.5b",

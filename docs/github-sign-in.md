@@ -14,7 +14,7 @@ build" and nothing contacts GitHub.
    (or under an organization: _Organization settings → Developer settings_).
 2. Fill in:
    - **Application name:** `Hoverwing`
-   - **Homepage URL:** the project site (e.g. `https://ilianburri.github.io/hoverwing/`)
+   - **Homepage URL:** the project site (e.g. `https://ilianburri.github.io/Hoverwing-Agent-First-IDE/`)
    - **Authorization callback URL:** the same URL (required by the form, not
      used by the device flow)
 3. Tick **Enable Device Flow** and click _Register application_.

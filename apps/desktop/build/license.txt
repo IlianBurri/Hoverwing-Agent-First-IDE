@@ -14,7 +14,7 @@ GitHub sign-in, the setup assistant). Two connections happen without such a clic
   server from the npm registry (registry.npmjs.org). Turn it off in the
   command palette under "Language servers".
 
-Full privacy statement: https://github.com/IlianBurri/hoverwing/blob/HEAD/PRIVACY.md
+Full privacy statement: https://github.com/IlianBurri/Hoverwing-Agent-First-IDE/blob/HEAD/PRIVACY.md
 
 Uninstall: Windows Settings > Apps > Installed apps > Hoverwing > Uninstall.
 Your settings stay in %APPDATA%\Hoverwing; delete that folder to remove them.

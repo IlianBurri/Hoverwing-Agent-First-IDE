@@ -5,7 +5,7 @@
   "productName": "Hoverwing",
   "description": "Hoverwing desktop app",
   "author": "Ilian",
-  "homepage": "https://github.com/IlianBurri/hoverwing",
+  "homepage": "https://github.com/IlianBurri/Hoverwing-Agent-First-IDE",
   "type": "module",
   "main": "./out/main/index.js",
   "scripts": {

@@ -23,7 +23,7 @@ asarUnpack:
 publish:
   provider: github
   owner: IlianBurri
-  repo: hoverwing
+  repo: Hoverwing-Agent-First-IDE
   releaseType: release
 mac:
   category: public.app-category.developer-tools

@@ -31,4 +31,4 @@ Hoverwing keeps your settings, chats, checkpoints and logs only on your computer
 them yourself.
 
 Questions: open an issue at
-<https://github.com/IlianBurri/hoverwing/issues>.
+<https://github.com/IlianBurri/Hoverwing-Agent-First-IDE/issues>.
