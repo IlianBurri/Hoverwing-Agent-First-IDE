@@ -264,6 +264,16 @@
       "close": "Close “{{name}}”",
       "untitled": "Agent {{number}}",
       "waiting": "waiting for you"
+    },
+    "options": {
+      "label": "Session settings",
+      "model": "Model",
+      "effort": "Effort",
+      "mode": "Mode",
+      "context": "Context used",
+      "contextValue": "{{used}} / {{size}}",
+      "contextHint": "How much of the model's context window this session uses",
+      "failed": "Change setting"
     }
   },
   "status": {
@@ -981,7 +991,19 @@
     "attachedLines": "{{path}}, lines {{start}}–{{end}}",
     "noProviderTitle": "No model connected",
     "noProviderText": "The chat talks to a model of your choice: OpenRouter, a local model with Ollama or llama.cpp, or any OpenAI-compatible endpoint.",
-    "privacyNote": "The chat has no access to your files: it only sees what you write and attach."
+    "privacyNote": "The chat has no access to your files: it only sees what you write and attach.",
+    "options": {
+      "toggle": "Model settings",
+      "label": "Settings for {{model}}",
+      "temperature": "Temperature",
+      "maxTokens": "Max. answer tokens",
+      "effort": "Reasoning effort",
+      "effort_low": "Low",
+      "effort_medium": "Medium",
+      "effort_high": "High",
+      "default": "Default",
+      "hint": "Empty = the provider's default. Reasoning effort only works with thinking models. The context size cannot be set over the OpenAI-compatible interface; for Ollama, start it with OLLAMA_CONTEXT_LENGTH."
+    }
   },
   "setup": {
     "open": "Setup assistant",

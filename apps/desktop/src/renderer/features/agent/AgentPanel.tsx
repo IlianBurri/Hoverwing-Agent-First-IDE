@@ -18,6 +18,7 @@ import { PermissionCard } from '../permissions';
 import { ChangesList } from '../review';
 import { SandboxBadge } from '../sandbox';
 import { loadAgentConfigs, startAgent, stopAgent } from './actions';
+import { AgentOptions } from './AgentOptions';
 import { AGENT_TAB_PANEL_ID, AgentTabs, isForSlot } from './AgentTabs';
 import { PlanView } from './PlanView';
 import { PromptInput } from './PromptInput';
@@ -222,6 +223,7 @@ export function AgentPanel() {
                     )}
                   </div>
                 )}
+                <AgentOptions />
                 <PromptInput key={slot.id} />
               </>
             ) : (

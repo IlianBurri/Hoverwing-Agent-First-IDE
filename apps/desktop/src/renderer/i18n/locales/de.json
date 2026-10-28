@@ -264,6 +264,16 @@
       "close": "„{{name}}“ schließen",
       "untitled": "Agent {{number}}",
       "waiting": "wartet auf dich"
+    },
+    "options": {
+      "label": "Sitzungseinstellungen",
+      "model": "Modell",
+      "effort": "Aufwand",
+      "mode": "Modus",
+      "context": "Kontext belegt",
+      "contextValue": "{{used}} / {{size}}",
+      "contextHint": "Wie viel vom Kontextfenster des Modells diese Sitzung belegt",
+      "failed": "Einstellung ändern"
     }
   },
   "status": {
@@ -981,7 +991,19 @@
     "attachedLines": "{{path}}, Zeilen {{start}}–{{end}}",
     "noProviderTitle": "Kein Modell verbunden",
     "noProviderText": "Der Chat spricht mit einem Modell deiner Wahl: OpenRouter, ein lokales Modell mit Ollama oder llama.cpp oder ein beliebiger OpenAI-kompatibler Endpoint.",
-    "privacyNote": "Der Chat hat keinen Zugriff auf deine Dateien: Er sieht nur, was du schreibst und anhängst."
+    "privacyNote": "Der Chat hat keinen Zugriff auf deine Dateien: Er sieht nur, was du schreibst und anhängst.",
+    "options": {
+      "toggle": "Modell-Einstellungen",
+      "label": "Einstellungen für {{model}}",
+      "temperature": "Temperatur",
+      "maxTokens": "Max. Antwort-Tokens",
+      "effort": "Denkaufwand",
+      "effort_low": "Niedrig",
+      "effort_medium": "Mittel",
+      "effort_high": "Hoch",
+      "default": "Standard",
+      "hint": "Leer = Standard des Anbieters. Der Denkaufwand wirkt nur bei Modellen, die nachdenken. Die Kontextgrösse lässt sich über die OpenAI-kompatible Schnittstelle nicht setzen; Ollama dafür mit OLLAMA_CONTEXT_LENGTH starten."
+    }
   },
   "setup": {
     "open": "Setup-Assistent",

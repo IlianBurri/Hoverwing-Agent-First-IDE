@@ -11,6 +11,9 @@
 //   whoami                 -> reports HOME and whether it runs in the sandbox
 //   mcp <tool> [arg|json]  -> calls a tool of Kestrel's MCP server and reports the result
 //                             (HTTP; with MOCK_MCP_STDIO=1 via the stdio bridge)
+//   settings               -> reports model, effort and mode and sends a context usage update
+// Sessions offer the config options "model" and "effort" and the modes
+// default / plan / bypassPermissions.
 import { spawn } from 'node:child_process';
 import { readFile, writeFile } from 'node:fs/promises';
 import { createInterface } from 'node:readline';
@@ -78,6 +81,52 @@ async function callTool(server, name, args) {
 }
 let toolId = 0;
 
+const newSession = (params) => ({
+  cwd: params.cwd,
+  cancelled: false,
+  mcpServers: params.mcpServers,
+  model: 'mock-small',
+  effort: 'low',
+  mode: 'default',
+});
+
+const configOptions = (session) => [
+  {
+    id: 'model',
+    name: 'Model',
+    category: 'model',
+    type: 'select',
+    currentValue: session.model,
+    options: [
+      { value: 'mock-small', name: 'Mock small' },
+      { value: 'mock-large', name: 'Mock large (1M context)' },
+    ],
+  },
+  {
+    id: 'effort',
+    name: 'Effort',
+    category: 'thought_level',
+    type: 'select',
+    currentValue: session.effort,
+    options: [
+      { value: 'low', name: 'Low' },
+      { value: 'high', name: 'High' },
+    ],
+  },
+];
+
+const sessionState = (session) => ({
+  configOptions: configOptions(session),
+  modes: {
+    currentModeId: session.mode,
+    availableModes: [
+      { id: 'default', name: 'Ask first' },
+      { id: 'plan', name: 'Plan' },
+      { id: 'bypassPermissions', name: 'Bypass permissions' },
+    ],
+  },
+});
+
 const say = (client, sessionId, text) =>
   client.notify('session/update', {
     sessionId,
@@ -93,15 +142,22 @@ const app = agent({ name: 'mock-agent' })
   .onRequest('session/new', ({ params }) => {
     if (process.env.MOCK_AUTH_REQUIRED === '1') throw RequestError.authRequired();
     const sessionId = `mock-${String(sessions.size + 1)}`;
-    sessions.set(sessionId, { cwd: params.cwd, cancelled: false, mcpServers: params.mcpServers });
-    return { sessionId };
+    const session = newSession(params);
+    sessions.set(sessionId, session);
+    return { sessionId, ...sessionState(session) };
+  })
+  .onRequest('session/set_config_option', ({ params }) => {
+    const session = sessions.get(params.sessionId);
+    session[params.configId] = params.value;
+    return { configOptions: configOptions(session) };
+  })
+  .onRequest('session/set_mode', ({ params }) => {
+    sessions.get(params.sessionId).mode = params.modeId;
+    return {};
   })
   .onRequest('session/load', async ({ params, client }) => {
-    sessions.set(params.sessionId, {
-      cwd: params.cwd,
-      cancelled: false,
-      mcpServers: params.mcpServers,
-    });
+    const session = newSession(params);
+    sessions.set(params.sessionId, session);
     await client.notify('session/update', {
       sessionId: params.sessionId,
       update: {
@@ -110,7 +166,7 @@ const app = agent({ name: 'mock-agent' })
       },
     });
     await say(client, params.sessionId, 'Restored answer from the earlier session.');
-    return {};
+    return sessionState(session);
   })
   .onNotification('session/cancel', ({ params }) => {
     const session = sessions.get(params.sessionId);
@@ -245,6 +301,16 @@ const app = agent({ name: 'mock-agent' })
       const allowed =
         response.outcome.outcome === 'selected' && response.outcome.optionId === 'allow';
       await say(client, sessionId, allowed ? 'Command allowed.' : 'Command rejected.');
+    } else if (command === 'settings') {
+      await client.notify('session/update', {
+        sessionId,
+        update: { sessionUpdate: 'usage_update', used: 42_000, size: 200_000 },
+      });
+      await say(
+        client,
+        sessionId,
+        `model=${session.model} effort=${session.effort} mode=${session.mode}`,
+      );
     } else if (command === 'slow') {
       await say(client, sessionId, 'Working on it…');
       for (let waited = 0; waited < 30_000 && !session.cancelled; waited += 50) {

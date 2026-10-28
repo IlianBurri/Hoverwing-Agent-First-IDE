@@ -42,6 +42,17 @@ export async function sendPrompt(text: string, slotId: string = activeSlotId()):
   return result.ok;
 }
 
+/** Changes a session setting of the tab's agent (remembered per project). */
+export async function setAgentOption(
+  slotId: string,
+  optionId: string,
+  value: string | boolean,
+): Promise<void> {
+  const result = await window.kestrel.invoke('agent:setOption', { slotId, optionId, value });
+  if (result.ok) setSlotStatus(slotId, result.data);
+  else notifyError(t('agent.options.failed'), result.error);
+}
+
 export async function cancelTurn(slotId: string = activeSlotId()): Promise<void> {
   await window.kestrel.invoke('agent:cancel', { slotId });
 }
