@@ -756,6 +756,15 @@ void app.whenReady().then(async () => {
   async function announceRename(window: BrowserWindow): Promise<void> {
     // The keychain key belongs to the app name on macOS and Linux.
     const dropped = await secrets.dropUnreadable().catch(() => 0);
+    // A dialog on a window that is not shown yet crashes the app on Wayland.
+    if (!window.isVisible()) {
+      await new Promise<void>((resolve) => {
+        window.once('show', () => {
+          resolve();
+        });
+      });
+    }
+    if (window.isDestroyed()) return;
     const text = nativeTexts[dialogLanguage(settings.get())];
     await dialog.showMessageBox(window, {
       type: 'info',

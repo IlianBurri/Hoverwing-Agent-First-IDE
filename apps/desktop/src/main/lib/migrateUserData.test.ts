@@ -39,6 +39,17 @@ describe('migrateUserData', () => {
     expect(readFileSync(join(newDir, 'settings.json'), 'utf8')).toBe('{"theme":"light"}');
   });
 
+  it('also copies into a folder Electron already created, keeping its files', () => {
+    mkdirSync(oldDir);
+    mkdirSync(newDir);
+    writeFileSync(join(oldDir, 'settings.json'), '{"theme":"light"}');
+    writeFileSync(join(oldDir, 'Local State'), 'old');
+    writeFileSync(join(newDir, 'Local State'), 'new');
+    expect(migrateUserData(oldDir, newDir)).toBe(true);
+    expect(readFileSync(join(newDir, 'settings.json'), 'utf8')).toBe('{"theme":"light"}');
+    expect(readFileSync(join(newDir, 'Local State'), 'utf8')).toBe('new');
+  });
+
   it('does nothing without old data', () => {
     expect(migrateUserData(oldDir, newDir)).toBe(false);
     mkdirSync(oldDir);
