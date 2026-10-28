@@ -1,6 +1,6 @@
 {
   "name": "@kestrel/desktop",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "private": true,
   "productName": "Kestrel",
   "description": "Kestrel desktop app",
