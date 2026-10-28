@@ -278,23 +278,6 @@ code {
   color: var(--color-ink-2);
 }
 
-/* Split: the review screenshot beside the trail of a change */
-.split {
-  display: grid;
-  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-  gap: var(--space-2xl);
-  align-items: center;
-}
-
-.split .lead {
-  margin-top: var(--space-lg);
-  color: var(--color-ink-2);
-}
-
-.split .shot > img {
-  object-position: 30% 20%;
-}
-
 .trail {
   margin: var(--space-xl) 0 0;
   padding: 0;
@@ -328,6 +311,154 @@ code {
 
 .trail p {
   margin-top: var(--space-2xs);
+}
+
+/* Tour: the screenshot stays pinned while the steps scroll past; the active
+   step's part of the app is framed and zoomed (site/tour.js sets the values). */
+.tour {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(17rem, 2fr);
+  gap: var(--space-2xl);
+  align-items: start;
+}
+
+.tour .lead {
+  margin-top: var(--space-lg);
+  color: var(--color-ink-2);
+}
+
+.tour-stage {
+  position: sticky;
+  top: max(var(--space-lg), calc(50dvh - 19rem));
+  margin: 0;
+}
+
+.tour-view {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 16 / 10;
+  /* As wide as the column, but never taller than the window. */
+  width: min(100%, calc((100dvh - 2 * var(--space-2xl)) * 1.6));
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-card);
+  background: var(--color-paper-3);
+}
+
+.tour-layer {
+  --s: 1;
+  --x: 0%;
+  --y: 0%;
+  position: absolute;
+  inset: 0;
+  transform-origin: 0 0;
+  transform: translate(var(--x), var(--y)) scale(var(--s));
+  transition: transform var(--dur-long) var(--ease-in-out);
+}
+
+.tour-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transition: opacity var(--dur-short) var(--ease-out);
+}
+
+.tour-img[data-img='agent'] {
+  opacity: 0;
+}
+
+.tour[data-img='agent'] .tour-img[data-img='agent'] {
+  opacity: 1;
+}
+
+.tour-mark {
+  position: absolute;
+  left: var(--ml, 0%);
+  top: var(--mt, 0%);
+  width: var(--mw, 100%);
+  height: var(--mh, 100%);
+  border-radius: calc(var(--radius-card) / var(--s));
+  outline: calc(var(--rule-hair) * 2 / var(--s)) solid var(--color-accent);
+  box-shadow: 0 0 0 200vmax color-mix(in oklab, var(--color-paper) 55%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    left var(--dur-long) var(--ease-in-out),
+    top var(--dur-long) var(--ease-in-out),
+    width var(--dur-long) var(--ease-in-out),
+    height var(--dur-long) var(--ease-in-out),
+    opacity var(--dur-short) var(--ease-out);
+}
+
+.tour:not([data-step='0']) .tour-mark {
+  opacity: 1;
+}
+
+.tour .trail li {
+  padding-bottom: 30dvh;
+}
+
+/* Room below the last step, so the stage stays pinned while it is read. */
+.tour .trail li:last-child {
+  padding-bottom: 26dvh;
+}
+
+.tour.is-live .trail li h3,
+.tour.is-live .trail li p {
+  transition: color var(--dur-short) var(--ease-out);
+}
+
+.tour.is-live .trail li:not(.is-active) h3,
+.tour.is-live .trail li:not(.is-active) p {
+  color: var(--color-muted);
+}
+
+.tour.is-live .trail li.is-active p {
+  color: var(--color-ink-2);
+}
+
+/* Without the pinned stage (phones, reduced motion): each step shows its own crop. */
+.tour-crop {
+  display: none;
+}
+
+@media (max-width: 60rem), (prefers-reduced-motion: reduce) {
+  .tour {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .tour-stage {
+    display: none;
+  }
+
+  .tour .trail li {
+    padding-bottom: var(--space-xl);
+  }
+
+  .tour .trail li:last-child {
+    padding-bottom: 0;
+  }
+
+  .tour-crop {
+    display: block;
+    margin-bottom: var(--space-sm);
+    aspect-ratio: calc(var(--cw) * 16) / calc(var(--ch) * 10);
+    border: var(--rule-hair) solid var(--color-rule);
+    border-radius: var(--radius-card);
+    background-color: var(--color-paper-3);
+    background-repeat: no-repeat;
+    background-size: calc(100% * 100 / var(--cw)) auto;
+    background-position: calc(var(--cl) / (100 - var(--cw)) * 100%)
+      calc(var(--ct) / (100 - var(--ch)) * 100%);
+  }
+
+  .tour li[data-img='agent'] .tour-crop {
+    background-image: url('images/agent.png');
+  }
+
+  .tour li[data-img='review'] .tour-crop {
+    background-image: url('images/review.png');
+  }
 }
 
 /* Table: what you bring and what it becomes */
@@ -585,7 +716,6 @@ code {
 
 @media (max-width: 60rem) {
   .hero .container,
-  .split,
   .head,
   .rows-wrap,
   .facts > div {
@@ -597,13 +727,8 @@ code {
     gap: var(--space-xl);
   }
 
-  .split,
   .rows-wrap {
     gap: var(--space-xl);
-  }
-
-  .split > figure {
-    order: 2;
   }
 
   .span-7,

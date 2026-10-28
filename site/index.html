@@ -29,6 +29,7 @@
     />
     <link rel="stylesheet" href="style.css" />
     <script src="app.js" defer></script>
+    <script src="tour.js" defer></script>
   </head>
   <body>
     <a class="skip" href="#top">Skip to content</a>
@@ -91,24 +92,33 @@
 
       <!-- Before and after: the review beside the trail of one change -->
       <section id="how" class="section section--gap">
-        <div class="container split">
-          <figure>
-            <div
-              class="shot"
-              data-slot="review"
-              data-kind="product"
-              data-alt="Reviewing an agent change: removed and added lines with Accept and Reject"
-            >
-              <img
-                src="images/review.png"
-                alt="Reviewing an agent change: removed and added lines with Accept and Reject"
-                loading="lazy"
-                width="2880"
-                height="1800"
-              />
+        <div class="container tour" data-step="0">
+          <figure class="tour-stage">
+            <div class="tour-view">
+              <div class="tour-layer">
+                <img
+                  class="tour-img"
+                  data-img="review"
+                  src="images/review.png"
+                  alt="Reviewing an agent change: removed and added lines with Accept and Reject"
+                  loading="lazy"
+                  width="2880"
+                  height="1800"
+                />
+                <img
+                  class="tour-img"
+                  data-img="agent"
+                  src="images/agent.png"
+                  alt="The agent panel with its plan, a held change and a request to run npm test"
+                  loading="lazy"
+                  width="2880"
+                  height="1800"
+                />
+                <span class="tour-mark" aria-hidden="true"></span>
+              </div>
             </div>
             <figcaption class="caption">
-              Diff review: green lines are new, red ones would be removed.
+              One agent turn in the real app: plan, checkpoint, request, diff and undo.
             </figcaption>
           </figure>
           <div>
@@ -117,31 +127,101 @@
               Kestrel runs the agent you already use: Claude Code, Gemini CLI or any ACP agent.
             </p>
             <ol class="trail">
-              <li>
+              <li
+                data-img="agent"
+                data-r="75.7 16.8 23.6 12.3"
+                style="--cl: 74.5; --ct: 13; --cw: 25.5; --ch: 18"
+              >
+                <span
+                  class="tour-crop"
+                  role="img"
+                  aria-label="The agent’s plan with two of three steps done"
+                ></span>
+                <h3>The agent shows its plan</h3>
+                <p>
+                  Every task starts with a plan you can read, and the agent ticks off each step as
+                  it works.
+                </p>
+              </li>
+              <li
+                data-img="agent"
+                data-r="75.4 30.6 9.6 3.4"
+                style="--cl: 74.5; --ct: 28; --cw: 25.5; --ch: 13"
+              >
+                <span
+                  class="tour-crop"
+                  role="img"
+                  aria-label="Checkpoint set, shown in the agent panel"
+                ></span>
                 <h3>A checkpoint is saved</h3>
                 <p>
                   Before every agent turn Kestrel snapshots the project in a separate Git directory.
                   Your own <code>.git</code> is never touched.
                 </p>
               </li>
-              <li class="you">
+              <li
+                class="you"
+                data-img="agent"
+                data-r="75.7 49.4 23.6 24.2"
+                style="--cl: 74.5; --ct: 47.5; --cw: 25.5; --ch: 28"
+              >
+                <span
+                  class="tour-crop"
+                  role="img"
+                  aria-label="The agent asks to run npm test: Allow once, Always allow or Deny"
+                ></span>
                 <h3>The agent asks before it acts</h3>
                 <p>
                   Running a command, opening a web page or calling a tool shows a request with the
                   exact command line. Allow it once, always for this project, or deny it.
                 </p>
               </li>
-              <li class="you">
+              <li
+                class="you"
+                data-img="review"
+                data-r="22.7 9 50.3 38.5"
+                style="--cl: 22.7; --ct: 8; --cw: 50.3; --ch: 40"
+              >
+                <span
+                  class="tour-crop"
+                  role="img"
+                  aria-label="The diff of the held change with Reject and Accept"
+                ></span>
                 <h3>You review the diff</h3>
                 <p>
                   Edits are held back. Accept a whole file or only the sections you want; Kestrel
                   refuses to overwrite a file that changed in the meantime.
                 </p>
               </li>
-              <li>
+              <li
+                data-img="review"
+                data-r="75.2 90 24.6 7.2"
+                style="--cl: 74.5; --ct: 84; --cw: 25.5; --ch: 14"
+              >
+                <span
+                  class="tour-crop"
+                  role="img"
+                  aria-label="The checkpoints list with the saved turn"
+                ></span>
                 <h3>Undo is one click away</h3>
                 <p>
                   Restore any checkpoint. Kestrel saves the current state first, so nothing is lost.
+                </p>
+              </li>
+              <li
+                data-img="agent"
+                data-r="13.2 97.4 11.4 2.6"
+                style="--cl: 0; --ct: 88; --cw: 45; --ch: 12"
+              >
+                <span
+                  class="tour-crop"
+                  role="img"
+                  aria-label="The status bar badge Directly on the system"
+                ></span>
+                <h3>You see where it runs</h3>
+                <p>
+                  The status bar says whether the agent runs directly on your system or in a Docker
+                  sandbox, so you never have to guess.
                 </p>
               </li>
             </ol>
