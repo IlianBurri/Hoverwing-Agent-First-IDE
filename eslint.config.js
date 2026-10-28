@@ -7,7 +7,16 @@ import globals from 'globals';
 
 export default tseslint.config(
   {
-    ignores: ['**/node_modules/**', '**/out/**', '**/dist/**', '**/release/**', '**/coverage/**'],
+    ignores: [
+      '**/node_modules/**',
+      '**/out/**',
+      '**/dist/**',
+      '**/release/**',
+      '**/coverage/**',
+      // Local tooling outside the product (Claude Code skills, video projects).
+      '.claude/**',
+      'video-agent/**',
+    ],
   },
   js.configs.recommended,
   ...tseslint.configs.strictTypeChecked,
