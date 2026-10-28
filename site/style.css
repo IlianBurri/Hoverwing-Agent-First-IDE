@@ -201,6 +201,23 @@ code {
   padding-block: var(--space-2xl);
 }
 
+.eyebrow {
+  display: inline-block;
+  margin-bottom: var(--space-md);
+  padding: var(--space-2xs) var(--space-sm);
+  border: var(--rule-hair) solid var(--color-rule-2);
+  border-radius: var(--radius-pill);
+  color: var(--color-ink-2);
+  font-size: var(--text-sm);
+  text-decoration: none;
+  transition: border-color var(--dur-micro) var(--ease-out);
+}
+
+.eyebrow:hover {
+  border-color: var(--color-accent);
+  color: var(--color-ink);
+}
+
 .hero .lead {
   margin-top: var(--space-lg);
   color: var(--color-ink-2);
@@ -539,6 +556,21 @@ code {
   grid-column: span 5;
 }
 
+.span-4 {
+  grid-column: span 4;
+}
+
+.ways {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ways .text-link {
+  margin-top: auto;
+  padding-top: var(--space-sm);
+}
+
 .tile--quiet {
   justify-content: center;
   background: var(--color-paper);
@@ -732,7 +764,8 @@ code {
   }
 
   .span-7,
-  .span-5 {
+  .span-5,
+  .span-4 {
     grid-column: 1 / -1;
   }
 
@@ -767,6 +800,10 @@ code {
 }
 
 @media (max-width: 40rem) {
+  .nav .nav-wide {
+    display: none;
+  }
+
   .tile,
   .downloads li {
     padding: var(--space-lg);

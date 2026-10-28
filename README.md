@@ -17,7 +17,10 @@ in an editor that makes every agent action visible, reviewable and reversible.
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 [**Website**](https://ilianburri.github.io/Kestrel-Agen-Harness-IDE/) · [**Download**](#download) · [Features](#features) · [Security](#security-by-default) ·
-[Development](#development) · [Roadmap](#roadmap) · [Privacy](PRIVACY.md)
+[Development](#development) · [Contributing](#contributing) · [Roadmap](#roadmap) · [Privacy](PRIVACY.md)
+
+**Early and looking for testers:** try it on a real project and
+[tell us what was unclear](https://github.com/IlianBurri/Kestrel-Agen-Harness-IDE/issues/new?template=feedback.yml).
 
 <br />
 
@@ -300,17 +303,32 @@ the app data folder: `"keybindings": { "view.toggleSidebar": "Mod+Shift+B" }`.
 
 </details>
 
+## Contributing
+
+Kestrel is built in the open, and help of any size is welcome:
+
+- **Try it** on a real project and share your
+  [first impressions](https://github.com/IlianBurri/Kestrel-Agen-Harness-IDE/issues/new?template=feedback.yml).
+- **Report bugs** or wish for features with the
+  [issue templates](https://github.com/IlianBurri/Kestrel-Agen-Harness-IDE/issues/new/choose).
+- **Fix something small:** look for
+  [`good first issue`](https://github.com/IlianBurri/Kestrel-Agen-Harness-IDE/labels/good%20first%20issue)
+  and read [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## Roadmap
 
-| Phase | Content                                                             | Status |
-| ----- | ------------------------------------------------------------------- | ------ |
-| 0–1   | Foundation, workbench, command palette, workspace, Monaco, terminal | ✅     |
-| 2     | Permission system, agents via ACP, diff review, checkpoints         | ✅     |
-| 3–4   | Agent sandbox in Docker, Docker panel                               | ✅     |
-| 5–6   | Integrated browser with agent tools, MCP manager                    | ✅     |
-| 7     | Model providers, built-in chat, inline autocompletion               | ✅     |
-| 8     | Setup assistant, installers and auto-update                         | ✅     |
-| 9     | Language servers (go to definition, diagnostics) and a Git panel    | ✅     |
+| Phase | Content                                                                   | Status |
+| ----- | ------------------------------------------------------------------------- | ------ |
+| 0–1   | Foundation, workbench, command palette, workspace, Monaco, terminal       | ✅     |
+| 2     | Permission system, agents via ACP, diff review, checkpoints               | ✅     |
+| 3–4   | Agent sandbox in Docker, Docker panel                                     | ✅     |
+| 5–6   | Integrated browser with agent tools, MCP manager                          | ✅     |
+| 7     | Model providers, built-in chat, inline autocompletion                     | ✅     |
+| 8     | Setup assistant, installers and auto-update                               | ✅     |
+| 9     | Language servers (go to definition, diagnostics) and a Git panel          | ✅     |
+| 10    | Parallel agents in tabs; model, effort and mode per agent                 | ✅     |
+| 11    | GitHub sign-in: clone your repositories, push and pull over HTTPS         | 🚧     |
+| Next  | Isolated copies for parallel agents, signed installers, more UI languages | 💡     |
 
 ## Trademarks
 

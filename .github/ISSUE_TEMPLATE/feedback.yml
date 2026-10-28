@@ -1,0 +1,32 @@
+name: First impressions
+description: You tried Kestrel – tell us what was unclear, slow or great.
+title: 'Feedback: '
+labels: ['feedback']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for trying Kestrel! A few honest sentences help more than you think.
+  - type: input
+    id: setup
+    attributes:
+      label: Your setup
+      description: Kestrel version, operating system and the agent or model you used.
+      placeholder: 0.9.1, Windows 11, Claude Code
+    validations:
+      required: true
+  - type: textarea
+    id: unclear
+    attributes:
+      label: What was unclear or harder than expected?
+      description: First start, connecting an agent, permissions, review … anything.
+    validations:
+      required: true
+  - type: textarea
+    id: good
+    attributes:
+      label: What worked well?
+  - type: textarea
+    id: missing
+    attributes:
+      label: What would make you use Kestrel every day?

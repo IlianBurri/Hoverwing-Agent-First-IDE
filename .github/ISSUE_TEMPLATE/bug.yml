@@ -1,0 +1,33 @@
+name: Bug report
+description: Something does not work as it should.
+labels: ['bug']
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Kestrel version and operating system
+      placeholder: 0.9.1 on Ubuntu 24.04
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open a folder …
+        2. Start Claude Code …
+        3. …
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: From the Logs tab in the bottom panel, if relevant. Remove anything private first.
+      render: text
