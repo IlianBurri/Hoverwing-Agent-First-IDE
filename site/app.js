@@ -45,7 +45,7 @@ async function main() {
   }
   const version = release.tag_name;
   document.getElementById('release-line').textContent =
-    `Version ${version} · free, MIT licensed, no account needed.`;
+    `Version ${version.replace(/^v/, '')}, free for Windows, macOS and Linux, MIT licensed, no account needed.`;
 
   for (const [key, pattern] of Object.entries(patterns)) {
     const button = document.querySelector(`[data-asset="${key}"]`);
@@ -53,7 +53,7 @@ async function main() {
     if (!button) continue;
     if (asset) {
       button.href = asset.browser_download_url;
-      button.textContent = `Download ${version} · ${sizeLabel(asset.size)}`;
+      button.textContent = `Download ${version.replace(/^v/, '')} (${sizeLabel(asset.size)})`;
     } else {
       button.href = release.html_url;
       button.textContent = 'See releases';

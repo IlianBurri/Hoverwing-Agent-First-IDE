@@ -10,3 +10,5 @@ playwright-report/
 .env
 .env.*
 !.env.example
+site/.hallmark/
+site/images/
