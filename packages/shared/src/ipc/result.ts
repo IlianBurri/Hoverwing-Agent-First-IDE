@@ -45,6 +45,9 @@ export type IpcErrorCode =
   | 'git_nothing_to_commit'
   | 'git_no_remote'
   | 'git_failed'
+  | 'github_not_configured'
+  | 'github_auth'
+  | 'github_failed'
   | 'layout_invalid';
 
 export interface IpcError {

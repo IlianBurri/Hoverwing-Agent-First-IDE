@@ -12,6 +12,8 @@ import { parseStatus, toProjectPaths } from './status';
 
 /** Network operations may take a while (large fetches). */
 const NETWORK_TIMEOUT_MS = 180_000;
+/** Cloning a large repository takes longer than a fetch. */
+const CLONE_TIMEOUT_MS = 600_000;
 /** Commits can run hooks (lint, tests). */
 const COMMIT_TIMEOUT_MS = 300_000;
 const MAX_DIFF_TEXT = 5 * 1024 * 1024;
@@ -27,6 +29,23 @@ export interface GitServiceDeps {
   log: (line: string) => void;
   /** Status, index or refs of a window's repository changed. */
   onChanged: (ownerId: number) => void;
+  /**
+   * Extra environment for commands that talk to a remote (the signed-in
+   * GitHub account's credential helper), or null.
+   */
+  credentials?: (env: Record<string, string>) => Promise<CredentialSession | null>;
+}
+
+export interface CredentialSession {
+  env: Record<string, string>;
+  release(): void;
+}
+
+interface RunOptions {
+  input?: string;
+  timeoutMs?: number;
+  /** Talks to a remote: gets the credential environment. */
+  network?: boolean;
 }
 
 interface Watched {
@@ -79,20 +98,26 @@ export class GitService {
   private async exec(
     root: string,
     args: readonly string[],
-    options: { input?: string; timeoutMs?: number } = {},
+    { network = false, ...options }: RunOptions = {},
   ): Promise<GitRunResult> {
-    return this.deps.run(['-c', 'color.ui=false', '-c', 'core.quotepath=false', ...args], {
-      cwd: root,
-      env: this.env(),
-      ...options,
-    });
+    const env = this.env();
+    const credentials = network ? await this.deps.credentials?.(env) : null;
+    try {
+      return await this.deps.run(['-c', 'color.ui=false', '-c', 'core.quotepath=false', ...args], {
+        cwd: root,
+        env: { ...env, ...credentials?.env },
+        ...options,
+      });
+    } finally {
+      credentials?.release();
+    }
   }
 
   /** Runs a command and throws a user-facing error on failure (details are logged). */
   private async check(
     root: string,
     args: readonly string[],
-    options: { input?: string; timeoutMs?: number } = {},
+    options: RunOptions = {},
   ): Promise<GitRunResult> {
     const result = await this.exec(root, args, options);
     const output = `${result.stderr}\n${result.stdout}`.trim();
@@ -348,14 +373,14 @@ export class GitService {
   async fetch(root: string): Promise<void> {
     await this.requireTrust(root);
     await this.queue(root, () =>
-      this.check(root, ['fetch', '--prune'], { timeoutMs: NETWORK_TIMEOUT_MS }),
+      this.check(root, ['fetch', '--prune'], { timeoutMs: NETWORK_TIMEOUT_MS, network: true }),
     );
   }
 
   async pull(root: string): Promise<void> {
     await this.requireTrust(root);
     await this.queue(root, () =>
-      this.check(root, ['pull', '--no-edit'], { timeoutMs: NETWORK_TIMEOUT_MS }),
+      this.check(root, ['pull', '--no-edit'], { timeoutMs: NETWORK_TIMEOUT_MS, network: true }),
     );
   }
 
@@ -367,7 +392,7 @@ export class GitService {
     const { branch, upstream } = status;
     await this.queue(root, async () => {
       if (upstream) {
-        await this.check(root, ['push'], { timeoutMs: NETWORK_TIMEOUT_MS });
+        await this.check(root, ['push'], { timeoutMs: NETWORK_TIMEOUT_MS, network: true });
         return;
       }
       const remotes = (await this.check(root, ['remote'])).stdout.split('\n').filter(Boolean);
@@ -375,7 +400,19 @@ export class GitService {
       if (!remote) throw new UserError('git_no_remote', 'The repository has no remote.');
       await this.check(root, ['push', '--set-upstream', remote, branch], {
         timeoutMs: NETWORK_TIMEOUT_MS,
+        network: true,
       });
+    });
+  }
+
+  /**
+   * Clones `url` into the new folder `name` inside `parent`. Needs no trust:
+   * a fresh clone runs no hooks from the repository.
+   */
+  async clone(parent: string, url: string, name: string): Promise<void> {
+    await this.check(parent, ['clone', '--', url, name], {
+      timeoutMs: CLONE_TIMEOUT_MS,
+      network: true,
     });
   }
 

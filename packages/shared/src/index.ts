@@ -19,4 +19,5 @@ export * from './schemas/setup';
 export * from './schemas/updates';
 export * from './schemas/lsp';
 export * from './schemas/git';
+export * from './schemas/github';
 export * from './schemas/workbench';

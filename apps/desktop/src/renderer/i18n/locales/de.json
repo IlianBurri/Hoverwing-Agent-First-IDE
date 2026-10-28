@@ -355,7 +355,10 @@
       "git_failed": "Git ist fehlgeschlagen (Details unter Logs › Git).",
       "layout_invalid": "Das Modell hat kein brauchbares Layout geliefert. Versuche es nochmal oder formuliere es anders.",
       "agent_limit": "In diesem Fenster laufen schon so viele Agenten wie möglich. Schließe zuerst einen Agent-Tab.",
-      "agent_conflict": "Ein anderer Agent ändert diese Datei gerade."
+      "agent_conflict": "Ein anderer Agent ändert diese Datei gerade.",
+      "github_not_configured": "Die GitHub-Anmeldung ist in diesem Build nicht eingerichtet.",
+      "github_auth": "Nicht bei GitHub angemeldet (oder die Anmeldung ist abgelaufen). Bitte melde dich erneut an.",
+      "github_failed": "GitHub ist nicht erreichbar (Details unter Logs › Git)."
     }
   },
   "palette": {
@@ -378,7 +381,8 @@
       "mcp": "MCP",
       "models": "Modelle",
       "chat": "Chat",
-      "git": "Git"
+      "git": "Git",
+      "github": "GitHub"
     },
     "palette": "Befehlspalette öffnen",
     "showFiles": "Dateien anzeigen",
@@ -1286,5 +1290,37 @@
     "remove": "Aus der Werkzeugleiste entfernen",
     "reset": "Standard wiederherstellen (Pull, Push)",
     "full": "Die Werkzeugleiste ist voll ({{max}} Knöpfe)."
+  },
+  "github": {
+    "title": "GitHub",
+    "open": "GitHub-Repositories …",
+    "cloneFromGitHub": "Von GitHub klonen …",
+    "signIn": "Mit GitHub anmelden",
+    "signOut": "Von GitHub abmelden",
+    "signInText": "Melde dich an, um deine Repositories zu sehen, sie zu klonen und im Git-Panel über HTTPS zu pushen oder zu pullen.",
+    "tokenHint": "Kestrel bittet um Zugriff auf deine Repositories (Scope «repo»). Das Token bleibt im Schlüsselbund deines Systems und wird nur für github.com an git gegeben. Beim Abmelden wird es vergessen; widerrufen kannst du es auf GitHub unter Settings › Applications.",
+    "enterCode": "Gib diesen Code auf der GitHub-Seite ein, die sich im Browser geöffnet hat:",
+    "code": "Anmeldecode",
+    "copyCode": "Code kopieren",
+    "openPage": "GitHub-Seite öffnen",
+    "waiting": "Warte auf deine Bestätigung auf GitHub …",
+    "signInError": {
+      "expired": "Der Code ist abgelaufen. Bitte melde dich erneut an.",
+      "denied": "Die Anmeldung wurde auf GitHub abgelehnt.",
+      "failed": "Die Anmeldung hat nicht geklappt. Bitte versuche es erneut."
+    },
+    "notConfigured": "Die GitHub-Anmeldung ist in diesem Build von Kestrel nicht eingerichtet.",
+    "signedInAs": "Angemeldet als {{login}}",
+    "repos": "Deine Repositories",
+    "search": "Repositories durchsuchen",
+    "refresh": "Aktualisieren",
+    "loading": "Repositories werden geladen …",
+    "noRepos": "Keine Repositories gefunden.",
+    "private": "Privat",
+    "archived": "archiviert",
+    "clone": "Klonen",
+    "cloneRepo": "{{name}} klonen",
+    "cloning": "Wird geklont …",
+    "cloneHint": "Du wählst den Ordner für die Kopie; danach öffnet sie sich hier. Wie jeder neue Ordner startet sie im eingeschränkten Modus, bis du ihm vertraust."
   }
 }

@@ -77,7 +77,19 @@ import { ReviewService, createReviewHandlers } from './modules/review';
 import { SearchRunner, createSearchHandlers } from './modules/search';
 import { createSettingsHandlers, createSettingsStore } from './modules/settings';
 import { TerminalManager, createTerminalHandlers, spawnNodePty } from './modules/terminal';
-import { WorkspaceManager, createWorkspaceHandlers, watchWorkspace } from './modules/workspace';
+import {
+  WorkspaceManager,
+  createWorkspaceHandlers,
+  watchWorkspace,
+  workspaceOpener,
+} from './modules/workspace';
+import {
+  GitCredentialBroker,
+  GitHubService,
+  createGitHubHandlers,
+  githubEndpoints,
+  writeCredentialHelper,
+} from './modules/github';
 import { TrustStore, createTrustHandlers } from './modules/trust';
 import { LspConfigStore, LspService, createLspHandlers, spawnLspTransport } from './modules/lsp';
 import { findProgram } from './lib/which';
@@ -319,6 +331,8 @@ void app.whenReady().then(async () => {
       const contents = webContents.fromId(ownerId);
       if (contents) sendEvent(contents, 'git:changed', {});
     },
+    // The signed-in GitHub account, for the GitHub host only.
+    credentials: (env) => gitCredentials.session(env),
   });
   const lspConfigs = new LspConfigStore(join(dataDir, 'lsp'));
   const lsp = new LspService({
@@ -351,6 +365,33 @@ void app.whenReady().then(async () => {
     },
   });
   const secrets = new SecretStore(join(dataDir, 'secrets.json'), safeStorage);
+  const endpoints = githubEndpoints(process.env);
+  const github = new GitHubService({
+    endpoints,
+    fetch: (url, init) => fetch(url, init),
+    secrets,
+    accountFile: join(dataDir, 'github.json'),
+    openExternal: (url) => shell.openExternal(url),
+    onChanged: (status) => {
+      broadcastEvent('github:changed', status);
+    },
+    log: (line) => {
+      broadcastEvent('git:log', { line, time: Date.now() });
+    },
+  });
+  const gitCredentials = new GitCredentialBroker({
+    origin: endpoints.web,
+    token: () => github.token(),
+    helper: {
+      program: process.execPath,
+      script: await writeCredentialHelper(join(dataDir, 'github')),
+    },
+  });
+  await gitCredentials.start();
+  app.on('will-quit', () => {
+    github.dispose();
+    void gitCredentials.stop();
+  });
   const mcp = new McpService({
     configs: new McpConfigStore(join(dataDir, 'mcp')),
     secrets,
@@ -640,15 +681,21 @@ void app.whenReady().then(async () => {
     for (const window of BrowserWindow.getAllWindows()) void agents.release(window.webContents.id);
   });
 
+  const onWorkspaceChanged = (ownerId: number) => {
+    terminals.killAll(ownerId);
+    void agents.stopAll(ownerId);
+    lsp.release(ownerId);
+    git.release(ownerId);
+  };
+
   registerIpc(
     {
       ...createAppHandlers(),
       ...createSettingsHandlers(settings),
-      ...createWorkspaceHandlers(workspaces, settings, (ownerId) => {
-        terminals.killAll(ownerId);
-        void agents.stopAll(ownerId);
-        lsp.release(ownerId);
-        git.release(ownerId);
+      ...createWorkspaceHandlers(workspaces, settings, onWorkspaceChanged),
+      ...createGitHubHandlers(github, {
+        clone: (parent, url, name) => git.clone(parent, url, name),
+        openFolder: workspaceOpener(workspaces, settings, onWorkspaceChanged),
       }),
       ...createTerminalHandlers(terminals, workspaces),
       ...createPermissionHandlers(permissions, workspaces),

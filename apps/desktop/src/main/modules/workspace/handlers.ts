@@ -1,5 +1,6 @@
 import { BrowserWindow, dialog, shell } from 'electron';
 import type { OpenDialogOptions } from 'electron';
+import type { WorkspaceInfo } from '@kestrel/shared';
 import type { IpcContext, ModuleHandlers } from '../../ipc/handlers';
 import { UserError } from '../../ipc/errors';
 import type { SettingsStore } from '../settings';
@@ -19,13 +20,22 @@ function setWindowTitle(sender: IpcContext['sender'], name: string | null): void
   BrowserWindow.fromWebContents(sender)?.setTitle(name ? `${name} — Kestrel` : 'Kestrel');
 }
 
-export function createWorkspaceHandlers(
+export type OpenWorkspaceFolder = (
+  sender: IpcContext['sender'],
+  folder: string,
+) => Promise<WorkspaceInfo>;
+
+/**
+ * Opens a folder main chose (native dialog, recent list, a fresh clone) in a
+ * window and remembers it. Never called with a path from the renderer.
+ */
+export function workspaceOpener(
   manager: WorkspaceManager,
   settings: SettingsStore,
   /** Called when a window opens or closes a folder (e.g. to end its terminals). */
   onWorkspaceChanged: (ownerId: number) => void = () => undefined,
-): ModuleHandlers<'workspace'> {
-  async function openAndRemember(sender: IpcContext['sender'], folder: string) {
+): OpenWorkspaceFolder {
+  return async (sender, folder) => {
     const info = await manager.openFolder(sender.id, folder);
     onWorkspaceChanged(sender.id);
     await settings.update({
@@ -33,7 +43,16 @@ export function createWorkspaceHandlers(
     });
     setWindowTitle(sender, info.name);
     return info;
-  }
+  };
+}
+
+export function createWorkspaceHandlers(
+  manager: WorkspaceManager,
+  settings: SettingsStore,
+  /** Called when a window opens or closes a folder (e.g. to end its terminals). */
+  onWorkspaceChanged: (ownerId: number) => void = () => undefined,
+): ModuleHandlers<'workspace'> {
+  const openAndRemember = workspaceOpener(manager, settings, onWorkspaceChanged);
 
   const root = (context: IpcContext) => manager.requireRoot(context.sender.id);
 

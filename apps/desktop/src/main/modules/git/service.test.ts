@@ -148,6 +148,37 @@ describe.skipIf(!hasGit)('GitService', () => {
     expect(git(remote, 'log', '--oneline', 'main')).toContain('init');
   });
 
+  it('gives only network commands the credential environment, and releases it', async () => {
+    const remote = join(dir, 'remote.git');
+    git(dir, 'init', '-q', '--bare', remote);
+    git(root, 'init', '-q', '-b', 'main');
+    git(root, 'remote', 'add', 'origin', remote);
+    await writeFile(join(root, 'a.txt'), 'a\n');
+    git(root, 'add', '.');
+    git(root, 'commit', '-qm', 'init');
+    const release = vi.fn();
+    const seen: string[][] = [];
+    const credentialed = new GitService({
+      run: (args, options) => {
+        if (options.env['KESTREL_TEST_CREDENTIALS']) seen.push([...args].slice(4, 5));
+        return runGitProcess(args, options);
+      },
+      isTrusted: () => Promise.resolve(true),
+      trash,
+      env,
+      log: () => undefined,
+      onChanged: () => undefined,
+      credentials: () => Promise.resolve({ env: { KESTREL_TEST_CREDENTIALS: '1' }, release }),
+    });
+    await credentialed.push(OWNER, root);
+    await credentialed.fetch(root);
+    await credentialed.clone(dir, remote, 'copy');
+    expect(seen).toEqual([['push'], ['fetch'], ['clone']]);
+    expect(release).toHaveBeenCalledTimes(3);
+    expect(existsSync(join(dir, 'copy', '.git'))).toBe(true);
+    credentialed.releaseAll();
+  });
+
   it('shows only the project part of a parent repository', async () => {
     git(root, 'init', '-q');
     const project = join(root, 'app');

@@ -355,7 +355,10 @@
       "git_failed": "Git failed (details in Logs › Git).",
       "layout_invalid": "The model did not return a usable layout. Try again or phrase it differently.",
       "agent_limit": "This window already runs the maximum number of agents. Close an agent tab first.",
-      "agent_conflict": "Another agent is changing this file."
+      "agent_conflict": "Another agent is changing this file.",
+      "github_not_configured": "GitHub sign-in is not set up in this build.",
+      "github_auth": "Not signed in to GitHub (or the sign-in expired). Please sign in again.",
+      "github_failed": "GitHub is not reachable (details in Logs › Git)."
     }
   },
   "palette": {
@@ -378,7 +381,8 @@
       "mcp": "MCP",
       "models": "Models",
       "chat": "Chat",
-      "git": "Git"
+      "git": "Git",
+      "github": "GitHub"
     },
     "palette": "Open command palette",
     "showFiles": "Show files",
@@ -1286,5 +1290,37 @@
     "remove": "Remove from toolbar",
     "reset": "Restore default (Pull, Push)",
     "full": "The toolbar is full ({{max}} buttons)."
+  },
+  "github": {
+    "title": "GitHub",
+    "open": "GitHub repositories …",
+    "cloneFromGitHub": "Clone from GitHub …",
+    "signIn": "Sign in with GitHub",
+    "signOut": "Sign out of GitHub",
+    "signInText": "Sign in to list your repositories, clone them and push or pull over HTTPS from the Git panel.",
+    "tokenHint": "Kestrel asks for access to your repositories (scope “repo”). The token stays in your system keychain and is only given to git for github.com. Sign-out forgets it; you can revoke it on GitHub under Settings › Applications.",
+    "enterCode": "Enter this code on the GitHub page that opened in your browser:",
+    "code": "Sign-in code",
+    "copyCode": "Copy code",
+    "openPage": "Open GitHub page",
+    "waiting": "Waiting for you to confirm on GitHub …",
+    "signInError": {
+      "expired": "The code expired. Please sign in again.",
+      "denied": "The sign-in was declined on GitHub.",
+      "failed": "The sign-in did not work. Please try again."
+    },
+    "notConfigured": "GitHub sign-in is not set up in this build of Kestrel.",
+    "signedInAs": "Signed in as {{login}}",
+    "repos": "Your repositories",
+    "search": "Search repositories",
+    "refresh": "Refresh",
+    "loading": "Loading repositories …",
+    "noRepos": "No repositories found.",
+    "private": "Private",
+    "archived": "archived",
+    "clone": "Clone",
+    "cloneRepo": "Clone {{name}}",
+    "cloning": "Cloning …",
+    "cloneHint": "You choose the folder for the copy; it opens here afterwards. Like every new folder, it starts in restricted mode until you trust it."
   }
 }
