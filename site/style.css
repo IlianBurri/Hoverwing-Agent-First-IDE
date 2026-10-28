@@ -580,6 +580,30 @@ code {
   margin-top: var(--space-xs);
 }
 
+/* The short: text beside a phone-format video */
+.short {
+  display: grid;
+  grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+  gap: var(--space-2xl);
+  align-items: center;
+}
+
+.short .lead {
+  margin-top: var(--space-md);
+  color: var(--color-ink-2);
+}
+
+.short-video {
+  justify-self: center;
+  width: auto;
+  max-width: 100%;
+  height: min(80dvh, 760px);
+  aspect-ratio: 9 / 16;
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-card);
+  background: var(--color-paper-3);
+}
+
 /* Rows: what Kestrel will not do */
 .rows-wrap {
   display: grid;
@@ -761,6 +785,10 @@ code {
 
   .rows-wrap {
     gap: var(--space-xl);
+  }
+
+  .short {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .span-7,

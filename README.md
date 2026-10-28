@@ -26,6 +26,12 @@ in an editor that makes every agent action visible, reviewable and reversible.
 
 <img src="docs/images/agent.png" alt="Kestrel with a coding agent: plan, tool calls, a change held for review and a permission request to run the tests" width="100%" />
 
+<br />
+
+<a href="https://ilianburri.github.io/Kestrel-Agen-Harness-IDE/#video"><img src="site/video/kestrel-short-poster.jpg" alt="Play: Kestrel in 34 seconds" width="220" /></a>
+
+▶ [**Kestrel in 34 seconds**](https://ilianburri.github.io/Kestrel-Agen-Harness-IDE/#video) · <sub>made with AI (Claude Code and a video skill); the screens are the real app</sub>
+
 </div>
 
 ## Why Kestrel?
